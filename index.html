@@ -156,7 +156,10 @@
   <!-- MODAL CLIENTE -->
   <div id="clientModal" class="hidden fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl">
-      <h3 id="clientModalTitle" class="text-xl font-bold text-pink-main mb-4">Registrar Cliente</h3>
+      <div class="flex justify-between items-center mb-4">
+        <h3 id="clientModalTitle" class="text-xl font-bold text-pink-main">Registrar Cliente</h3>
+        <button onclick="closeClientModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
       <form id="clientForm" class="space-y-4">
         <input type="hidden" id="clientId">
         <div>
@@ -168,7 +171,7 @@
           <input type="tel" id="clientPhone" required class="w-full px-4 py-2 rounded-xl border border-pink-200">
         </div>
         <div class="flex justify-end space-x-2 pt-2">
-          <button type="button" onclick="closeClientModal()" class="px-4 py-2 rounded-xl bg-gray-100 text-gray-600">Cancelar</button>
+          <button type="button" onclick="closeClientModal()" class="px-4 py-2 rounded-xl bg-gray-100 text-gray-600 font-medium">Cancelar</button>
           <button type="submit" class="px-4 py-2 rounded-xl btn-pink font-semibold">Guardar</button>
         </div>
       </form>
@@ -225,7 +228,7 @@
     ];
 
     let clients = JSON.parse(localStorage.getItem('jm_clients')) || [
-      { id: '1', name: 'Camila Torres', phone: '3001234567', debt: 0 }
+      { id: '1', name: 'Camila Torres', phone: '3001234567' }
     ];
 
     let sales = JSON.parse(localStorage.getItem('jm_sales')) || [];
@@ -304,7 +307,7 @@
         `;
       } else {
         html += `
-          <button onclick="switchTab('vendor_inv')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50">Mi Inventario & Ventas</button>
+          <button onclick="switchTab('vendor_inv')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50">Inventario & Ventas</button>
           <button onclick="switchTab('clients')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50">Mis Clientes</button>
         `;
       }
@@ -322,7 +325,7 @@
       else if (tabName === 'vendor_inv') renderVendorTab(main);
     }
 
-    // PESTAÑA: DASHBOARD GENERAL (BIENVENIDA GRANDE)
+    // PESTAÑA: DASHBOARD GENERAL
     function renderDashboardTab(container) {
       const totalSalesCount = sales.length;
       const totalProductsCount = products.length;
@@ -433,7 +436,7 @@
       `;
     }
 
-    // MANEJO DE IMÁGENES PNG / ARCHIVOS LOCALES
+    // MANEJO DE IMÁGENES
     function setupFileInput() {
       const fileInput = document.getElementById('prodImgFile');
       fileInput.addEventListener('change', function(e) {
@@ -571,7 +574,7 @@
 
           <div class="flex justify-between items-center pt-4">
             <h2 class="text-xl font-bold text-gray-800">Historial General de Ventas</h2>
-            <button onclick="window.print()" class="px-4 py-2 bg-gray-800 text-white rounded-xl text-sm font-semibold"><i class="fa-solid fa-print"></i> Imprimir Historial de Ventas</button>
+            <button onclick="window.print()" class="px-4 py-2 bg-gray-800 text-white rounded-xl text-sm font-semibold"><i class="fa-solid fa-print"></i> Imprimir Historial</button>
           </div>
 
           <div class="bg-white rounded-2xl border border-pink-100 shadow-sm overflow-hidden">
@@ -582,17 +585,19 @@
                   <th class="p-4">Fecha</th>
                   <th class="p-4">Vendedora</th>
                   <th class="p-4">Producto</th>
+                  <th class="p-4">Cant.</th>
                   <th class="p-4">Total</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-100 text-sm">
-                ${sales.length === 0 ? '<tr><td colspan="5" class="p-4 text-center text-gray-400">No hay ventas registradas aún.</td></tr>' : ''}
+                ${sales.length === 0 ? '<tr><td colspan="6" class="p-4 text-center text-gray-400">No hay ventas registradas aún.</td></tr>' : ''}
                 ${sales.map(s => `
                   <tr>
                     <td class="p-4"><img src="${s.productImg || 'https://via.placeholder.com/40'}" class="w-10 h-10 object-cover rounded-xl border border-pink-100"></td>
                     <td class="p-4">${s.date}</td>
                     <td class="p-4 font-semibold">${s.vendor}</td>
                     <td class="p-4 font-medium">${s.product}</td>
+                    <td class="p-4">${s.quantity || 1} unids</td>
                     <td class="p-4 text-pink-main font-bold">$${s.total.toLocaleString()}</td>
                   </tr>
                 `).join('')}
@@ -627,20 +632,16 @@
                 <tr>
                   <th class="p-4">Nombre</th>
                   <th class="p-4">Celular</th>
-                  <th class="p-4">Estado Cuenta</th>
                   <th class="p-4">Acciones</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-100 text-sm">
+                ${clients.length === 0 ? '<tr><td colspan="3" class="p-4 text-center text-gray-400">No hay clientes registrados.</td></tr>' : ''}
                 ${clients.map(c => `
                   <tr>
                     <td class="p-4 font-semibold">${c.name}</td>
                     <td class="p-4">${c.phone}</td>
                     <td class="p-4">
-                      ${c.debt > 0 ? `<span class="text-red-500 font-bold">Debe $${c.debt.toLocaleString()}</span>` : '<span class="text-green-500 font-bold">Al Día</span>'}
-                    </td>
-                    <td class="p-4 space-x-2">
-                      <button onclick="editClient('${c.id}')" class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen"></i></button>
                       <button onclick="deleteClient('${c.id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>
                     </td>
                   </tr>
@@ -652,11 +653,10 @@
       `;
     }
 
-    function openClientModal(client = null) {
-      document.getElementById('clientModalTitle').innerText = client ? 'Editar Cliente' : 'Registrar Cliente';
-      document.getElementById('clientId').value = client ? client.id : '';
-      document.getElementById('clientName').value = client ? client.name : '';
-      document.getElementById('clientPhone').value = client ? client.phone : '';
+    function openClientModal() {
+      document.getElementById('clientId').value = '';
+      document.getElementById('clientName').value = '';
+      document.getElementById('clientPhone').value = '';
       document.getElementById('clientModal').classList.remove('hidden');
     }
 
@@ -666,25 +666,14 @@
 
     document.getElementById('clientForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      const id = document.getElementById('clientId').value;
       const name = document.getElementById('clientName').value.trim();
       const phone = document.getElementById('clientPhone').value.trim();
 
-      if (id) {
-        const c = clients.find(x => x.id === id);
-        if (c) { c.name = name; c.phone = phone; }
-      } else {
-        clients.push({ id: Date.now().toString(), name, phone, debt: 0 });
-      }
+      clients.push({ id: Date.now().toString(), name, phone });
       saveData();
       closeClientModal();
       renderClientsTab(document.getElementById('mainContent'));
     });
-
-    function editClient(id) {
-      const c = clients.find(x => x.id === id);
-      if (c) openClientModal(c);
-    }
 
     function deleteClient(id) {
       if (confirm('¿Deseas eliminar este cliente?')) {
@@ -694,32 +683,47 @@
       }
     }
 
-    // PESTAÑA: USUARIOS
+    // PESTAÑA: USUARIOS (ADMIN)
     function renderUsersTab(container) {
       container.innerHTML = `
         <div class="space-y-4">
           <div class="flex justify-between items-center">
             <h2 class="text-xl font-bold text-gray-800">Gestión de Usuarios</h2>
-            <button onclick="registerNewUser()" class="btn-pink px-4 py-2 rounded-xl text-sm font-semibold">+ Crear Usuario</button>
+            <button onclick="openUserModal()" class="btn-pink px-4 py-2 rounded-xl text-sm font-semibold">+ Nuevo Usuario</button>
           </div>
-          <div class="bg-white rounded-2xl border border-pink-100 p-4 shadow-sm">
-            <ul class="divide-y divide-gray-100">
-              ${users.map(u => `
-                <li class="py-3 flex justify-between items-center">
-                  <div>
-                    <span class="font-bold text-gray-800">${u.name} (${u.user})</span>
-                    <span class="ml-2 text-xs px-2 py-0.5 rounded-full ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-pink-100 text-pink-700'}">${u.role === 'admin' ? 'Administrador' : 'Vended@r'}</span>
-                  </div>
-                </li>
-              `).join('')}
-            </ul>
+
+          <div class="bg-white rounded-2xl border border-pink-100 shadow-sm overflow-hidden">
+            <table class="w-full text-left border-collapse">
+              <thead class="bg-pink-50 text-pink-main text-xs uppercase font-semibold">
+                <tr>
+                  <th class="p-4">Nombre</th>
+                  <th class="p-4">Usuario</th>
+                  <th class="p-4">Rol</th>
+                  <th class="p-4">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100 text-sm">
+                ${users.map(u => `
+                  <tr>
+                    <td class="p-4 font-semibold">${u.name}</td>
+                    <td class="p-4">${u.user}</td>
+                    <td class="p-4"><span class="px-2 py-1 bg-pink-50 text-pink-main rounded-lg text-xs font-bold">${u.role === 'admin' ? 'Administrador' : 'Vended@r'}</span></td>
+                    <td class="p-4">
+                      ${u.user !== 'mari' ? `<button onclick="deleteUser('${u.id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>` : '<span class="text-gray-300 text-xs">Protegido</span>'}
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
           </div>
         </div>
       `;
     }
 
-    function registerNewUser() {
-      document.getElementById('userForm').reset();
+    function openUserModal() {
+      document.getElementById('newUserName').value = '';
+      document.getElementById('newUserLogin').value = '';
+      document.getElementById('newUserPass').value = '';
       document.getElementById('userModal').classList.remove('hidden');
     }
 
@@ -734,81 +738,76 @@
       const pass = document.getElementById('newUserPass').value.trim();
       const role = document.getElementById('newUserRole').value;
 
-      if (users.some(u => u.user.toLowerCase() === user.toLowerCase())) {
-        alert('Este usuario ya existe. Por favor elige otro.');
-        return;
-      }
-
-      users.push({
-        id: Date.now().toString(),
-        name,
-        user,
-        pass,
-        role,
-        paidMonth: false
-      });
-
+      users.push({ id: Date.now().toString(), name, user, pass, role, paidMonth: false });
       saveData();
       closeUserModal();
       renderUsersTab(document.getElementById('mainContent'));
-      alert('¡Usuario creado correctamente!');
     });
 
-    // PESTAÑA: VENDEDORA (CON HISTORIAL CON FOTO Y NOMBRE DE LO QUE VENDIÓ)
+    function deleteUser(id) {
+      if (confirm('¿Deseas eliminar este usuario?')) {
+        users = users.filter(x => x.id !== id);
+        saveData();
+        renderUsersTab(document.getElementById('mainContent'));
+      }
+    }
+
+    // PESTAÑA: INVENTARIO & VENTAS (VENDEDOR)
     function renderVendorTab(container) {
       const mySales = sales.filter(s => s.vendor === currentUser.user);
-      const totalEarned = mySales.reduce((a, b) => a + b.total, 0);
+      const myTotalRevenue = mySales.reduce((acc, s) => acc + s.total, 0);
 
       container.innerHTML = `
         <div class="space-y-6">
-          <div class="grid grid-cols-2 gap-4">
-            <div class="bg-white p-4 rounded-2xl border border-pink-100 shadow-sm text-center">
-              <span class="text-xs text-gray-400 font-bold block">MIS VENTAS REALIZADAS</span>
-              <span class="text-2xl font-bold text-pink-main">${mySales.length}</span>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white p-6 rounded-2xl border border-pink-100 shadow-sm">
+              <span class="text-xs text-gray-400 font-semibold block">MIS VENTAS TOTALES</span>
+              <span class="text-2xl font-bold text-pink-main">$${myTotalRevenue.toLocaleString()}</span>
             </div>
-            <div class="bg-white p-4 rounded-2xl border border-pink-100 shadow-sm text-center">
-              <span class="text-xs text-gray-400 font-bold block">TOTAL GENERADO</span>
-              <span class="text-2xl font-bold text-green-500">$${totalEarned.toLocaleString()}</span>
+            <div class="bg-white p-6 rounded-2xl border border-pink-100 shadow-sm">
+              <span class="text-xs text-gray-400 font-semibold block">VENTAS REALIZADAS</span>
+              <span class="text-2xl font-bold text-gray-800">${mySales.length}</span>
             </div>
           </div>
 
-          <h2 class="text-xl font-bold text-gray-800">Inventario Disponible para Vender</h2>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            ${products.map(p => `
-              <div class="bg-white p-4 rounded-2xl border border-pink-100 shadow-sm flex flex-col justify-between">
-                <div>
-                  <img src="${p.img || 'https://via.placeholder.com/150'}" class="w-full h-32 object-cover rounded-xl mb-3">
-                  <h4 class="font-bold text-gray-800">${p.name}</h4>
-                  <p class="text-pink-main font-bold text-lg">$${p.price.toLocaleString()}</p>
-                  <p class="text-xs text-gray-400">Stock: ${p.stock} unids</p>
-                </div>
-                <button onclick="registerVendorSale('${p.id}')" ${p.stock <= 0 ? 'disabled' : ''} class="mt-3 w-full py-2 btn-pink rounded-xl font-semibold text-sm ${p.stock <= 0 ? 'opacity-50 cursor-not-allowed' : ''}">
-                  ${p.stock > 0 ? 'Registrar Venta' : 'Agotado'}
-                </button>
+          <h2 class="text-xl font-bold text-gray-800">Registrar Nueva Venta (Inventario en Tiempo Real)</h2>
+          <div class="bg-white p-6 rounded-2xl border border-pink-100 shadow-sm">
+            <form id="vendorSaleForm" class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1">Seleccionar Producto</label>
+                <select id="saleProdId" required class="w-full px-4 py-2 rounded-xl border border-pink-200">
+                  <option value="">-- Elige un producto --</option>
+                  ${products.map(p => `<option value="${p.id}">${p.name} ($${p.price.toLocaleString()} - Stock disponible: ${p.stock})</option>`).join('')}
+                </select>
               </div>
-            `).join('')}
+              <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1">Cantidad</label>
+                <input type="number" id="saleQuantity" min="1" value="1" required class="w-full px-4 py-2 rounded-xl border border-pink-200">
+              </div>
+              <button type="submit" class="btn-pink w-full py-3 rounded-xl font-semibold">Registrar Venta y Descontar Stock</button>
+            </form>
           </div>
 
-          <h2 class="text-xl font-bold text-gray-800 pt-4">Mi Registro Histórico de Ventas</h2>
-
+          <h2 class="text-xl font-bold text-gray-800 pt-4">Mi Historial de Ventas</h2>
           <div class="bg-white rounded-2xl border border-pink-100 shadow-sm overflow-hidden">
             <table class="w-full text-left border-collapse">
               <thead class="bg-pink-50 text-pink-main text-xs uppercase font-semibold">
                 <tr>
                   <th class="p-4">Foto</th>
-                  <th class="p-4">Producto Vendido</th>
                   <th class="p-4">Fecha</th>
+                  <th class="p-4">Producto</th>
+                  <th class="p-4">Cantidad</th>
                   <th class="p-4">Total</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-100 text-sm">
-                ${mySales.length === 0 ? '<tr><td colspan="4" class="p-4 text-center text-gray-400">Aún no has registrado ninguna venta.</td></tr>' : ''}
+                ${mySales.length === 0 ? '<tr><td colspan="5" class="p-4 text-center text-gray-400">Aún no has registrado ventas.</td></tr>' : ''}
                 ${mySales.map(s => `
                   <tr>
                     <td class="p-4"><img src="${s.productImg || 'https://via.placeholder.com/40'}" class="w-10 h-10 object-cover rounded-xl border border-pink-100"></td>
-                    <td class="p-4 font-semibold text-gray-800">${s.product}</td>
-                    <td class="p-4 text-gray-500">${s.date}</td>
+                    <td class="p-4">${s.date}</td>
+                    <td class="p-4 font-medium">${s.product}</td>
+                    <td class="p-4">${s.quantity || 1} unids</td>
                     <td class="p-4 text-pink-main font-bold">$${s.total.toLocaleString()}</td>
                   </tr>
                 `).join('')}
@@ -817,24 +816,41 @@
           </div>
         </div>
       `;
-    }
 
-    function registerVendorSale(productId) {
-      const p = products.find(x => x.id === productId);
-      if (p && p.stock > 0) {
-        p.stock -= 1;
-        sales.push({
-          id: Date.now().toString(),
-          vendor: currentUser.user,
-          product: p.name,
-          productImg: p.img,
-          total: p.price,
-          date: new Date().toLocaleDateString()
-        });
-        saveData();
-        renderVendorTab(document.getElementById('mainContent'));
-        alert('¡Venta registrada con éxito!');
-      }
+      document.getElementById('vendorSaleForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const pId = document.getElementById('saleProdId').value;
+        const qty = parseInt(document.getElementById('saleQuantity').value);
+        const prod = products.find(x => x.id === pId);
+
+        if (!prod) {
+          alert('Selecciona un producto válido.');
+          return;
+        }
+
+        if (qty <= 0) {
+          alert('La cantidad debe ser mayor a 0.');
+          return;
+        }
+
+        if (prod.stock >= qty) {
+          prod.stock -= qty; // Descuenta del inventario general
+          sales.push({
+            id: Date.now().toString(),
+            date: new Date().toLocaleDateString(),
+            vendor: currentUser.user,
+            product: prod.name,
+            productImg: prod.img,
+            quantity: qty,
+            total: prod.price * qty
+          });
+          saveData();
+          alert(`¡Venta de ${qty} unidad(es) registrada con éxito! Stock actualizado.`);
+          renderVendorTab(container);
+        } else {
+          alert(`Stock insuficiente. Solo quedan ${prod.stock} unidades disponibles de "${prod.name}".`);
+        }
+      });
     }
   </script>
 </body>
