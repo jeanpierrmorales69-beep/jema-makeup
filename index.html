@@ -45,7 +45,7 @@
           <i class="fa-solid fa-wand-magic-sparkles"></i>
         </div>
         <h1 class="text-3xl font-bold text-pink-main">Jema_makeup</h1>
-        <p class="text-gray-500 text-sm mt-1">Ingresa tu usuario y contraseña para acceder</p>
+        <p class="text-gray-500 text-sm mt-1">Acceso restringido. Ingresa tus credenciales.</p>
       </div>
 
       <form id="loginForm" class="space-y-4">
@@ -132,6 +132,11 @@
             <label class="block text-sm font-medium text-gray-600 mb-1">Precio Venta ($)</label>
             <input type="number" id="prodPrice" required class="w-full px-4 py-2 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300">
           </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1">Comisión para la Vendedora ($)</label>
+          <input type="number" id="prodCommission" required placeholder="Ej: 2000" class="w-full px-4 py-2 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300">
+          <p class="text-xs text-gray-400 mt-1">Sugerido: 10% al 20% del valor del producto.</p>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-600 mb-1">Cantidad en Stock</label>
@@ -222,9 +227,9 @@
     ];
 
     let products = JSON.parse(localStorage.getItem('jm_products')) || [
-      { id: '1', name: 'Labial Matte Velvet Rose', cost: 8000, price: 18000, stock: 15, img: '' },
-      { id: '2', name: 'Base Cobertura Total Glow', cost: 15000, price: 32000, stock: 10, img: '' },
-      { id: '3', name: 'Paleta de Sombras Pastel Dreams', cost: 22000, price: 45000, stock: 8, img: '' }
+      { id: '1', name: 'Labial Matte Velvet Rose', cost: 8000, price: 18000, commission: 2000, stock: 15, img: '' },
+      { id: '2', name: 'Base Cobertura Total Glow', cost: 15000, price: 32000, commission: 3500, stock: 10, img: '' },
+      { id: '3', name: 'Paleta de Sombras Pastel Dreams', cost: 22000, price: 45000, commission: 5000, stock: 8, img: '' }
     ];
 
     let clients = JSON.parse(localStorage.getItem('jm_clients')) || [
@@ -284,6 +289,9 @@
         document.getElementById('userAvatarHeader').innerHTML = `<i class="fa-solid ${currentUser.avatar || 'fa-crown'}"></i>`;
         renderNavigation();
       } else {
+        // Obliga a mostrar el login si no hay sesión activa
+        localStorage.removeItem('jm_session');
+        currentUser = null;
         document.getElementById('loginSection').classList.remove('hidden');
         document.getElementById('appSection').classList.add('hidden');
       }
@@ -374,7 +382,7 @@
       `;
     }
 
-    // PESTAÑA: INVENTARIO MAESTRO (ADMIN) - CON GANANCIA POR PRODUCTO
+    // PESTAÑA: INVENTARIO MAESTRO (ADMIN) - CON COMISIÓN Y GANANCIA
     function renderInventoryTab(container) {
       const totalExpected = products.reduce((acc, p) => acc + (p.price * p.stock), 0);
       const totalCost = products.reduce((acc, p) => acc + (p.cost * p.stock), 0);
@@ -413,25 +421,24 @@
                   <th class="p-4">Producto</th>
                   <th class="p-4">Costo</th>
                   <th class="p-4">Precio Venta</th>
-                  <th class="p-4">Ganancia Unit.</th>
+                  <th class="p-4">Comisión Vendedora</th>
+                  <th class="p-4">Ganancia Negocio</th>
                   <th class="p-4">Stock</th>
                   <th class="p-4 no-print">Acciones</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-100 text-sm">
                 ${products.map(p => {
-                  const profitUnit = p.price - p.cost;
-                  const profitPercent = p.cost > 0 ? Math.round((profitUnit / p.cost) * 100) : 0;
+                  const comm = p.commission || 0;
+                  const profitUnit = (p.price - p.cost) - comm;
                   return `
                     <tr>
                       <td class="p-4"><img src="${p.img || 'https://via.placeholder.com/50'}" class="w-12 h-12 object-cover rounded-xl border border-pink-100"></td>
                       <td class="p-4 font-semibold">${p.name}</td>
                       <td class="p-4">$${p.cost.toLocaleString()}</td>
                       <td class="p-4 text-pink-main font-bold">$${p.price.toLocaleString()}</td>
-                      <td class="p-4">
-                        <span class="font-bold text-green-600 block">$${profitUnit.toLocaleString()}</span>
-                        <span class="text-xs text-gray-400">${profitPercent}% margen</span>
-                      </td>
+                      <td class="p-4"><span class="px-3 py-1 rounded-full bg-pink-100 text-pink-main font-bold text-xs">$${comm.toLocaleString()}</span></td>
+                      <td class="p-4 font-bold text-green-600">$${profitUnit.toLocaleString()}</td>
                       <td class="p-4"><span class="px-3 py-1 rounded-full bg-pink-50 text-pink-main font-bold text-xs">${p.stock} unids</span></td>
                       <td class="p-4 space-x-2 no-print">
                         <button onclick="editProduct('${p.id}')" class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen"></i></button>
@@ -470,6 +477,7 @@
       document.getElementById('prodName').value = prod ? prod.name : '';
       document.getElementById('prodCost').value = prod ? prod.cost : '';
       document.getElementById('prodPrice').value = prod ? prod.price : '';
+      document.getElementById('prodCommission').value = prod ? (prod.commission || 2000) : '';
       document.getElementById('prodStock').value = prod ? prod.stock : '';
       document.getElementById('prodImgBase64').value = prod ? prod.img : '';
 
@@ -493,6 +501,7 @@
       const name = document.getElementById('prodName').value.trim();
       const cost = parseFloat(document.getElementById('prodCost').value);
       const price = parseFloat(document.getElementById('prodPrice').value);
+      const commission = parseFloat(document.getElementById('prodCommission').value);
       const stock = parseInt(document.getElementById('prodStock').value);
       const img = document.getElementById('prodImgBase64').value;
 
@@ -502,6 +511,7 @@
           p.name = name;
           p.cost = cost;
           p.price = price;
+          p.commission = commission;
           p.stock = stock;
           p.img = img;
         }
@@ -511,6 +521,7 @@
           name,
           cost,
           price,
+          commission,
           stock,
           img
         });
@@ -534,7 +545,7 @@
       }
     }
 
-    // PESTAÑA: VENTAS & METAS (ADMIN)
+    // PESTAÑA: VENTAS & METAS (ADMIN) - CON CÁLCULO DE COMISIONES POR PAGAR
     function renderAnalyticsTab(container) {
       const weeklyGoal = 200000;
       const weeklySales = sales.reduce((acc, s) => acc + s.total, 0);
@@ -558,24 +569,25 @@
           </div>
 
           <div class="flex justify-between items-center">
-            <h2 class="text-xl font-bold text-gray-800">Estado de Pagos a Vendedoras</h2>
+            <h2 class="text-xl font-bold text-gray-800">Comisiones y Pagos a Vendedoras</h2>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             ${vendors.map(v => {
               const vSales = sales.filter(s => s.vendor === v.user);
               const totalV = vSales.reduce((a, b) => a + b.total, 0);
+              const totalCommission = vSales.reduce((a, b) => a + (b.totalCommission || 0), 0);
               return `
                 <div class="bg-white p-5 rounded-2xl border border-pink-100 shadow-sm flex justify-between items-center">
                   <div>
                     <h4 class="font-bold text-gray-800 text-lg">${v.name}</h4>
-                    <p class="text-sm text-gray-500">${vSales.length} ventas realizadas</p>
-                    <p class="text-pink-main font-bold mt-1">Total: $${totalV.toLocaleString()}</p>
+                    <p class="text-sm text-gray-500">${vSales.length} ventas realizadas (Venta: $${totalV.toLocaleString()})</p>
+                    <p class="text-pink-main font-bold mt-1">Comisión a pagar: $${totalCommission.toLocaleString()}</p>
                   </div>
                   <div class="text-right">
-                    <span class="text-xs font-semibold block mb-1">Pago Mensual</span>
+                    <span class="text-xs font-semibold block mb-1">Estado Pago</span>
                     <button onclick="toggleVendorPayment('${v.id}')" class="px-3 py-1.5 rounded-full font-bold text-xs ${v.paidMonth ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
-                      ${v.paidMonth ? '✔ Pagada' : '✖ Pendiente'}
+                      ${v.paidMonth ? '✔ Pagado' : '✖ Pendiente'}
                     </button>
                   </div>
                 </div>
@@ -597,11 +609,12 @@
                   <th class="p-4">Vendedora</th>
                   <th class="p-4">Producto</th>
                   <th class="p-4">Cant.</th>
-                  <th class="p-4">Total</th>
+                  <th class="p-4">Comisión Ganada</th>
+                  <th class="p-4">Total Venta</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-100 text-sm">
-                ${sales.length === 0 ? '<tr><td colspan="6" class="p-4 text-center text-gray-400">No hay ventas registradas aún.</td></tr>' : ''}
+                ${sales.length === 0 ? '<tr><td colspan="7" class="p-4 text-center text-gray-400">No hay ventas registradas aún.</td></tr>' : ''}
                 ${sales.map(s => `
                   <tr>
                     <td class="p-4"><img src="${s.productImg || 'https://via.placeholder.com/40'}" class="w-10 h-10 object-cover rounded-xl border border-pink-100"></td>
@@ -609,6 +622,7 @@
                     <td class="p-4 font-semibold">${s.vendor}</td>
                     <td class="p-4 font-medium">${s.product}</td>
                     <td class="p-4">${s.quantity || 1} unids</td>
+                    <td class="p-4 text-green-600 font-bold">+$${(s.totalCommission || 0).toLocaleString()}</td>
                     <td class="p-4 text-pink-main font-bold">$${s.total.toLocaleString()}</td>
                   </tr>
                 `).join('')}
@@ -767,28 +781,29 @@
     function renderVendorTab(container) {
       const mySales = sales.filter(s => s.vendor === currentUser.user);
       const myTotalRevenue = mySales.reduce((acc, s) => acc + s.total, 0);
+      const myTotalCommission = mySales.reduce((acc, s) => acc + (s.totalCommission || 0), 0);
 
       container.innerHTML = `
         <div class="space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="bg-white p-6 rounded-2xl border border-pink-100 shadow-sm">
-              <span class="text-xs text-gray-400 font-semibold block">MIS VENTAS TOTALES</span>
-              <span class="text-2xl font-bold text-pink-main">$${myTotalRevenue.toLocaleString()}</span>
+              <span class="text-xs text-gray-400 font-semibold block">MIS COMISIONES GANADAS</span>
+              <span class="text-2xl font-bold text-green-600">$${myTotalCommission.toLocaleString()}</span>
             </div>
             <div class="bg-white p-6 rounded-2xl border border-pink-100 shadow-sm">
-              <span class="text-xs text-gray-400 font-semibold block">VENTAS REALIZADAS</span>
-              <span class="text-2xl font-bold text-gray-800">${mySales.length}</span>
+              <span class="text-xs text-gray-400 font-semibold block">TOTAL VENTAS REALIZADAS</span>
+              <span class="text-2xl font-bold text-pink-main">$${myTotalRevenue.toLocaleString()} (${mySales.length} ventas)</span>
             </div>
           </div>
 
-          <h2 class="text-xl font-bold text-gray-800">Registrar Nueva Venta (Inventario en Tiempo Real)</h2>
+          <h2 class="text-xl font-bold text-gray-800">Registrar Nueva Venta</h2>
           <div class="bg-white p-6 rounded-2xl border border-pink-100 shadow-sm">
             <form id="vendorSaleForm" class="space-y-4">
               <div>
                 <label class="block text-sm font-medium text-gray-600 mb-1">Seleccionar Producto</label>
                 <select id="saleProdId" required class="w-full px-4 py-2 rounded-xl border border-pink-200">
                   <option value="">-- Elige un producto --</option>
-                  ${products.map(p => `<option value="${p.id}">${p.name} ($${p.price.toLocaleString()} - Stock disponible: ${p.stock})</option>`).join('')}
+                  ${products.map(p => `<option value="${p.id}">${p.name} ($${p.price.toLocaleString()} | Comisión: $${(p.commission || 0).toLocaleString()} | Stock: ${p.stock})</option>`).join('')}
                 </select>
               </div>
               <div>
@@ -799,7 +814,7 @@
             </form>
           </div>
 
-          <h2 class="text-xl font-bold text-gray-800 pt-4">Mi Historial de Ventas</h2>
+          <h2 class="text-xl font-bold text-gray-800 pt-4">Mi Historial de Ventas y Comisiones</h2>
           <div class="bg-white rounded-2xl border border-pink-100 shadow-sm overflow-hidden">
             <table class="w-full text-left border-collapse">
               <thead class="bg-pink-50 text-pink-main text-xs uppercase font-semibold">
@@ -808,17 +823,19 @@
                   <th class="p-4">Fecha</th>
                   <th class="p-4">Producto</th>
                   <th class="p-4">Cantidad</th>
-                  <th class="p-4">Total</th>
+                  <th class="p-4">Mi Comisión</th>
+                  <th class="p-4">Total Venta</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-100 text-sm">
-                ${mySales.length === 0 ? '<tr><td colspan="5" class="p-4 text-center text-gray-400">Aún no has registrado ventas.</td></tr>' : ''}
+                ${mySales.length === 0 ? '<tr><td colspan="6" class="p-4 text-center text-gray-400">Aún no has registrado ventas.</td></tr>' : ''}
                 ${mySales.map(s => `
                   <tr>
                     <td class="p-4"><img src="${s.productImg || 'https://via.placeholder.com/40'}" class="w-10 h-10 object-cover rounded-xl border border-pink-100"></td>
                     <td class="p-4">${s.date}</td>
                     <td class="p-4 font-medium">${s.product}</td>
                     <td class="p-4">${s.quantity || 1} unids</td>
+                    <td class="p-4 text-green-600 font-bold">+$${(s.totalCommission || 0).toLocaleString()}</td>
                     <td class="p-4 text-pink-main font-bold">$${s.total.toLocaleString()}</td>
                   </tr>
                 `).join('')}
@@ -846,6 +863,7 @@
 
         if (prod.stock >= qty) {
           prod.stock -= qty;
+          const unitCommission = prod.commission || 0;
           sales.push({
             id: Date.now().toString(),
             date: new Date().toLocaleDateString(),
@@ -853,10 +871,11 @@
             product: prod.name,
             productImg: prod.img,
             quantity: qty,
+            totalCommission: unitCommission * qty,
             total: prod.price * qty
           });
           saveData();
-          alert(`¡Venta de ${qty} unidad(es) registrada con éxito! Stock actualizado.`);
+          alert(`¡Venta de ${qty} unidad(es) registrada! Comisión generada: $${(unitCommission * qty).toLocaleString()}`);
           renderVendorTab(container);
         } else {
           alert(`Stock insuficiente. Solo quedan ${prod.stock} unidades disponibles de "${prod.name}".`);
