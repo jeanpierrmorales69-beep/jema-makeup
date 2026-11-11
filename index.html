@@ -213,6 +213,41 @@
     </div>
   </div>
 
+  <!-- MODAL REGISTRAR USUARIO -->
+  <div id="userModal" class="hidden fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold text-pink-main">Crear Nuevo Usuario</h3>
+        <button onclick="closeUserModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+      <form id="userForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1">Nombre Completo</label>
+          <input type="text" id="newUserName" required class="w-full px-4 py-2 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1">Usuario (para iniciar sesión)</label>
+          <input type="text" id="newUserLogin" required class="w-full px-4 py-2 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1">Contraseña</label>
+          <input type="password" id="newUserPass" required class="w-full px-4 py-2 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1">Rol</label>
+          <select id="newUserRole" class="w-full px-4 py-2 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300">
+            <option value="vendor">Vended@r</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" onclick="closeUserModal()" class="px-4 py-2 rounded-xl bg-gray-100 text-gray-600 font-medium">Cancelar</button>
+          <button type="submit" class="px-4 py-2 rounded-xl btn-pink font-semibold">Guardar Usuario</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
     // ESTADO GLOBAL DE LA APLICACIÓN
     let currentUser = null;
@@ -454,7 +489,7 @@
       }
     }
 
-    // PESTAÑA: CLIENTES (EDITAR Y ELIMINAR IMPLEMENTADO)
+    // PESTAÑA: CLIENTES
     function renderClientsTab(container) {
       container.innerHTML = `
         <div class="space-y-4">
@@ -536,7 +571,7 @@
       }
     }
 
-    // PESTAÑA: USUARIOS (ADMIN)
+    // PESTAÑA: USUARIOS (CON MODAL PROFESIONAL)
     function renderUsersTab(container) {
       container.innerHTML = `
         <div class="space-y-4">
@@ -561,17 +596,40 @@
     }
 
     function registerNewUser() {
-      const name = prompt('Nombre de la vendedora / usuario:');
-      const user = prompt('Nombre de usuario (Login):');
-      const pass = prompt('Contraseña:');
-      const role = prompt('Rol (admin / vendor):', 'vendor');
-
-      if (name && user && pass) {
-        users.push({ id: Date.now().toString(), name, user, pass, role, paidMonth: false });
-        saveData();
-        renderUsersTab(document.getElementById('mainContent'));
-      }
+      document.getElementById('userForm').reset();
+      document.getElementById('userModal').classList.remove('hidden');
     }
+
+    function closeUserModal() {
+      document.getElementById('userModal').classList.add('hidden');
+    }
+
+    document.getElementById('userForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('newUserName').value.trim();
+      const user = document.getElementById('newUserLogin').value.trim();
+      const pass = document.getElementById('newUserPass').value.trim();
+      const role = document.getElementById('newUserRole').value;
+
+      if (users.some(u => u.user.toLowerCase() === user.toLowerCase())) {
+        alert('Este usuario ya existe. Por favor elige otro.');
+        return;
+      }
+
+      users.push({
+        id: Date.now().toString(),
+        name,
+        user,
+        pass,
+        role,
+        paidMonth: false
+      });
+
+      saveData();
+      closeUserModal();
+      renderUsersTab(document.getElementById('mainContent'));
+      alert('¡Usuario creado correctamente!');
+    });
 
     // PESTAÑA: VENDEDORA (MI INVENTARIO & VENTAS)
     function renderVendorTab(container) {
