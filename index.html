@@ -134,11 +134,6 @@
           </div>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-600 mb-1">Comisión para la Vendedora ($)</label>
-          <input type="number" id="prodCommission" required placeholder="Ej: 2000" class="w-full px-4 py-2 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300">
-          <p class="text-xs text-gray-400 mt-1">Sugerido: 10% al 20% del valor del producto.</p>
-        </div>
-        <div>
           <label class="block text-sm font-medium text-gray-600 mb-1">Cantidad en Stock</label>
           <input type="number" id="prodStock" required class="w-full px-4 py-2 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300">
         </div>
@@ -227,9 +222,9 @@
     ];
 
     let products = JSON.parse(localStorage.getItem('jm_products')) || [
-      { id: '1', name: 'Labial Matte Velvet Rose', cost: 8000, price: 18000, commission: 2000, stock: 15, img: '' },
-      { id: '2', name: 'Base Cobertura Total Glow', cost: 15000, price: 32000, commission: 3500, stock: 10, img: '' },
-      { id: '3', name: 'Paleta de Sombras Pastel Dreams', cost: 22000, price: 45000, commission: 5000, stock: 8, img: '' }
+      { id: '1', name: 'Labial Matte Velvet Rose', cost: 8000, price: 18000, stock: 15, img: '' },
+      { id: '2', name: 'Base Cobertura Total Glow', cost: 15000, price: 32000, stock: 10, img: '' },
+      { id: '3', name: 'Paleta de Sombras Pastel Dreams', cost: 22000, price: 45000, stock: 8, img: '' }
     ];
 
     let clients = JSON.parse(localStorage.getItem('jm_clients')) || [
@@ -289,7 +284,6 @@
         document.getElementById('userAvatarHeader').innerHTML = `<i class="fa-solid ${currentUser.avatar || 'fa-crown'}"></i>`;
         renderNavigation();
       } else {
-        // Obliga a mostrar el login si no hay sesión activa
         localStorage.removeItem('jm_session');
         currentUser = null;
         document.getElementById('loginSection').classList.remove('hidden');
@@ -382,7 +376,7 @@
       `;
     }
 
-    // PESTAÑA: INVENTARIO MAESTRO (ADMIN) - CON COMISIÓN Y GANANCIA
+    // PESTAÑA: INVENTARIO MAESTRO (ADMIN) - CON COMISIÓN DEL 25% DE LA UTILIDAD
     function renderInventoryTab(container) {
       const totalExpected = products.reduce((acc, p) => acc + (p.price * p.stock), 0);
       const totalCost = products.reduce((acc, p) => acc + (p.cost * p.stock), 0);
@@ -400,13 +394,13 @@
               <span class="text-2xl font-bold text-gray-700">$${totalCost.toLocaleString()}</span>
             </div>
             <div class="bg-white p-5 rounded-2xl border border-pink-100 shadow-sm">
-              <span class="text-xs text-gray-400 font-semibold block">UTILIDAD PROYECTADA</span>
+              <span class="text-xs text-gray-400 font-semibold block">UTILIDAD TOTAL PROYECTADA</span>
               <span class="text-2xl font-bold text-green-500">$${totalUtility.toLocaleString()}</span>
             </div>
           </div>
 
           <div class="flex justify-between items-center">
-            <h2 class="text-xl font-bold text-gray-800">Productos Registrados</h2>
+            <h2 class="text-xl font-bold text-gray-800">Productos Registrados (Comisión: 25% de la Utilidad)</h2>
             <div class="space-x-2">
               <button onclick="window.print()" class="px-4 py-2 bg-gray-800 text-white rounded-xl text-sm font-semibold"><i class="fa-solid fa-print"></i> Imprimir Inventario</button>
               <button onclick="openProductModal()" class="btn-pink px-4 py-2 rounded-xl text-sm font-semibold">+ Agregar Producto</button>
@@ -421,24 +415,27 @@
                   <th class="p-4">Producto</th>
                   <th class="p-4">Costo</th>
                   <th class="p-4">Precio Venta</th>
-                  <th class="p-4">Comisión Vendedora</th>
-                  <th class="p-4">Ganancia Negocio</th>
+                  <th class="p-4">Utilidad Total (Unit)</th>
+                  <th class="p-4">Comisión Vendedora (25%)</th>
+                  <th class="p-4">Ganancia Negocio (75%)</th>
                   <th class="p-4">Stock</th>
                   <th class="p-4 no-print">Acciones</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-100 text-sm">
                 ${products.map(p => {
-                  const comm = p.commission || 0;
-                  const profitUnit = (p.price - p.cost) - comm;
+                  const utilityUnit = p.price - p.cost;
+                  const commUnit = utilityUnit * 0.25;
+                  const bizUnit = utilityUnit * 0.75;
                   return `
                     <tr>
                       <td class="p-4"><img src="${p.img || 'https://via.placeholder.com/50'}" class="w-12 h-12 object-cover rounded-xl border border-pink-100"></td>
                       <td class="p-4 font-semibold">${p.name}</td>
                       <td class="p-4">$${p.cost.toLocaleString()}</td>
                       <td class="p-4 text-pink-main font-bold">$${p.price.toLocaleString()}</td>
-                      <td class="p-4"><span class="px-3 py-1 rounded-full bg-pink-100 text-pink-main font-bold text-xs">$${comm.toLocaleString()}</span></td>
-                      <td class="p-4 font-bold text-green-600">$${profitUnit.toLocaleString()}</td>
+                      <td class="p-4 font-medium">$${utilityUnit.toLocaleString()}</td>
+                      <td class="p-4"><span class="px-3 py-1 rounded-full bg-pink-100 text-pink-main font-bold text-xs">+$${commUnit.toLocaleString()}</span></td>
+                      <td class="p-4 font-bold text-green-600">$${bizUnit.toLocaleString()}</td>
                       <td class="p-4"><span class="px-3 py-1 rounded-full bg-pink-50 text-pink-main font-bold text-xs">${p.stock} unids</span></td>
                       <td class="p-4 space-x-2 no-print">
                         <button onclick="editProduct('${p.id}')" class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen"></i></button>
@@ -477,7 +474,6 @@
       document.getElementById('prodName').value = prod ? prod.name : '';
       document.getElementById('prodCost').value = prod ? prod.cost : '';
       document.getElementById('prodPrice').value = prod ? prod.price : '';
-      document.getElementById('prodCommission').value = prod ? (prod.commission || 2000) : '';
       document.getElementById('prodStock').value = prod ? prod.stock : '';
       document.getElementById('prodImgBase64').value = prod ? prod.img : '';
 
@@ -501,9 +497,13 @@
       const name = document.getElementById('prodName').value.trim();
       const cost = parseFloat(document.getElementById('prodCost').value);
       const price = parseFloat(document.getElementById('prodPrice').value);
-      const commission = parseFloat(document.getElementById('prodCommission').value);
       const stock = parseInt(document.getElementById('prodStock').value);
       const img = document.getElementById('prodImgBase64').value;
+
+      if (price < cost) {
+        alert('El precio de venta no puede ser menor al costo.');
+        return;
+      }
 
       if (id) {
         const p = products.find(x => x.id === id);
@@ -511,7 +511,6 @@
           p.name = name;
           p.cost = cost;
           p.price = price;
-          p.commission = commission;
           p.stock = stock;
           p.img = img;
         }
@@ -521,7 +520,6 @@
           name,
           cost,
           price,
-          commission,
           stock,
           img
         });
@@ -545,7 +543,7 @@
       }
     }
 
-    // PESTAÑA: VENTAS & METAS (ADMIN) - CON CÁLCULO DE COMISIONES POR PAGAR
+    // PESTAÑA: VENTAS & METAS (ADMIN)
     function renderAnalyticsTab(container) {
       const weeklyGoal = 200000;
       const weeklySales = sales.reduce((acc, s) => acc + s.total, 0);
@@ -569,7 +567,7 @@
           </div>
 
           <div class="flex justify-between items-center">
-            <h2 class="text-xl font-bold text-gray-800">Comisiones y Pagos a Vendedoras</h2>
+            <h2 class="text-xl font-bold text-gray-800">Comisiones (25% de la Utilidad) y Pagos a Vendedoras</h2>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -609,7 +607,7 @@
                   <th class="p-4">Vendedora</th>
                   <th class="p-4">Producto</th>
                   <th class="p-4">Cant.</th>
-                  <th class="p-4">Comisión Ganada</th>
+                  <th class="p-4">Comisión (25%)</th>
                   <th class="p-4">Total Venta</th>
                 </tr>
               </thead>
@@ -787,7 +785,7 @@
         <div class="space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="bg-white p-6 rounded-2xl border border-pink-100 shadow-sm">
-              <span class="text-xs text-gray-400 font-semibold block">MIS COMISIONES GANADAS</span>
+              <span class="text-xs text-gray-400 font-semibold block">MIS COMISIONES GANADAS (25% Utilidad)</span>
               <span class="text-2xl font-bold text-green-600">$${myTotalCommission.toLocaleString()}</span>
             </div>
             <div class="bg-white p-6 rounded-2xl border border-pink-100 shadow-sm">
@@ -803,7 +801,11 @@
                 <label class="block text-sm font-medium text-gray-600 mb-1">Seleccionar Producto</label>
                 <select id="saleProdId" required class="w-full px-4 py-2 rounded-xl border border-pink-200">
                   <option value="">-- Elige un producto --</option>
-                  ${products.map(p => `<option value="${p.id}">${p.name} ($${p.price.toLocaleString()} | Comisión: $${(p.commission || 0).toLocaleString()} | Stock: ${p.stock})</option>`).join('')}
+                  ${products.map(p => {
+                    const util = p.price - p.cost;
+                    const com = util * 0.25;
+                    return `<option value="${p.id}">${p.name} ($${p.price.toLocaleString()} | Tu comisión: $${com.toLocaleString()} | Stock: ${p.stock})</option>`;
+                  }).join('')}
                 </select>
               </div>
               <div>
@@ -823,7 +825,7 @@
                   <th class="p-4">Fecha</th>
                   <th class="p-4">Producto</th>
                   <th class="p-4">Cantidad</th>
-                  <th class="p-4">Mi Comisión</th>
+                  <th class="p-4">Mi Comisión (25%)</th>
                   <th class="p-4">Total Venta</th>
                 </tr>
               </thead>
@@ -863,7 +865,8 @@
 
         if (prod.stock >= qty) {
           prod.stock -= qty;
-          const unitCommission = prod.commission || 0;
+          const unitUtil = prod.price - prod.cost;
+          const unitCommission = unitUtil * 0.25;
           sales.push({
             id: Date.now().toString(),
             date: new Date().toLocaleDateString(),
@@ -875,7 +878,7 @@
             total: prod.price * qty
           });
           saveData();
-          alert(`¡Venta de ${qty} unidad(es) registrada! Comisión generada: $${(unitCommission * qty).toLocaleString()}`);
+          alert(`¡Venta registrada con éxito! Tu comisión generada es de $${(unitCommission * qty).toLocaleString()}`);
           renderVendorTab(container);
         } else {
           alert(`Stock insuficiente. Solo quedan ${prod.stock} unidades disponibles de "${prod.name}".`);
