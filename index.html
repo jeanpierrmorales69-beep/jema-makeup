@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jema_makeup - Sistema de Gestión y Ventas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #FFF5F7;
+    }
+    .bg-pastel-pink { background-color: #FDE8ED; }
+    .bg-pastel-card { background-color: #FFFFFF; }
+    .text-pink-main { color: #E86A92; }
+    .border-pink-main { border-color: #F4A2B8; }
+    .btn-pink {
+      background-color: #E86A92;
+      color: white;
+      transition: all 0.3s ease;
+    }
+    .btn-pink:hover {
+      background-color: #D8557F;
+      box-shadow: 0 4px 12px rgba(232, 106, 146, 0.3);
+    }
+    .avatar-ring {
+      border: 3px solid #F4A2B8;
+    }
+    @media print {
+      .no-print { display: none !important; }
+      .print-only { display: block !important; }
+      body { background-color: white !important; }
+    }
+    .print-only { display: none; }
+  </style>
+</head>
+<body class="text-gray-700 min-h-screen flex flex-col">
+
+  <!-- VISTA: LOGIN & SELECCIÓN DE AVATAR -->
+  <div id="loginSection" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-pink-50 to-pink-100">
+    <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md border border-pink-100">
+      <div class="text-center mb-6">
+        <div class="inline-block p-4 rounded-full bg-pink-100 text-pink-main text-3xl mb-3">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </div>
+        <h1 class="text-3xl font-bold text-pink-main">Jema_makeup</h1>
+        <p class="text-gray-500 text-sm mt-1">Inicia sesión para ingresar al sistema</p>
+      </div>
+
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1">Usuario</label>
+          <input type="text" id="loginUser" required class="w-full px-4 py-2 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1">Contraseña</label>
+          <input type="password" id="loginPass" required class="w-full px-4 py-2 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-2">Elige tu Avatar</label>
+          <div class="flex justify-around py-2">
+            <button type="button" onclick="selectAvatar('fa-user-ninja')" class="avatar-option p-3 rounded-full text-2xl border-2 border-transparent hover:border-pink-300 text-pink-400"><i class="fa-solid fa-user-ninja"></i></button>
+            <button type="button" onclick="selectAvatar('fa-crown')" class="avatar-option p-3 rounded-full text-2xl border-2 border-transparent hover:border-pink-300 text-pink-400"><i class="fa-solid fa-crown"></i></button>
+            <button type="button" onclick="selectAvatar('fa-gem')" class="avatar-option p-3 rounded-full text-2xl border-2 border-transparent hover:border-pink-300 text-pink-400"><i class="fa-solid fa-gem"></i></button>
+            <button type="button" onclick="selectAvatar('fa-heart')" class="avatar-option p-3 rounded-full text-2xl border-2 border-transparent hover:border-pink-300 text-pink-400"><i class="fa-solid fa-heart"></i></button>
+            <button type="button" onclick="selectAvatar('fa-sparkles')" class="avatar-option p-3 rounded-full text-2xl border-2 border-transparent hover:border-pink-300 text-pink-400"><i class="fa-solid fa-sparkles"></i></button>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-3 rounded-xl btn-pink font-semibold shadow-md">Ingresar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- VISTA PRINCIPAL (APP) -->
+  <div id="appSection" class="hidden flex-1 flex flex-col">
+    <!-- Navbar -->
+    <header class="bg-white shadow-sm border-b border-pink-100 no-print">
+      <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div id="userAvatarHeader" class="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center text-pink-main text-xl avatar-ring">
+            <i class="fa-solid fa-crown"></i>
+          </div>
+          <div>
+            <span class="text-xs text-gray-400 block">Bienvenid@,</span>
+            <span id="userNameHeader" class="font-bold text-gray-800">Mari</span>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <button onclick="togglePublicCatalog()" class="px-3 py-1.5 rounded-lg border border-pink-300 text-pink-main hover:bg-pink-50 text-sm font-medium">
+            <i class="fa-solid fa-eye mr-1"></i> Vista Cliente
+          </button>
+          <button onclick="logout()" class="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Menú de Navegación -->
+    <nav class="bg-white border-b border-pink-100 no-print">
+      <div class="max-w-7xl mx-auto px-4 flex overflow-x-auto space-x-2 py-2" id="navTabs">
+        <!-- Generado dinámicamente según rol -->
+      </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6" id="mainContent">
+      <!-- Pestañas activas se renderizan aquí -->
+    </main>
+  </div>
+
+  <!-- CATÁLOGO PÚBLICO (VISTA CLIENTE) -->
+  <div id="publicCatalogSection" class="hidden min-h-screen bg-pink-50 flex flex-col">
+    <header class="bg-white border-b border-pink-100 p-4 shadow-sm sticky top-0 z-10">
+      <div class="max-w-6xl mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-pink-main flex items-center gap-2">
+          <i class="fa-solid fa-heart"></i> Jema_makeup
+        </h1>
+        <div class="flex items-center space-x-3">
+          <button onclick="toggleCartModal()" class="relative bg-pink-100 text-pink-main px-4 py-2 rounded-full font-semibold">
+            <i class="fa-solid fa-cart-shopping"></i> Bolsa
+            <span id="cartCount" class="bg-pink-500 text-white text-xs px-2 py-0.5 rounded-full ml-1">0</span>
+          </button>
+          <button onclick="closePublicCatalog()" class="text-xs bg-gray-200 px-3 py-2 rounded-full font-medium">Volver</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-4 flex-1 w-full">
+      <div class="bg-white p-4 rounded-2xl shadow-sm mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+        <p class="text-gray-600 text-sm">¡Haz tu pedido en línea! Envíos a todo Cali. <strong>Siloé y compras mayores a $30.000 tienen Envío GRATIS.</strong></p>
+        <button onclick="shareCatalogWhatsApp()" class="btn-pink px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2">
+          <i class="fa-brands fa-whatsapp text-lg"></i> Compartir Catálogo
+        </button>
+      </div>
+
+      <div id="publicProductGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <!-- Render productos -->
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL CARRITO DE COMPRAS -->
+  <div id="cartModal" class="hidden fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] flex flex-col">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold text-pink-main"><i class="fa-solid fa-bag-shopping"></i> Tu Bolsa de Compras</h3>
+        <button onclick="toggleCartModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+
+      <div id="cartItemsContainer" class="flex-1 overflow-y-auto space-y-3 mb-4 pr-1">
+        <!-- Items -->
+      </div>
+
+      <div class="border-t border-gray-100 pt-4 space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Nombre Completo *</label>
+          <input type="text" id="orderClientName" class="w-full px-3 py-2 rounded-xl border text-sm" placeholder="Tu nombre">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Dirección Completa y Barrio *</label>
+          <textarea id="orderClientAddress" rows="2" class="w-full px-3 py-2 rounded-xl border text-sm" placeholder="Ej: Calle 5 # 12-34, Barrio Siloé"></textarea>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Método de Pago</label>
+          <select id="orderPaymentMethod" class="w-full px-3 py-2 rounded-xl border text-sm">
+            <option value="Contra Entrega">Pago Contra Entrega</option>
+            <option value="Transferencia">Transferencia Bancaria</option>
+          </select>
+        </div>
+
+        <div class="bg-pink-50 p-3 rounded-xl flex justify-between items-center text-sm">
+          <span>Envío:</span>
+          <span id="shippingFeeText" class="font-bold text-pink-600">Calculando...</span>
+        </div>
+
+        <div class="flex justify-between items-center text-lg font-bold">
+          <span>Total:</span>
+          <span id="cartTotalText" class="text-pink-main">$0</span>
+        </div>
+
+        <button onclick="sendWhatsAppOrder()" class="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl flex items-center justify-center gap-2">
+          <i class="fa-brands fa-whatsapp text-xl"></i> Realizar Pedido por WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL EDITAR / REGISTRAR CLIENTE -->
+  <div id="clientModal" class="hidden fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl">
+      <h3 id="clientModalTitle" class="text-xl font-bold text-pink-main mb-4">Registrar Cliente</h3>
+      <form id="clientForm" class="space-y-4">
+        <input type="hidden" id="clientId">
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1">Nombre Completo</label>
+          <input type="text" id="clientName" required class="w-full px-4 py-2 rounded-xl border border-pink-200">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1">Celular / Teléfono</label>
+          <input type="tel" id="clientPhone" required class="w-full px-4 py-2 rounded-xl border border-pink-200">
+        </div>
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" onclick="closeClientModal()" class="px-4 py-2 rounded-xl bg-gray-100 text-gray-600">Cancelar</button>
+          <button type="submit" class="px-4 py-2 rounded-xl btn-pink font-semibold">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ESTADO GLOBAL DE LA APLICACIÓN
+    let currentUser = null;
+    let selectedAvatar = 'fa-crown';
+    let cart = [];
+
+    // DATOS EN LOCALSTORAGE O POR DEFECTO
+    let users = JSON.parse(localStorage.getItem('jm_users')) || [
+      { id: '1', user: 'mari', pass: '1234', role: 'admin', name: 'Mari', avatar: 'fa-crown', paidMonth: true }
+    ];
+
+    let products = JSON.parse(localStorage.getItem('jm_products')) || [
+      { id: '1', name: 'Labial Matte Velvet Rose', cost: 8000, price: 18000, stock: 15, img: '' },
+      { id: '2', name: 'Base Cobertura Total Glow', cost: 15000, price: 32000, stock: 10, img: '' },
+      { id: '3', name: 'Paleta de Sombras Pastel Dreams', cost: 22000, price: 45000, stock: 8, img: '' }
+    ];
+
+    let clients = JSON.parse(localStorage.getItem('jm_clients')) || [
+      { id: '1', name: 'Camila Torres', phone: '3001234567', debt: 0 }
+    ];
+
+    let sales = JSON.parse(localStorage.getItem('jm_sales')) || [];
+
+    // INICIALIZACIÓN
+    window.onload = function() {
+      saveData();
+      checkAuth();
+    };
+
+    function saveData() {
+      localStorage.setItem('jm_users', JSON.stringify(users));
+      localStorage.setItem('jm_products', JSON.stringify(products));
+      localStorage.setItem('jm_clients', JSON.stringify(clients));
+      localStorage.setItem('jm_sales', JSON.stringify(sales));
+    }
+
+    function selectAvatar(iconClass) {
+      selectedAvatar = iconClass;
+      document.querySelectorAll('.avatar-option').forEach(btn => {
+        btn.classList.remove('border-pink-500', 'bg-pink-50');
+      });
+      event.currentTarget.classList.add('border-pink-500', 'bg-pink-50');
+    }
+
+    // AUTENTICACIÓN
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const u = document.getElementById('loginUser').value.trim();
+      const p = document.getElementById('loginPass').value.trim();
+
+      const found = users.find(x => x.user.toLowerCase() === u.toLowerCase() && x.pass === p);
+      if (found) {
+        currentUser = found;
+        currentUser.avatar = selectedAvatar;
+        localStorage.setItem('jm_session', JSON.stringify(currentUser));
+        checkAuth();
+      } else {
+        alert('Usuario o contraseña incorrectos');
+      }
+    });
+
+    function checkAuth() {
+      const session = localStorage.getItem('jm_session');
+      if (session) {
+        currentUser = JSON.parse(session);
+        document.getElementById('loginSection').classList.add('hidden');
+        document.getElementById('appSection').classList.remove('hidden');
+        document.getElementById('userNameHeader').innerText = currentUser.name || currentUser.user;
+        document.getElementById('userAvatarHeader').innerHTML = `<i class="fa-solid ${currentUser.avatar || 'fa-crown'}"></i>`;
+        renderNavigation();
+      } else {
+        document.getElementById('loginSection').classList.remove('hidden');
+        document.getElementById('appSection').classList.add('hidden');
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('jm_session');
+      currentUser = null;
+      checkAuth();
+    }
+
+    // NAVEGACIÓN
+    function renderNavigation() {
+      const navTabs = document.getElementById('navTabs');
+      let html = '';
+
+      if (currentUser.role === 'admin') {
+        html += `
+          <button onclick="switchTab('inventory')" class="tab-btn font-semibold px-4 py-2 rounded-xl bg-pink-100 text-pink-main border border-pink-200">Inventario Maestro</button>
+          <button onclick="switchTab('analytics')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50">Ventas & Metas</button>
+          <button onclick="switchTab('pos')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50">Punto de Venta (POS)</button>
+          <button onclick="switchTab('clients')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50">Clientes</button>
+          <button onclick="switchTab('users')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50">Usuarios</button>
+        `;
+      } else {
+        html += `
+          <button onclick="switchTab('vendor_inv')" class="tab-btn font-semibold px-4 py-2 rounded-xl bg-pink-100 text-pink-main border border-pink-200">Mi Inventario & Ventas</button>
+          <button onclick="switchTab('clients')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50">Mis Clientes</button>
+        `;
+      }
+      navTabs.innerHTML = html;
+      switchTab(currentUser.role === 'admin' ? 'inventory' : 'vendor_inv');
+    }
+
+    function switchTab(tabName) {
+      const main = document.getElementById('mainContent');
+      if (tabName === 'inventory') renderInventoryTab(main);
+      else if (tabName === 'analytics') renderAnalyticsTab(main);
+      else if (tabName === 'pos') renderPOSTab(main);
+      else if (tabName === 'clients') renderClientsTab(main);
+      else if (tabName === 'users') renderUsersTab(main);
+      else if (tabName === 'vendor_inv') renderVendorTab(main);
+    }
+
+    // PESTAÑA: INVENTARIO MAESTRO (ADMIN)
+    function renderInventoryTab(container) {
+      const totalExpected = products.reduce((acc, p) => acc + (p.price * p.stock), 0);
+      const totalCost = products.reduce((acc, p) => acc + (p.cost * p.stock), 0);
+      const totalUtility = totalExpected - totalCost;
+
+      container.innerHTML = `
+        <div class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white p-5 rounded-2xl border border-pink-100 shadow-sm">
+              <span class="text-xs text-gray-400 font-semibold block">VENTAS ESPERADAS</span>
+              <span class="text-2xl font-bold text-pink-main">$${totalExpected.toLocaleString()}</span>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-pink-100 shadow-sm">
+              <span class="text-xs text-gray-400 font-semibold block">COSTO TOTAL</span>
+              <span class="text-2xl font-bold text-gray-700">$${totalCost.toLocaleString()}</span>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-pink-100 shadow-sm">
+              <span class="text-xs text-gray-400 font-semibold block">UTILIDAD PROYECTADA</span>
+              <span class="text-2xl font-bold text-green-500">$${totalUtility.toLocaleString()}</span>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center">
+            <h2 class="text-xl font-bold text-gray-800">Productos Registrados</h2>
+            <div class="space-x-2">
+              <button onclick="printInventory()" class="px-4 py-2 bg-gray-800 text-white rounded-xl text-sm font-semibold"><i class="fa-solid fa-print"></i> Imprimir Inventario</button>
+              <button onclick="openProductModal()" class="btn-pink px-4 py-2 rounded-xl text-sm font-semibold">+ Nuevo Producto</button>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl shadow-sm border border-pink-100 overflow-hidden">
+            <table class="w-full text-left border-collapse">
+              <thead class="bg-pink-50 text-pink-main text-xs uppercase font-semibold">
+                <tr>
+                  <th class="p-4">Foto</th>
+                  <th class="p-4">Producto</th>
+                  <th class="p-4">Costo</th>
+                  <th class="p-4">Precio Venta</th>
+                  <th class="p-4">Stock</th>
+                  <th class="p-4">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100 text-sm">
+                ${products.map(p => `
+                  <tr>
+                    <td class="p-4"><img src="${p.img || 'https://via.placeholder.com/50'}" class="w-12 h-12 object-cover rounded-xl border border-pink-100"></td>
+                    <td class="p-4 font-semibold">${p.name}</td>
+                    <td class="p-4">$${p.cost.toLocaleString()}</td>
+                    <td class="p-4 text-pink-main font-bold">$${p.price.toLocaleString()}</td>
+                    <td class="p-4"><span class="px-3 py-1 rounded-full bg-pink-50 text-pink-main font-bold text-xs">${p.stock} unids</span></td>
+                    <td class="p-4 space-x-2">
+                      <button onclick="deleteProduct('${p.id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    // PESTAÑA: VENTAS & METAS (ADMIN)
+    function renderAnalyticsTab(container) {
+      const weeklyGoal = 200000;
+      const weeklySales = sales.reduce((acc, s) => acc + s.total, 0);
+      const goalPercentage = Math.min(100, Math.round((weeklySales / weeklyGoal) * 100));
+      const missing = Math.max(0, weeklyGoal - weeklySales);
+
+      const vendors = users.filter(u => u.role === 'vendor');
+
+      container.innerHTML = `
+        <div class="space-y-6">
+          <div class="bg-white p-6 rounded-3xl border border-pink-100 shadow-sm">
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="text-lg font-bold text-pink-main">Meta Semanal: $${weeklyGoal.toLocaleString()} COP</h3>
+              <span class="text-sm font-semibold text-gray-500">${goalPercentage}% Logrado</span>
+            </div>
+            <div class="w-full bg-gray-100 h-4 rounded-full overflow-hidden mb-3">
+              <div class="bg-pink-main h-full transition-all duration-500" style="width: ${goalPercentage}%"></div>
+            </div>
+            <p class="text-sm text-gray-600 font-medium">
+              ${missing > 0 ? `¡Vamos por más! Faltan <strong>$${missing.toLocaleString()}</strong> para cumplir la meta.` : '¡Felicidades! 🎉 Se ha alcanzado la meta semanal.'}
+            </p>
+          </div>
+
+          <div class="flex justify-between items-center">
+            <h2 class="text-xl font-bold text-gray-800">Estado de Pagos & Desempeño de Vendedoras</h2>
+            <button onclick="printMonthlySalesReport()" class="px-4 py-2 bg-gray-800 text-white rounded-xl text-sm font-semibold"><i class="fa-solid fa-print"></i> Reporte Mensual</button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            ${vendors.map(v => {
+              const vSales = sales.filter(s => s.vendor === v.user);
+              const totalV = vSales.reduce((a, b) => a + b.total, 0);
+              return `
+                <div class="bg-white p-5 rounded-2xl border border-pink-100 shadow-sm flex justify-between items-center">
+                  <div>
+                    <h4 class="font-bold text-gray-800 text-lg">${v.name}</h4>
+                    <p class="text-sm text-gray-500">${vSales.length} ventas realizadas</p>
+                    <p class="text-pink-main font-bold mt-1">Total: $${totalV.toLocaleString()}</p>
+                  </div>
+                  <div class="text-right">
+                    <span class="text-xs font-semibold block mb-1">Pago Mensual</span>
+                    <button onclick="toggleVendorPayment('${v.id}')" class="px-3 py-1.5 rounded-full font-bold text-xs ${v.paidMonth ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                      ${v.paidMonth ? '✔ Pagada' : '✖ Pendiente'}
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleVendorPayment(userId) {
+      const u = users.find(x => x.id === userId);
+      if (u) {
+        u.paidMonth = !u.paidMonth;
+        saveData();
+        renderAnalyticsTab(document.getElementById('mainContent'));
+      }
+    }
+
+    // PESTAÑA: CLIENTES (EDITAR Y ELIMINAR IMPLEMENTADO)
+    function renderClientsTab(container) {
+      container.innerHTML = `
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <h2 class="text-xl font-bold text-gray-800">Directorio de Clientes</h2>
+            <button onclick="openClientModal()" class="btn-pink px-4 py-2 rounded-xl text-sm font-semibold">+ Registrar Cliente</button>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-pink-100 shadow-sm overflow-hidden">
+            <table class="w-full text-left border-collapse">
+              <thead class="bg-pink-50 text-pink-main text-xs uppercase font-semibold">
+                <tr>
+                  <th class="p-4">Nombre</th>
+                  <th class="p-4">Celular</th>
+                  <th class="p-4">Estado Cuenta</th>
+                  <th class="p-4">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100 text-sm">
+                ${clients.map(c => `
+                  <tr>
+                    <td class="p-4 font-semibold">${c.name}</td>
+                    <td class="p-4">${c.phone}</td>
+                    <td class="p-4">
+                      ${c.debt > 0 ? `<span class="text-red-500 font-bold">Debe $${c.debt.toLocaleString()}</span>` : '<span class="text-green-500 font-bold">Al Día</span>'}
+                    </td>
+                    <td class="p-4 space-x-2">
+                      <button onclick="editClient('${c.id}')" class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen"></i></button>
+                      <button onclick="deleteClient('${c.id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function openClientModal(client = null) {
+      document.getElementById('clientModalTitle').innerText = client ? 'Editar Cliente' : 'Registrar Cliente';
+      document.getElementById('clientId').value = client ? client.id : '';
+      document.getElementById('clientName').value = client ? client.name : '';
+      document.getElementById('clientPhone').value = client ? client.phone : '';
+      document.getElementById('clientModal').classList.remove('hidden');
+    }
+
+    function closeClientModal() {
+      document.getElementById('clientModal').classList.add('hidden');
+    }
+
+    document.getElementById('clientForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const id = document.getElementById('clientId').value;
+      const name = document.getElementById('clientName').value.trim();
+      const phone = document.getElementById('clientPhone').value.trim();
+
+      if (id) {
+        const c = clients.find(x => x.id === id);
+        if (c) { c.name = name; c.phone = phone; }
+      } else {
+        clients.push({ id: Date.now().toString(), name, phone, debt: 0 });
+      }
+      saveData();
+      closeClientModal();
+      renderClientsTab(document.getElementById('mainContent'));
+    });
+
+    function editClient(id) {
+      const c = clients.find(x => x.id === id);
+      if (c) openClientModal(c);
+    }
+
+    function deleteClient(id) {
+      if (confirm('¿Deseas eliminar este cliente?')) {
+        clients = clients.filter(x => x.id !== id);
+        saveData();
+        renderClientsTab(document.getElementById('mainContent'));
+      }
+    }
+
+    // PESTAÑA: USUARIOS (ADMIN)
+    function renderUsersTab(container) {
+      container.innerHTML = `
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <h2 class="text-xl font-bold text-gray-800">Gestión de Usuarios</h2>
+            <button onclick="registerNewUser()" class="btn-pink px-4 py-2 rounded-xl text-sm font-semibold">+ Crear Usuario</button>
+          </div>
+          <div class="bg-white rounded-2xl border border-pink-100 p-4 shadow-sm">
+            <ul class="divide-y divide-gray-100">
+              ${users.map(u => `
+                <li class="py-3 flex justify-between items-center">
+                  <div>
+                    <span class="font-bold text-gray-800">${u.name} (${u.user})</span>
+                    <span class="ml-2 text-xs px-2 py-0.5 rounded-full ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-pink-100 text-pink-700'}">${u.role}</span>
+                  </div>
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+        </div>
+      `;
+    }
+
+    function registerNewUser() {
+      const name = prompt('Nombre de la vendedora / usuario:');
+      const user = prompt('Nombre de usuario (Login):');
+      const pass = prompt('Contraseña:');
+      const role = prompt('Rol (admin / vendor):', 'vendor');
+
+      if (name && user && pass) {
+        users.push({ id: Date.now().toString(), name, user, pass, role, paidMonth: false });
+        saveData();
+        renderUsersTab(document.getElementById('mainContent'));
+      }
+    }
+
+    // PESTAÑA: VENDEDORA (MI INVENTARIO & VENTAS)
+    function renderVendorTab(container) {
+      const mySales = sales.filter(s => s.vendor === currentUser.user);
+      const totalEarned = mySales.reduce((a, b) => a + b.total, 0);
+
+      container.innerHTML = `
+        <div class="space-y-6">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-white p-4 rounded-2xl border border-pink-100 shadow-sm text-center">
+              <span class="text-xs text-gray-400 font-bold block">VENTAS REALIZADAS</span>
+              <span class="text-2xl font-bold text-pink-main">${mySales.length}</span>
+            </div>
+            <div class="bg-white p-4 rounded-2xl border border-pink-100 shadow-sm text-center">
+              <span class="text-xs text-gray-400 font-bold block">TOTAL VENDIDO</span>
+              <span class="text-2xl font-bold text-green-500">$${totalEarned.toLocaleString()}</span>
+            </div>
+          </div>
+
+          <h2 class="text-xl font-bold text-gray-800">Inventario Disponible</h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            ${products.map(p => `
+              <div class="bg-white p-4 rounded-2xl border border-pink-100 shadow-sm flex flex-col justify-between">
+                <div>
+                  <img src="${p.img || 'https://via.placeholder.com/150'}" class="w-full h-32 object-cover rounded-xl mb-3">
+                  <h4 class="font-bold text-gray-800">${p.name}</h4>
+                  <p class="text-pink-main font-bold text-lg">$${p.price.toLocaleString()}</p>
+                  <p class="text-xs text-gray-400">Stock: ${p.stock} unids</p>
+                </div>
+                <button onclick="registerVendorSale('${p.id}')" ${p.stock <= 0 ? 'disabled' : ''} class="mt-3 w-full py-2 btn-pink rounded-xl font-semibold text-sm ${p.stock <= 0 ? 'opacity-50 cursor-not-allowed' : ''}">
+                  ${p.stock > 0 ? 'Registrar Venta' : 'Agotado'}
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function registerVendorSale(productId) {
+      const p = products.find(x => x.id === productId);
+      if (p && p.stock > 0) {
+        p.stock -= 1;
+        sales.push({
+          id: Date.now().toString(),
+          vendor: currentUser.user,
+          product: p.name,
+          total: p.price,
+          date: new Date().toLocaleDateString()
+        });
+        saveData();
+        renderVendorTab(document.getElementById('mainContent'));
+        alert('¡Venta registrada con éxito!');
+      }
+    }
+
+    // CATÁLOGO PÚBLICO & COMPARTIR WHATSAPP
+    function togglePublicCatalog() {
+      document.getElementById('publicCatalogSection').classList.remove('hidden');
+      renderPublicCatalog();
+    }
+    function closePublicCatalog() {
+      document.getElementById('publicCatalogSection').classList.add('hidden');
+    }
+
+    function renderPublicCatalog() {
+      const grid = document.getElementById('publicProductGrid');
+      grid.innerHTML = products.map(p => `
+        <div class="bg-white p-3 rounded-2xl border border-pink-100 shadow-sm flex flex-col justify-between">
+          <div>
+            <img src="${p.img || 'https://via.placeholder.com/150'}" class="w-full h-32 object-cover rounded-xl mb-2">
+            <h4 class="font-bold text-sm text-gray-800">${p.name}</h4>
+            <p class="text-pink-main font-bold">$${p.price.toLocaleString()}</p>
+          </div>
+          <button onclick="addToCart('${p.id}')" class="mt-2 w-full py-1.5 bg-pink-100 text-pink-main font-semibold text-xs rounded-xl hover:bg-pink-200">
+            + Agregar a Bolsa
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function addToCart(productId) {
+      const p = products.find(x => x.id === productId);
+      if (p) {
+        cart.push(p);
+        document.getElementById('cartCount').innerText = cart.length;
+        alert(`${p.name} agregado a la bolsa.`);
+      }
+    }
+
+    function toggleCartModal() {
+      const modal = document.getElementById('cartModal');
+      modal.classList.toggle('hidden');
+      if (!modal.classList.contains('hidden')) renderCartItems();
+    }
+
+    function renderCartItems() {
+      const container = document.getElementById('cartItemsContainer');
+      if (cart.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">Tu bolsa está vacía.</p>';
+      } else {
+        container.innerHTML = cart.map((item, idx) => `
+          <div class="flex justify-between items-center text-sm border-b border-gray-50 pb-2">
+            <span>${item.name}</span>
+            <span class="font-bold text-pink-main">$${item.price.toLocaleString()}</span>
+          </div>
+        `).join('');
+      }
+
+      const total = cart.reduce((acc, i) => acc + i.price, 0);
+      const isFree = total >= 30000;
+      document.getElementById('shippingFeeText').innerText = isFree ? 'GRATIS' : 'A convenir / Domicilio contra entrega';
+      document.getElementById('cartTotalText').innerText = `$${total.toLocaleString()}`;
+    }
+
+    function sendWhatsAppOrder() {
+      const name = document.getElementById('orderClientName').value.trim();
+      const address = document.getElementById('orderClientAddress').value.trim();
+      const method = document.getElementById('orderPaymentMethod').value;
+
+      if (!name || !address) {
+        alert('Por favor completa tu nombre y dirección de envío.');
+        return;
+      }
+
+      const total = cart.reduce((acc, i) => acc + i.price, 0);
+      let text = `¡Hola Jema_makeup! Quisiera realizar el siguiente pedido:\n\n`;
+      cart.forEach(i => text += `- ${i.name} ($${i.price.toLocaleString()})\n`);
+      text += `\n*Total:* $${total.toLocaleString()}`;
+      text += `\n*Cliente:* ${name}`;
+      text += `\n*Dirección:* ${address}`;
+      text += `\n*Método de Pago:* ${method}`;
+
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    function shareCatalogWhatsApp() {
+      let msg = `✨ *Catálogo Oficial Jema_makeup* ✨\n\nConoce nuestros productos disponibles:\n\n`;
+      products.forEach(p => msg += `💄 *${p.name}* - $${p.price.toLocaleString()}\n`);
+      msg += `\n¡Escríbenos para hacer tu pedido directo! 💖`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    // FUNCIONES DE IMPRESIÓN
+    function printInventory() {
+      window.print();
+    }
+    function printMonthlySalesReport() {
+      window.print();
+    }
+  </script>
+</body>
+</html>
