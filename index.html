@@ -62,7 +62,7 @@
           <label class="block text-sm font-medium text-gray-600 mb-2">Elige tu Avatar</label>
           <div class="flex justify-around py-2">
             <button type="button" onclick="selectAvatar('fa-user-ninja')" class="avatar-option p-3 rounded-full text-2xl border-2 border-transparent hover:border-pink-300 text-pink-400"><i class="fa-solid fa-user-ninja"></i></button>
-            <button type="button" onclick="selectAvatar('fa-crown')" class="avatar-option p-3 rounded-full text-2xl border-2 border-transparent hover:border-pink-300 text-pink-400"><i class="fa-solid fa-crown"></i></button>
+            <button type="button" onclick="selectAvatar('fa-crown')" class="avatar-option p-3 rounded-full text-2xl border-2 border-pink-300 bg-pink-50 text-pink-400"><i class="fa-solid fa-crown"></i></button>
             <button type="button" onclick="selectAvatar('fa-gem')" class="avatar-option p-3 rounded-full text-2xl border-2 border-transparent hover:border-pink-300 text-pink-400"><i class="fa-solid fa-gem"></i></button>
             <button type="button" onclick="selectAvatar('fa-heart')" class="avatar-option p-3 rounded-full text-2xl border-2 border-transparent hover:border-pink-300 text-pink-400"><i class="fa-solid fa-heart"></i></button>
             <button type="button" onclick="selectAvatar('fa-sparkles')" class="avatar-option p-3 rounded-full text-2xl border-2 border-transparent hover:border-pink-300 text-pink-400"><i class="fa-solid fa-sparkles"></i></button>
@@ -254,7 +254,7 @@
       event.currentTarget.classList.add('border-pink-500', 'bg-pink-50');
     }
 
-    // AUTENTICACIÓN
+    // AUTENTICACIÓN OBLIGATORIA
     document.getElementById('loginForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const u = document.getElementById('loginUser').value.trim();
@@ -265,6 +265,8 @@
         currentUser = found;
         currentUser.avatar = selectedAvatar;
         localStorage.setItem('jm_session', JSON.stringify(currentUser));
+        document.getElementById('loginUser').value = '';
+        document.getElementById('loginPass').value = '';
         checkAuth();
       } else {
         alert('Usuario o contraseña incorrectos');
@@ -372,7 +374,7 @@
       `;
     }
 
-    // PESTAÑA: INVENTARIO MAESTRO (ADMIN)
+    // PESTAÑA: INVENTARIO MAESTRO (ADMIN) - CON GANANCIA POR PRODUCTO
     function renderInventoryTab(container) {
       const totalExpected = products.reduce((acc, p) => acc + (p.price * p.stock), 0);
       const totalCost = products.reduce((acc, p) => acc + (p.cost * p.stock), 0);
@@ -411,24 +413,33 @@
                   <th class="p-4">Producto</th>
                   <th class="p-4">Costo</th>
                   <th class="p-4">Precio Venta</th>
+                  <th class="p-4">Ganancia Unit.</th>
                   <th class="p-4">Stock</th>
                   <th class="p-4 no-print">Acciones</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-100 text-sm">
-                ${products.map(p => `
-                  <tr>
-                    <td class="p-4"><img src="${p.img || 'https://via.placeholder.com/50'}" class="w-12 h-12 object-cover rounded-xl border border-pink-100"></td>
-                    <td class="p-4 font-semibold">${p.name}</td>
-                    <td class="p-4">$${p.cost.toLocaleString()}</td>
-                    <td class="p-4 text-pink-main font-bold">$${p.price.toLocaleString()}</td>
-                    <td class="p-4"><span class="px-3 py-1 rounded-full bg-pink-50 text-pink-main font-bold text-xs">${p.stock} unids</span></td>
-                    <td class="p-4 space-x-2 no-print">
-                      <button onclick="editProduct('${p.id}')" class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen"></i></button>
-                      <button onclick="deleteProduct('${p.id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                  </tr>
-                `).join('')}
+                ${products.map(p => {
+                  const profitUnit = p.price - p.cost;
+                  const profitPercent = p.cost > 0 ? Math.round((profitUnit / p.cost) * 100) : 0;
+                  return `
+                    <tr>
+                      <td class="p-4"><img src="${p.img || 'https://via.placeholder.com/50'}" class="w-12 h-12 object-cover rounded-xl border border-pink-100"></td>
+                      <td class="p-4 font-semibold">${p.name}</td>
+                      <td class="p-4">$${p.cost.toLocaleString()}</td>
+                      <td class="p-4 text-pink-main font-bold">$${p.price.toLocaleString()}</td>
+                      <td class="p-4">
+                        <span class="font-bold text-green-600 block">$${profitUnit.toLocaleString()}</span>
+                        <span class="text-xs text-gray-400">${profitPercent}% margen</span>
+                      </td>
+                      <td class="p-4"><span class="px-3 py-1 rounded-full bg-pink-50 text-pink-main font-bold text-xs">${p.stock} unids</span></td>
+                      <td class="p-4 space-x-2 no-print">
+                        <button onclick="editProduct('${p.id}')" class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteProduct('${p.id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
               </tbody>
             </table>
           </div>
@@ -834,7 +845,7 @@
         }
 
         if (prod.stock >= qty) {
-          prod.stock -= qty; // Descuenta del inventario general
+          prod.stock -= qty;
           sales.push({
             id: Date.now().toString(),
             date: new Date().toLocaleDateString(),
