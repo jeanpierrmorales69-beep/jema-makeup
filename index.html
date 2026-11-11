@@ -37,7 +37,7 @@
 </head>
 <body class="text-gray-700 min-h-screen flex flex-col">
 
-  <!-- VISTA: LOGIN & SELECCIÓN DE AVATAR -->
+  <!-- VISTA: LOGIN (OBLIGATORIO AL INICIAR) -->
   <div id="loginSection" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-pink-50 to-pink-100">
     <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md border border-pink-100">
       <div class="text-center mb-6">
@@ -45,7 +45,7 @@
           <i class="fa-solid fa-wand-magic-sparkles"></i>
         </div>
         <h1 class="text-3xl font-bold text-pink-main">Jema_makeup</h1>
-        <p class="text-gray-500 text-sm mt-1">Inicia sesión para ingresar al sistema</p>
+        <p class="text-gray-500 text-sm mt-1">Ingresa tu usuario y contraseña para acceder</p>
       </div>
 
       <form id="loginForm" class="space-y-4">
@@ -69,7 +69,7 @@
           </div>
         </div>
 
-        <button type="submit" class="w-full py-3 rounded-xl btn-pink font-semibold shadow-md">Ingresar</button>
+        <button type="submit" class="w-full py-3 rounded-xl btn-pink font-semibold shadow-md">Ingresar al Sistema</button>
       </form>
     </div>
   </div>
@@ -110,7 +110,7 @@
     </main>
   </div>
 
-  <!-- MODAL NUEVO / EDITAR PRODUCTO CON FOTO PNG -->
+  <!-- MODAL NUEVO / EDITAR PRODUCTO -->
   <div id="productModal" class="hidden fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl">
       <div class="flex justify-between items-center mb-4">
@@ -153,7 +153,7 @@
     </div>
   </div>
 
-  <!-- MODAL EDITAR / REGISTRAR CLIENTE -->
+  <!-- MODAL CLIENTE -->
   <div id="clientModal" class="hidden fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl">
       <h3 id="clientModalTitle" class="text-xl font-bold text-pink-main mb-4">Registrar Cliente</h3>
@@ -175,7 +175,7 @@
     </div>
   </div>
 
-  <!-- MODAL REGISTRAR USUARIO -->
+  <!-- MODAL CREAR USUARIO -->
   <div id="userModal" class="hidden fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl">
       <div class="flex justify-between items-center mb-4">
@@ -293,32 +293,80 @@
     // NAVEGACIÓN
     function renderNavigation() {
       const navTabs = document.getElementById('navTabs');
-      let html = '';
+      let html = `<button onclick="switchTab('dashboard')" class="tab-btn font-semibold px-4 py-2 rounded-xl bg-pink-100 text-pink-main border border-pink-200">Dashboard</button>`;
 
       if (currentUser.role === 'admin') {
         html += `
-          <button onclick="switchTab('inventory')" class="tab-btn font-semibold px-4 py-2 rounded-xl bg-pink-100 text-pink-main border border-pink-200">Inventario Maestro</button>
+          <button onclick="switchTab('inventory')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50">Inventario Maestro</button>
           <button onclick="switchTab('analytics')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50">Ventas & Metas</button>
           <button onclick="switchTab('clients')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50">Clientes</button>
           <button onclick="switchTab('users')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50">Usuarios</button>
         `;
       } else {
         html += `
-          <button onclick="switchTab('vendor_inv')" class="tab-btn font-semibold px-4 py-2 rounded-xl bg-pink-100 text-pink-main border border-pink-200">Mi Inventario & Ventas</button>
+          <button onclick="switchTab('vendor_inv')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50">Mi Inventario & Ventas</button>
           <button onclick="switchTab('clients')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50">Mis Clientes</button>
         `;
       }
       navTabs.innerHTML = html;
-      switchTab(currentUser.role === 'admin' ? 'inventory' : 'vendor_inv');
+      switchTab('dashboard');
     }
 
     function switchTab(tabName) {
       const main = document.getElementById('mainContent');
-      if (tabName === 'inventory') renderInventoryTab(main);
+      if (tabName === 'dashboard') renderDashboardTab(main);
+      else if (tabName === 'inventory') renderInventoryTab(main);
       else if (tabName === 'analytics') renderAnalyticsTab(main);
       else if (tabName === 'clients') renderClientsTab(main);
       else if (tabName === 'users') renderUsersTab(main);
       else if (tabName === 'vendor_inv') renderVendorTab(main);
+    }
+
+    // PESTAÑA: DASHBOARD GENERAL (BIENVENIDA GRANDE)
+    function renderDashboardTab(container) {
+      const totalSalesCount = sales.length;
+      const totalProductsCount = products.length;
+
+      container.innerHTML = `
+        <div class="space-y-6">
+          <div class="bg-gradient-to-r from-pink-100 via-pink-50 to-white p-8 rounded-3xl border border-pink-200 shadow-sm text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="space-y-2">
+              <span class="px-3 py-1 bg-white text-pink-main font-bold text-xs rounded-full uppercase shadow-xs">Panel Principal</span>
+              <h1 class="text-3xl md:text-4xl font-extrabold text-pink-main">¡Hola, ${currentUser.name || currentUser.user}! ✨</h1>
+              <p class="text-gray-600 text-base">Bienvenid@ a la plataforma de gestión de <strong>Jema_makeup</strong>. ¿Qué deseas gestionar hoy?</p>
+            </div>
+            <div class="w-20 h-20 rounded-full bg-white flex items-center justify-center text-pink-main text-4xl shadow-md border-2 border-pink-200">
+              <i class="fa-solid ${currentUser.avatar || 'fa-crown'}"></i>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white p-6 rounded-2xl border border-pink-100 shadow-sm flex items-center justify-between">
+              <div>
+                <span class="text-xs font-bold text-gray-400 block">PRODUCTOS EN SISTEMA</span>
+                <span class="text-3xl font-extrabold text-gray-800">${totalProductsCount}</span>
+              </div>
+              <div class="p-3 bg-pink-50 rounded-2xl text-pink-main text-2xl"><i class="fa-solid fa-boxes-stacked"></i></div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-pink-100 shadow-sm flex items-center justify-between">
+              <div>
+                <span class="text-xs font-bold text-gray-400 block">VENTAS REGISTRADAS</span>
+                <span class="text-3xl font-extrabold text-pink-main">${totalSalesCount}</span>
+              </div>
+              <div class="p-3 bg-pink-50 rounded-2xl text-pink-main text-2xl"><i class="fa-solid fa-bag-shopping"></i></div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-pink-100 shadow-sm flex items-center justify-between">
+              <div>
+                <span class="text-xs font-bold text-gray-400 block">CLIENTES REGISTRADOS</span>
+                <span class="text-3xl font-extrabold text-gray-800">${clients.length}</span>
+              </div>
+              <div class="p-3 bg-pink-50 rounded-2xl text-pink-main text-2xl"><i class="fa-solid fa-users"></i></div>
+            </div>
+          </div>
+        </div>
+      `;
     }
 
     // PESTAÑA: INVENTARIO MAESTRO (ADMIN)
@@ -472,7 +520,7 @@
       }
     }
 
-    // PESTAÑA: VENTAS, HISTORIAL & METAS (ADMIN)
+    // PESTAÑA: VENTAS & METAS (ADMIN)
     function renderAnalyticsTab(container) {
       const weeklyGoal = 200000;
       const weeklySales = sales.reduce((acc, s) => acc + s.total, 0);
@@ -530,6 +578,7 @@
             <table class="w-full text-left border-collapse">
               <thead class="bg-pink-50 text-pink-main text-xs uppercase font-semibold">
                 <tr>
+                  <th class="p-4">Foto</th>
                   <th class="p-4">Fecha</th>
                   <th class="p-4">Vendedora</th>
                   <th class="p-4">Producto</th>
@@ -537,12 +586,13 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-100 text-sm">
-                ${sales.length === 0 ? '<tr><td colspan="4" class="p-4 text-center text-gray-400">No hay ventas registradas aún.</td></tr>' : ''}
+                ${sales.length === 0 ? '<tr><td colspan="5" class="p-4 text-center text-gray-400">No hay ventas registradas aún.</td></tr>' : ''}
                 ${sales.map(s => `
                   <tr>
+                    <td class="p-4"><img src="${s.productImg || 'https://via.placeholder.com/40'}" class="w-10 h-10 object-cover rounded-xl border border-pink-100"></td>
                     <td class="p-4">${s.date}</td>
                     <td class="p-4 font-semibold">${s.vendor}</td>
-                    <td class="p-4">${s.product}</td>
+                    <td class="p-4 font-medium">${s.product}</td>
                     <td class="p-4 text-pink-main font-bold">$${s.total.toLocaleString()}</td>
                   </tr>
                 `).join('')}
@@ -644,7 +694,7 @@
       }
     }
 
-    // PESTAÑA: USUARIOS (ADMIN CREA USUARIOS)
+    // PESTAÑA: USUARIOS
     function renderUsersTab(container) {
       container.innerHTML = `
         <div class="space-y-4">
@@ -704,7 +754,7 @@
       alert('¡Usuario creado correctamente!');
     });
 
-    // PESTAÑA: VENDEDORA (MI INVENTARIO & VENTAS)
+    // PESTAÑA: VENDEDORA (CON HISTORIAL CON FOTO Y NOMBRE DE LO QUE VENDIÓ)
     function renderVendorTab(container) {
       const mySales = sales.filter(s => s.vendor === currentUser.user);
       const totalEarned = mySales.reduce((a, b) => a + b.total, 0);
@@ -713,16 +763,16 @@
         <div class="space-y-6">
           <div class="grid grid-cols-2 gap-4">
             <div class="bg-white p-4 rounded-2xl border border-pink-100 shadow-sm text-center">
-              <span class="text-xs text-gray-400 font-bold block">VENTAS REALIZADAS</span>
+              <span class="text-xs text-gray-400 font-bold block">MIS VENTAS REALIZADAS</span>
               <span class="text-2xl font-bold text-pink-main">${mySales.length}</span>
             </div>
             <div class="bg-white p-4 rounded-2xl border border-pink-100 shadow-sm text-center">
-              <span class="text-xs text-gray-400 font-bold block">TOTAL VENDIDO</span>
+              <span class="text-xs text-gray-400 font-bold block">TOTAL GENERADO</span>
               <span class="text-2xl font-bold text-green-500">$${totalEarned.toLocaleString()}</span>
             </div>
           </div>
 
-          <h2 class="text-xl font-bold text-gray-800">Inventario Disponible</h2>
+          <h2 class="text-xl font-bold text-gray-800">Inventario Disponible para Vender</h2>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             ${products.map(p => `
@@ -739,6 +789,32 @@
               </div>
             `).join('')}
           </div>
+
+          <h2 class="text-xl font-bold text-gray-800 pt-4">Mi Registro Histórico de Ventas</h2>
+
+          <div class="bg-white rounded-2xl border border-pink-100 shadow-sm overflow-hidden">
+            <table class="w-full text-left border-collapse">
+              <thead class="bg-pink-50 text-pink-main text-xs uppercase font-semibold">
+                <tr>
+                  <th class="p-4">Foto</th>
+                  <th class="p-4">Producto Vendido</th>
+                  <th class="p-4">Fecha</th>
+                  <th class="p-4">Total</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100 text-sm">
+                ${mySales.length === 0 ? '<tr><td colspan="4" class="p-4 text-center text-gray-400">Aún no has registrado ninguna venta.</td></tr>' : ''}
+                ${mySales.map(s => `
+                  <tr>
+                    <td class="p-4"><img src="${s.productImg || 'https://via.placeholder.com/40'}" class="w-10 h-10 object-cover rounded-xl border border-pink-100"></td>
+                    <td class="p-4 font-semibold text-gray-800">${s.product}</td>
+                    <td class="p-4 text-gray-500">${s.date}</td>
+                    <td class="p-4 text-pink-main font-bold">$${s.total.toLocaleString()}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
         </div>
       `;
     }
@@ -751,6 +827,7 @@
           id: Date.now().toString(),
           vendor: currentUser.user,
           product: p.name,
+          productImg: p.img,
           total: p.price,
           date: new Date().toLocaleDateString()
         });
