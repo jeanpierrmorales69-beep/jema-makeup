@@ -43,7 +43,13 @@
 </head>
 <body class="text-gray-800 min-h-full flex flex-col">
 
-  <!-- VISTA 1: CATÁLOGO PÚBLICO TIPO CARRITO (CLIENTES) -->
+  <!-- NOTIFICACIÓN FLOTANTE (TOAST) -->
+  <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-gray-900 text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-sm font-bold">
+    <i class="fa-solid fa-circle-check text-green-400 text-lg"></i>
+    <span id="toastMessage">¡Acción realizada con éxito!</span>
+  </div>
+
+  <!-- VISTA 1: CATÁLOGO PÚBLICO TIPO CARRITO -->
   <div id="publicCatalogSection" class="min-h-screen bg-[#FFF5F7] flex flex-col">
     <header class="glass-card shadow-sm p-4 sticky top-0 z-30 border-b border-pink-100">
       <div class="max-w-7xl mx-auto flex justify-between items-center">
@@ -73,7 +79,7 @@
         <div>
           <span class="text-xs font-bold text-pink-main uppercase tracking-wider block mb-1">Experiencia Exclusiva</span>
           <h2 class="text-2xl font-bold text-gray-900">Catálogo de Alta Gama</h2>
-          <p class="text-gray-500 text-sm mt-0.5">Selecciona tus productos favoritos, arma tu bolsa y haz tu pedido directo al WhatsApp.</p>
+          <p class="text-gray-500 text-sm mt-0.5">Selecciona tus productos, elige tu asesora preferida y envía tu pedido directamente a su WhatsApp.</p>
         </div>
         <div class="flex items-center gap-2 bg-pink-50 px-4 py-2 rounded-2xl border border-pink-200">
           <i class="fa-solid fa-truck-fast text-pink-main"></i>
@@ -103,12 +109,18 @@
 
       <div class="border-t border-gray-100 pt-4 space-y-3">
         <div>
+          <label class="block text-xs font-bold text-gray-600 mb-1">Seleccionar Asesora / Vendedora *</label>
+          <select id="cartVendorSelect" class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm bg-white font-bold text-pink-main">
+            <!-- Dinámico -->
+          </select>
+        </div>
+        <div>
           <label class="block text-xs font-bold text-gray-600 mb-1">Nombre Completo *</label>
           <input type="text" id="orderClientName" class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-pink-300 outline-none" placeholder="Tu nombre">
         </div>
         <div>
-          <label class="block text-xs font-bold text-gray-600 mb-1">Dirección y Barrio *</label>
-          <textarea id="orderClientAddress" rows="2" class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-pink-300 outline-none" placeholder="Dirección completa"></textarea>
+          <label class="block text-xs font-bold text-gray-600 mb-1">Dirección y Barrio (Opcional)</label>
+          <textarea id="orderClientAddress" rows="2" class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-pink-300 outline-none" placeholder="Dirección opcional"></textarea>
         </div>
 
         <div class="flex justify-between items-center text-xl font-extrabold pt-2">
@@ -123,7 +135,7 @@
     </div>
   </div>
 
-  <!-- VISTA 2: MODAL LOGIN PERSONAL -->
+  <!-- MODAL LOGIN PERSONAL -->
   <div id="loginModalSection" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4 z-50">
     <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md border border-pink-100 relative">
       <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
@@ -257,17 +269,21 @@
     </div>
   </div>
 
-  <!-- MODAL CREAR USUARIO -->
+  <!-- MODAL CREAR USUARIO (VENDEDORA CON WHATSAPP) -->
   <div id="userModal" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl border border-pink-100">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-extrabold text-pink-main">Crear Nuevo Usuario</h3>
+        <h3 class="text-xl font-extrabold text-pink-main">Crear Nueva Vendedora</h3>
         <button onclick="closeUserModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
       <form id="userForm" class="space-y-4">
         <div>
-          <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Nombre Completo</label>
-          <input type="text" id="newUserName" required class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm">
+          <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Nombre de la Vendedora</label>
+          <input type="text" id="newUserName" required class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm" placeholder="Ej: Dana">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Número de WhatsApp (con código de país 57...)</label>
+          <input type="tel" id="newUserPhone" required class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm" placeholder="Ej: 573112210988">
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Usuario (Login)</label>
@@ -292,14 +308,14 @@
     </div>
   </div>
 
-  <!-- SCRIPT DE LA APLICACIÓN -->
+  <!-- SCRIPT GENERAL -->
   <script>
     let currentUser = null;
     let selectedAvatar = 'fa-crown';
     let cart = [];
 
     let users = JSON.parse(localStorage.getItem('jm_users')) || [
-      { id: '1', user: 'mari', pass: '1234', role: 'admin', name: 'Mari', avatar: 'fa-crown', paidMonth: true }
+      { id: '1', user: 'mari', pass: '1234', role: 'admin', name: 'Mari', phone: '573112210988', avatar: 'fa-crown', paidMonth: {} }
     ];
 
     let products = JSON.parse(localStorage.getItem('jm_products')) || [
@@ -320,6 +336,7 @@
       checkAuth();
       setupFileInput();
       renderPublicCatalog();
+      populateVendorDropdown();
     };
 
     function saveData() {
@@ -328,6 +345,15 @@
       localStorage.setItem('jm_clients', JSON.stringify(clients));
       localStorage.setItem('jm_sales', JSON.stringify(sales));
       localStorage.setItem('jm_custom_orders', JSON.stringify(customOrders));
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toastNotification');
+      document.getElementById('toastMessage').innerText = message;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
     }
 
     function selectAvatar(iconClass) {
@@ -357,6 +383,7 @@
         localStorage.setItem('jm_session', JSON.stringify(currentUser));
         closeLoginModal();
         checkAuth();
+        showToast(`¡Bienvenida de nuevo, ${currentUser.name}!`);
       } else {
         alert('Usuario o contraseña incorrectos');
       }
@@ -376,6 +403,7 @@
         document.getElementById('publicCatalogSection').classList.remove('hidden');
         document.getElementById('appSection').classList.add('hidden');
         renderPublicCatalog();
+        populateVendorDropdown();
       }
     }
 
@@ -385,9 +413,17 @@
       checkAuth();
     }
 
-    // CATÁLOGO PÚBLICO TIPO CARRITO
+    // CATÁLOGO PÚBLICO
+    function populateVendorDropdown() {
+      const select = document.getElementById('cartVendorSelect');
+      if (!select) return;
+      const vendors = users.filter(u => u.role === 'vendor' || u.role === 'admin');
+      select.innerHTML = vendors.map(v => `<option value="${v.phone || '573112210988'}">${v.name} (${v.role === 'admin' ? 'Admin' : 'Vendedora'})</option>`).join('');
+    }
+
     function renderPublicCatalog() {
       const grid = document.getElementById('publicProductGrid');
+      if (!grid) return;
       grid.innerHTML = products.map(p => `
         <div class="glass-card p-4 rounded-3xl shadow-sm flex flex-col justify-between border border-pink-100 hover:shadow-md transition">
           <div>
@@ -416,14 +452,17 @@
           cart.push({ ...p, qty: 1 });
         }
         document.getElementById('cartCount').innerText = cart.reduce((a, b) => a + b.qty, 0);
-        alert(`¡${p.name} agregado a tu bolsa!`);
+        showToast(`¡${p.name} agregado a tu bolsa!`);
       }
     }
 
     function toggleCartModal() {
       const modal = document.getElementById('cartModal');
       modal.classList.toggle('hidden');
-      if (!modal.classList.contains('hidden')) renderCartItems();
+      if (!modal.classList.contains('hidden')) {
+        populateVendorDropdown();
+        renderCartItems();
+      }
     }
 
     function renderCartItems() {
@@ -431,7 +470,7 @@
       if (cart.length === 0) {
         container.innerHTML = '<p class="text-center text-gray-400 text-sm py-6">Tu bolsa de compras está vacía.</p>';
       } else {
-        container.innerHTML = cart.map(item => `
+        container.innerHTML = cart.map((item, index) => `
           <div class="flex justify-between items-center text-sm border-b border-gray-100 pb-3">
             <div class="flex items-center gap-3">
               <img src="${item.img || 'https://via.placeholder.com/40'}" class="w-12 h-12 object-cover rounded-xl border">
@@ -440,7 +479,10 @@
                 <p class="text-xs text-gray-500">Cant: ${item.qty} x $${item.price.toLocaleString()}</p>
               </div>
             </div>
-            <span class="font-extrabold text-pink-main">$${(item.price * item.qty).toLocaleString()}</span>
+            <div class="flex items-center gap-3">
+              <span class="font-extrabold text-pink-main">$${(item.price * item.qty).toLocaleString()}</span>
+              <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-600 p-1"><i class="fa-solid fa-trash text-xs"></i></button>
+            </div>
           </div>
         `).join('');
       }
@@ -448,12 +490,19 @@
       document.getElementById('cartTotalText').innerText = `$${total.toLocaleString()}`;
     }
 
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      document.getElementById('cartCount').innerText = cart.reduce((a, b) => a + b.qty, 0);
+      renderCartItems();
+    }
+
     function sendWhatsAppOrder() {
+      const vendorPhone = document.getElementById('cartVendorSelect').value || '573112210988';
       const name = document.getElementById('orderClientName').value.trim();
       const address = document.getElementById('orderClientAddress').value.trim();
 
-      if (!name || !address) {
-        alert('Por favor ingresa tu nombre y dirección de entrega.');
+      if (!name) {
+        alert('Por favor ingresa tu nombre.');
         return;
       }
 
@@ -462,9 +511,9 @@
       cart.forEach(i => text += `- ${i.qty}x ${i.name} ($${(i.price * i.qty).toLocaleString()})\n`);
       text += `\n*Total a Pagar:* $${total.toLocaleString()}`;
       text += `\n*Cliente:* ${name}`;
-      text += `\n*Dirección:* ${address}`;
+      if (address) text += `\n*Dirección:* ${address}`;
 
-      window.open(`https://wa.me/573112210988?text=${encodeURIComponent(text)}`, '_blank');
+      window.open(`https://wa.me/${vendorPhone}?text=${encodeURIComponent(text)}`, '_blank');
     }
 
     // NAVEGACIÓN INTERNA
@@ -506,7 +555,6 @@
       else if (tabName === 'vendor_inv') renderPOSSection(main, 'vendor');
     }
 
-    // DASHBOARD PRINCIPAL
     function renderDashboardTab(container) {
       container.innerHTML = `
         <div class="space-y-6">
@@ -547,7 +595,7 @@
       `;
     }
 
-    // INVENTARIO MAESTRO (ADMIN)
+    // INVENTARIO MAESTRO
     function renderInventoryTab(container) {
       const totalExpected = products.reduce((acc, p) => acc + (p.price * p.stock), 0);
       const totalCost = products.reduce((acc, p) => acc + (p.cost * p.stock), 0);
@@ -682,6 +730,7 @@
       closeProductModal();
       renderInventoryTab(document.getElementById('mainContent'));
       renderPublicCatalog();
+      showToast('¡Producto guardado exitosamente!');
     });
 
     function editProduct(id) {
@@ -695,10 +744,11 @@
         saveData();
         renderInventoryTab(document.getElementById('mainContent'));
         renderPublicCatalog();
+        showToast('Producto eliminado.');
       }
     }
 
-    // PUNTO DE VENTA (POS / FACTURACIÓN) PARA VENDEDORAS Y ADMIN
+    // PUNTO DE VENTA (POS / FACTURACIÓN)
     let posCart = [];
 
     function renderPOSSection(container, mode) {
@@ -734,7 +784,6 @@
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Selector de Productos -->
             <div class="lg:col-span-2 space-y-4">
               <h2 class="text-xl font-extrabold text-gray-900">Seleccionar Productos para Facturar</h2>
               <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -751,7 +800,6 @@
               </div>
             </div>
 
-            <!-- Factura / Carrito -->
             <div class="glass-card p-6 rounded-3xl border border-pink-200 shadow-sm flex flex-col justify-between space-y-4">
               <div>
                 <h3 class="text-lg font-extrabold text-pink-main mb-3 flex items-center gap-2"><i class="fa-solid fa-file-invoice-dollar"></i> Factura de Venta</h3>
@@ -760,7 +808,7 @@
                   <div>
                     <label class="block text-xs font-bold text-gray-600 mb-1">Cliente</label>
                     <select id="posClientSelect" class="w-full px-3 py-2 rounded-xl border text-xs bg-white">
-                      <option value="Cliente Ocasional">Cliente Ocasional (Rápido)</option>
+                      <option value="Cliente Ocasional">Cliente Ocasional</option>
                       ${clients.map(c => `<option value="${c.name}">${c.name} (${c.phone})</option>`).join('')}
                     </select>
                   </div>
@@ -789,7 +837,6 @@
             </div>
           </div>
 
-          <!-- Historial de Ventas del Vendedor o Admin -->
           <div class="pt-6">
             <h2 class="text-xl font-extrabold text-gray-900 mb-4">Historial de Ventas Realizadas</h2>
             <div class="glass-card rounded-3xl shadow-sm border border-pink-100 overflow-hidden">
@@ -816,7 +863,8 @@
                       <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-extrabold ${s.status === 'Pagado' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${s.status || 'Pagado'}</span></td>
                       <td class="p-4 text-pink-main font-extrabold">$${s.total.toLocaleString()}</td>
                       <td class="p-4 space-x-2">
-                        <button onclick="generateReceiptPDF('${s.id}')" class="text-blue-500 hover:text-blue-700 text-xs font-bold" title="Generar Recibo"><i class="fa-solid fa-file-pdf text-base"></i></button>
+                        <button onclick="generateReceiptPDF('${s.id}')" class="text-blue-500 hover:text-blue-700 text-xs font-bold" title="Imprimir Recibo PDF"><i class="fa-solid fa-file-pdf text-base"></i></button>
+                        <button onclick="sendReceiptWhatsApp('${s.id}')" class="text-green-500 hover:text-green-700 text-xs font-bold" title="Enviar por WhatsApp"><i class="fa-brands fa-whatsapp text-base"></i></button>
                         <button onclick="deleteSale('${s.id}')" class="text-red-400 hover:text-red-600 text-xs" title="Borrar Venta"><i class="fa-solid fa-trash"></i></button>
                       </td>
                     </tr>
@@ -852,15 +900,23 @@
       if (posCart.length === 0) {
         container.innerHTML = '<p class="text-xs text-gray-400 text-center">Bolsa vacía.</p>';
       } else {
-        container.innerHTML = posCart.map(item => `
-          <div class="flex justify-between items-center text-xs">
+        container.innerHTML = posCart.map((item, index) => `
+          <div class="flex justify-between items-center text-xs border-b border-gray-50 pb-1">
             <span>${item.qty}x ${item.name}</span>
-            <span class="font-bold text-pink-main">$${(item.price * item.qty).toLocaleString()}</span>
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-pink-main">$${(item.price * item.qty).toLocaleString()}</span>
+              <button onclick="posRemoveItem(${index})" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
           </div>
         `).join('');
       }
       const total = posCart.reduce((acc, i) => acc + (i.price * i.qty), 0);
       document.getElementById('posTotalText').innerText = `$${total.toLocaleString()}`;
+    }
+
+    function posRemoveItem(index) {
+      posCart.splice(index, 1);
+      renderPOSCart();
     }
 
     function completePOSSale() {
@@ -876,7 +932,7 @@
         if (prodRef) prodRef.stock -= item.qty;
 
         const utility = (item.price - item.cost) * item.qty;
-        const commission = utility > 0 ? utility * 0.35 : 0; // 35% de utilidad para vendedora
+        const commission = utility > 0 ? utility * 0.35 : 0;
 
         sales.push({
           id: Date.now().toString() + Math.random(),
@@ -895,7 +951,7 @@
       posCart = [];
       saveData();
       switchTab(currentUser.role === 'admin' ? 'admin_sales' : 'vendor_inv');
-      alert('¡Venta registrada con éxito!');
+      showToast('¡Venta registrada con éxito!');
     }
 
     function deleteSale(saleId) {
@@ -903,6 +959,7 @@
         sales = sales.filter(s => s.id !== saleId);
         saveData();
         switchTab(currentUser.role === 'admin' ? 'admin_sales' : 'vendor_inv');
+        showToast('Venta eliminada.');
       }
     }
 
@@ -912,7 +969,7 @@
       const receiptHTML = `
         <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 400px; margin: auto; border: 1px solid #ddd; border-radius: 10px;">
           <h2 style="text-align: center; color: #D44D79;">JEMA_MAKEUP</h2>
-          <p style="text-align: center; font-size: 12px; color: #777;">Comprobante de Venta Exclusiva</p>
+          <p style="text-align: center; font-size: 12px; color: #777;">Comprobante de Venta</p>
           <hr style="border: 0; border-top: 1px dashed #eee;" />
           <p><strong>Fecha:</strong> ${s.date}</p>
           <p><strong>Cliente:</strong> ${s.clientName || 'Ocasional'}</p>
@@ -932,7 +989,14 @@
       setTimeout(() => win.print(), 500);
     }
 
-    // DASHBOARD ADMIN & FILTROS POR VENDEDORA
+    function sendReceiptWhatsApp(saleId) {
+      const s = sales.find(x => x.id === saleId);
+      if (!s) return;
+      const text = `✨ *Comprobante Jema_makeup* ✨\n\n- Cliente: ${s.clientName}\n- Producto: ${s.product}\n- Total: $${s.total.toLocaleString()}\n- Estado: ${s.status}\n\n¡Gracias por tu compra! 💖`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    // DASHBOARD ADMIN & RANKING
     function renderAnalyticsTab(container) {
       const weeklyGoal = 300000;
       const weeklySales = sales.reduce((acc, s) => acc + s.total, 0);
@@ -977,7 +1041,7 @@
       `;
     }
 
-    // CONTROL DE PAGOS MENSUALES POR VENDEDORA
+    // CONTROL DE PAGOS MENSUALES POR VENDEDORA (AÑOS Y MESES)
     function renderPaymentsTab(container) {
       const vendors = users.filter(u => u.role === 'vendor');
       const years = [2026, 2027, 2028];
@@ -986,18 +1050,26 @@
       container.innerHTML = `
         <div class="space-y-6">
           <h2 class="text-2xl font-extrabold text-gray-900">Control de Pagos Mensuales a Vendedoras</h2>
-          <div class="glass-card p-6 rounded-3xl border border-pink-100 shadow-sm space-y-6">
+          <div class="space-y-4">
             ${vendors.map(v => `
-              <div class="border-b border-gray-100 pb-4 last:border-0">
-                <h4 class="font-bold text-lg text-gray-900 mb-3">${v.name} (${v.user})</h4>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div class="glass-card p-6 rounded-3xl border border-pink-100 shadow-sm">
+                <h4 class="font-extrabold text-lg text-gray-900 mb-4">${v.name} (${v.user})</h4>
+                <div class="space-y-4">
                   ${years.map(y => `
-                    <div class="bg-white p-3 rounded-2xl border border-pink-100">
-                      <span class="text-xs font-bold text-pink-main block mb-2">${y}</span>
-                      <select class="w-full text-xs p-2 rounded-xl border font-bold bg-pink-50 text-gray-700">
-                        <option value="Pendiente">❌ Pendiente</option>
-                        <option value="Pagado">✔ Pagado</option>
-                      </select>
+                    <div class="bg-white p-4 rounded-2xl border border-pink-100">
+                      <span class="text-xs font-bold text-pink-main uppercase tracking-wider block mb-3">${y}</span>
+                      <div class="grid grid-cols-2 md:grid-cols-6 gap-2">
+                        ${months.map(m => {
+                          if (!v.paidMonth) v.paidMonth = {};
+                          if (!v.paidMonth[y]) v.paidMonth[y] = {};
+                          const isPaid = v.paidMonth[y][m] || false;
+                          return `
+                            <button onclick="toggleMonthPayment('${v.id}', ${y}, '${m}')" class="p-2 rounded-xl text-xs font-bold border transition ${isPaid ? 'bg-green-100 text-green-700 border-green-300' : 'bg-gray-50 text-gray-600 border-gray-200'}">
+                              ${m}: ${isPaid ? '✔ Pagado' : '❌ Pendiente'}
+                            </button>
+                          `;
+                        }).join('')}
+                      </div>
                     </div>
                   `).join('')}
                 </div>
@@ -1006,6 +1078,18 @@
           </div>
         </div>
       `;
+    }
+
+    function toggleMonthPayment(vendorId, year, month) {
+      const v = users.find(x => x.id === vendorId);
+      if (v) {
+        if (!v.paidMonth) v.paidMonth = {};
+        if (!v.paidMonth[year]) v.paidMonth[year] = {};
+        v.paidMonth[year][month] = !v.paidMonth[year][month];
+        saveData();
+        renderPaymentsTab(document.getElementById('mainContent'));
+        showToast('Estado de pago actualizado.');
+      }
     }
 
     // CLIENTES & ABONOS CON FORMATEO DE PUNTOS
@@ -1066,11 +1150,12 @@
         const c = clients.find(x => x.id === id);
         if (c) { c.name = name; c.phone = phone; }
       } else {
-        clients.push({ id: Date.now().toString(), name, phone, debt: 50000 }); // Ejemplo inicial de deuda con puntos
+        clients.push({ id: Date.now().toString(), name, phone, debt: 0 });
       }
       saveData();
       closeClientModal();
       renderClientsTab(document.getElementById('mainContent'));
+      showToast('Cliente guardado.');
     });
 
     function openAbonoModal(clientId) {
@@ -1082,11 +1167,11 @@
         c.debt = Math.max(0, c.debt - monto);
         saveData();
         renderClientsTab(document.getElementById('mainContent'));
-        alert(`¡Abono registrado con éxito! Nuevo saldo: $${c.debt.toLocaleString()}`);
+        showToast(`¡Abono registrado! Nuevo saldo: $${c.debt.toLocaleString()}`);
       }
     }
 
-    // SECCIÓN DE ENCARGOS
+    // ENCARGOS COMPARTIDOS
     function renderCustomOrdersTab(container) {
       container.innerHTML = `
         <div class="space-y-6">
@@ -1099,20 +1184,20 @@
             <table class="w-full text-left border-collapse">
               <thead class="bg-pink-50 text-pink-main text-xs uppercase font-extrabold">
                 <tr>
+                  <th class="p-4">Registrado por</th>
                   <th class="p-4">Cliente</th>
                   <th class="p-4">Descripción del Encargo</th>
                   <th class="p-4">Fecha</th>
-                  <th class="p-4">Estado</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-100 text-sm">
                 ${customOrders.length === 0 ? '<tr><td colspan="4" class="p-4 text-center text-gray-400">No hay encargos registrados.</td></tr>' : ''}
                 ${customOrders.map(o => `
                   <tr>
-                    <td class="p-4 font-bold">${o.client}</td>
+                    <td class="p-4 font-bold text-pink-main">${o.author}</td>
+                    <td class="p-4">${o.client}</td>
                     <td class="p-4">${o.description}</td>
                     <td class="p-4 text-xs">${o.date}</td>
-                    <td class="p-4"><span class="px-3 py-1 rounded-full bg-pink-100 text-pink-main font-bold text-xs">Pendiente</span></td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -1126,10 +1211,10 @@
       const client = prompt('Nombre del cliente:');
       const desc = prompt('Descripción del encargo:');
       if (client && desc) {
-        customOrders.push({ id: Date.now().toString(), client, description: desc, date: new Date().toLocaleDateString() });
+        customOrders.push({ id: Date.now().toString(), author: currentUser.name, client, description: desc, date: new Date().toLocaleDateString() });
         saveData();
         renderCustomOrdersTab(document.getElementById('mainContent'));
-        alert('¡Encargo registrado!');
+        showToast('Encargo registrado correctamente.');
       }
     }
 
@@ -1139,14 +1224,14 @@
         <div class="space-y-6">
           <div class="flex justify-between items-center">
             <h2 class="text-2xl font-extrabold text-gray-900">Gestión de Usuarios</h2>
-            <button onclick="openUserModal()" class="px-5 py-2.5 btn-lux rounded-2xl text-xs font-bold shadow-md">+ Crear Usuario</button>
+            <button onclick="openUserModal()" class="px-5 py-2.5 btn-lux rounded-2xl text-xs font-bold shadow-md">+ Crear Vendedora</button>
           </div>
           <div class="glass-card rounded-3xl shadow-sm border border-pink-100 p-6">
             <ul class="divide-y divide-gray-100">
               ${users.map(u => `
                 <li class="py-3 flex justify-between items-center">
                   <div>
-                    <span class="font-bold text-gray-900">${u.name} (${u.user})</span>
+                    <span class="font-bold text-gray-900">${u.name} (${u.user})</span> - <span class="text-xs text-gray-500">WhatsApp: ${u.phone || 'N/A'}</span>
                     <span class="ml-2 text-xs px-2.5 py-0.5 rounded-full ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-pink-100 text-pink-700'} font-bold">${u.role === 'admin' ? 'Administrador' : 'Vended@r'}</span>
                   </div>
                 </li>
@@ -1168,15 +1253,16 @@
     document.getElementById('userForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const name = document.getElementById('newUserName').value.trim();
+      const phone = document.getElementById('newUserPhone').value.trim();
       const user = document.getElementById('newUserLogin').value.trim();
       const pass = document.getElementById('newUserPass').value.trim();
       const role = document.getElementById('newUserRole').value;
 
-      users.push({ id: Date.now().toString(), name, user, pass, role, paidMonth: false });
+      users.push({ id: Date.now().toString(), name, phone, user, pass, role, paidMonth: {} });
       saveData();
       closeUserModal();
       renderUsersTab(document.getElementById('mainContent'));
-      alert('¡Usuario creado correctamente!');
+      showToast('¡Vendedora creada correctamente!');
     });
   </script>
 </body>
