@@ -6,6 +6,36 @@
   <title>Jema_makeup - Luxury Cosmetics & Management</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- FIREBASE SDK (Modular v10 CDN) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // Credenciales de tu proyecto JemaMakeupDB[cite: 5, 6]
+    const firebaseConfig = {
+      apiKey: "AIzaSyBzYoM4RsZE1VwJRD_lFIQ8ub9pzCWzA4",
+      authDomain: "jemamakeupdb.firebaseapp.com",
+      databaseURL: "https://jemamakeupdb-default-rtdb.firebaseio.com",
+      projectId: "jemamakeupdb",
+      storageBucket: "jemamakeupdb.firebasestorage.app",
+      messagingSenderId: "16430226347",
+      appId: "1:16430226347:web:df4c2621920c247c7890ee",
+      measurementId: "G-P0CYX1DE9F"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    window.db = db;
+    window.dbRef = ref;
+    window.dbSet = set;
+    window.dbGet = get;
+
+    // Disparar evento cuando Firebase esté listo para cargar los datos
+    window.dispatchEvent(new Event('firebase-ready'));
+  </script>
+
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
     body {
@@ -318,7 +348,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT PRINCIPAL BLINDADO -->
+  <!-- SCRIPT PRINCIPAL CON FIREBASE -->
   <script>
     function safeParse(key, fallback) {
       try {
@@ -359,23 +389,53 @@
     let sales = safeParse('jm_sales', []);
     let customOrders = safeParse('jm_custom_orders', []);
 
-    document.addEventListener('DOMContentLoaded', function() {
-      saveData();
-      setupFileInput();
-      checkAuth();
-    });
-
-    function saveData() {
+    // Sincronización automática con Firebase
+    async function saveData() {
       try {
         localStorage.setItem('jm_users', JSON.stringify(users));
         localStorage.setItem('jm_products', JSON.stringify(products));
         localStorage.setItem('jm_clients', JSON.stringify(clients));
         localStorage.setItem('jm_sales', JSON.stringify(sales));
         localStorage.setItem('jm_custom_orders', JSON.stringify(customOrders));
+
+        if (window.db && window.dbRef && window.dbSet) {
+          await window.dbSet(window.dbRef(window.db, 'jemamakeup/data'), {
+            users: users,
+            products: products,
+            clients: clients,
+            sales: sales,
+            customOrders: customOrders
+          });
+        }
       } catch (e) {
-        console.warn('Error guardando en memoria local:', e);
+        console.warn('Error sincronizando con Firebase:', e);
       }
     }
+
+    window.addEventListener('firebase-ready', async function() {
+      if (window.db && window.dbRef && window.dbGet) {
+        try {
+          const snapshot = await window.dbGet(window.dbRef(window.db, 'jemamakeup/data'));
+          if (snapshot.exists()) {
+            const cloudData = snapshot.val();
+            if (cloudData.users) users = cloudData.users;
+            if (cloudData.products) products = cloudData.products;
+            if (cloudData.clients) clients = cloudData.clients;
+            if (cloudData.sales) sales = cloudData.sales;
+            if (cloudData.customOrders) customOrders = cloudData.customOrders;
+          }
+        } catch (e) {
+          console.warn('Usando datos locales por error de red con Firebase:', e);
+        }
+      }
+      setupFileInput();
+      checkAuth();
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      setupFileInput();
+      checkAuth();
+    });
 
     function showToast(message) {
       const toast = document.getElementById('toastNotification');
