@@ -38,13 +38,13 @@
     .avatar-ring {
       border: 3px solid #C94A72;
     }
-    @keyframes float {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-5px); }
-      100% { transform: translateY(0px); }
+    @keyframes floatAnimation {
+      0% { transform: translateY(0px) scale(1); }
+      50% { transform: translateY(-6px) scale(1.03); filter: drop-shadow(0 8px 12px rgba(201, 74, 114, 0.25)); }
+      100% { transform: translateY(0px) scale(1); }
     }
-    .floating-badge {
-      animation: float 3s ease-in-out infinite;
+    .floating-logo {
+      animation: floatAnimation 3s ease-in-out infinite;
     }
     @media print {
       .no-print { display: none !important; }
@@ -66,10 +66,8 @@
   <div id="publicCatalogSection" class="min-h-screen bg-[#FFF0F3] flex flex-col">
     <header class="glass-card shadow-sm p-4 sticky top-0 z-30 border-b border-pink-100">
       <div class="max-w-7xl mx-auto flex justify-between items-center">
-        <div class="flex items-center space-x-2">
-          <div class="w-10 h-10 rounded-full bg-pink-100 text-pink-main flex items-center justify-center font-bold text-xl shadow-inner floating-badge">
-            <i class="fa-solid fa-gem"></i>
-          </div>
+        <div class="flex items-center space-x-3">
+          <img src="logo (5).png" alt="Jema Makeup" class="w-12 h-12 rounded-2xl object-cover floating-logo border-2 border-pink-300 shadow-md">
           <div>
             <h1 class="text-xl font-extrabold text-pink-main tracking-wide">JEMA_MAKEUP</h1>
             <p class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Luxury Cosmetics</p>
@@ -94,7 +92,7 @@
           <h2 class="text-2xl font-extrabold text-gray-900">Catálogo de Alta Gama</h2>
           <p class="text-gray-500 text-sm mt-0.5">Selecciona tus productos, elige tu asesora preferida y envía tu pedido directamente a su WhatsApp.</p>
         </div>
-        <div class="flex items-center gap-2 bg-pink-50 px-4 py-2 rounded-2xl border border-pink-200 floating-badge">
+        <div class="flex items-center gap-2 bg-pink-50 px-4 py-2 rounded-2xl border border-pink-200">
           <i class="fa-solid fa-sparkles text-pink-main"></i>
           <span class="text-xs font-semibold text-gray-700">Belleza sin límites</span>
         </div>
@@ -154,8 +152,8 @@
       <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
       
       <div class="text-center mb-6">
-        <div class="inline-block p-4 rounded-full bg-pink-100 text-pink-main text-3xl mb-3 shadow-inner">
-          <i class="fa-solid fa-shield-halved"></i>
+        <div class="inline-block p-3 rounded-full bg-pink-100 text-pink-main mb-3 shadow-inner">
+          <img src="logo (5).png" class="w-14 h-14 rounded-2xl object-cover floating-logo">
         </div>
         <h2 class="text-2xl font-extrabold text-pink-main">Acceso Personal</h2>
         <p class="text-gray-400 text-xs mt-1">Área exclusiva para administradores y vendedoras</p>
@@ -191,9 +189,7 @@
     <header class="glass-card shadow-sm border-b border-pink-100 no-print sticky top-0 z-30">
       <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         <div class="flex items-center space-x-3">
-          <div id="userAvatarHeader" class="w-11 h-11 rounded-2xl bg-pink-100 flex items-center justify-center text-pink-main text-xl avatar-ring shadow-sm">
-            <i class="fa-solid fa-crown"></i>
-          </div>
+          <img src="logo (5).png" alt="Logo" class="w-11 h-11 rounded-2xl object-cover floating-logo border-2 border-pink-300">
           <div>
             <span id="userNameHeader" class="font-extrabold text-gray-900 text-base block leading-tight">Mari</span>
             <span id="userRoleHeader" class="text-[11px] text-pink-main font-bold uppercase tracking-wider block">Administradora</span>
@@ -335,7 +331,7 @@
     let products = JSON.parse(localStorage.getItem('jm_products')) || [
       { id: '1', name: 'Labial Matte Velvet Rose', cost: 8000, price: 18000, stock: 15, img: '' },
       { id: '2', name: 'Base Cobertura Total Glow', cost: 15000, price: 32000, stock: 2, img: '' },
-      { id: '3', name: 'Paleta de Sombras Pastel Dreams', cost: 22000, price: 45000, stock: 0, img: '' }
+      { id: '3', name: 'Paleta de Sombras Pastel Dreams', cost: 22000, price: 45000, stock: 10, img: '' }
     ];
 
     let clients = JSON.parse(localStorage.getItem('jm_clients')) || [
@@ -411,7 +407,7 @@
         document.getElementById('appSection').classList.remove('hidden');
         document.getElementById('userNameHeader').innerText = currentUser.name || currentUser.user;
         document.getElementById('userRoleHeader').innerText = currentUser.role === 'admin' ? 'Administradora' : 'Vended@r';
-        document.getElementById('userAvatarHeader').innerHTML = `<i class="fa-solid ${currentUser.avatar || 'fa-crown'}"></i>`;
+        document.getElementById('userAvatarHeader').innerHTML = `<img src="logo (5).png" class="w-full h-full rounded-2xl object-cover">`;
         renderNavigation();
       } else {
         document.getElementById('publicCatalogSection').classList.remove('hidden');
@@ -570,7 +566,6 @@
     }
 
     function renderDashboardTab(container) {
-      // Alerta de stock bajo (< 3 unidades)
       const lowStockProducts = products.filter(p => p.stock < 3);
 
       container.innerHTML = `
@@ -581,8 +576,8 @@
               <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900">¡Bienvenid@, ${currentUser.name || currentUser.user}! ✨</h1>
               <p class="text-gray-500 text-sm">Todo listo para seguir brillando y alcanzando las metas de la semana.</p>
             </div>
-            <div class="w-20 h-20 rounded-3xl bg-white flex items-center justify-center text-pink-main text-4xl shadow-md border-2 border-pink-200 floating-badge">
-              <i class="fa-solid ${currentUser.avatar || 'fa-crown'}"></i>
+            <div class="w-20 h-20 rounded-3xl bg-white flex items-center justify-center text-pink-main text-4xl shadow-md border-2 border-pink-200 floating-logo overflow-hidden">
+              <img src="logo (5).png" class="w-full h-full object-cover">
             </div>
           </div>
 
@@ -818,6 +813,7 @@
             <div class="lg:col-span-2 space-y-4">
               <h2 class="text-xl font-extrabold text-gray-900">Seleccionar Productos para Facturar</h2>
               <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                ${products.length === 0 ? '<p class="text-gray-400 text-sm">No hay productos registrados en el inventario.</p>' : ''}
                 ${products.map(p => `
                   <div onclick="posAddToCart('${p.id}')" class="glass-card p-4 rounded-2xl border border-pink-100 shadow-xs cursor-pointer hover:border-pink-300 transition flex flex-col justify-between">
                     <div>
@@ -1072,7 +1068,7 @@
       `;
     }
 
-    // CONTROL DE PAGOS MENSUALES (CORREGIDO Y FUNCIONAL)
+    // CONTROL DE PAGOS MENSUALES
     function renderPaymentsTab(container) {
       const vendors = users.filter(u => u.role === 'vendor' || u.role === 'admin');
       const years = [2026, 2027, 2028];
@@ -1280,7 +1276,7 @@
       }
     }
 
-    // GESTIÓN DE USUARIOS (VER CONTRASEÑA, WHATSAPP, EDITAR Y BORRAR)
+    // GESTIÓN DE USUARIOS
     function renderUsersTab(container) {
       container.innerHTML = `
         <div class="space-y-6">
