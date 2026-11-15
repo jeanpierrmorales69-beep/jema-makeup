@@ -26,21 +26,18 @@
       box-shadow: 0 10px 25px -5px rgba(255, 0, 191, 0.4);
     }
     .glass-card {
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(255, 255, 255, 0.96);
       backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 0, 191, 0.2);
+      border: 1px solid rgba(255, 0, 191, 0.22);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     .glass-card:hover {
       transform: translateY(-2px);
       box-shadow: 0 12px 30px -10px rgba(255, 0, 191, 0.15);
     }
-    .avatar-ring {
-      border: 3px solid #ff00bf;
-    }
     @keyframes floatAnimation {
       0% { transform: translateY(0px) scale(1); }
-      50% { transform: translateY(-6px) scale(1.03); filter: drop-shadow(0 8px 12px rgba(255, 0, 191, 0.3)); }
+      50% { transform: translateY(-6px) scale(1.04); filter: drop-shadow(0 8px 14px rgba(255, 0, 191, 0.35)); }
       100% { transform: translateY(0px) scale(1); }
     }
     .floating-logo {
@@ -67,7 +64,7 @@
     <header class="glass-card shadow-sm p-4 sticky top-0 z-30 border-b border-pink-100">
       <div class="max-w-7xl mx-auto flex justify-between items-center">
         <div class="flex items-center space-x-3">
-          <img src="logo (5).png" alt="Jema Makeup" class="w-12 h-12 rounded-2xl object-cover floating-logo border-2 border-[#ff00bf] shadow-md">
+          <img src="logo (5).png" alt="Jema Makeup" class="w-12 h-12 rounded-2xl object-cover floating-logo border-2 border-[#ff00bf] shadow-md bg-white">
           <div>
             <h1 class="text-xl font-extrabold text-pink-main tracking-wide">JEMA_MAKEUP</h1>
             <p class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Luxury Cosmetics</p>
@@ -98,9 +95,7 @@
         </div>
       </div>
 
-      <div id="publicProductGrid" class="grid grid-cols-2 md:grid-cols-4 gap-6">
-        <!-- Productos dinámicos -->
-      </div>
+      <div id="publicProductGrid" class="grid grid-cols-2 md:grid-cols-4 gap-6"></div>
     </main>
   </div>
 
@@ -114,16 +109,12 @@
         <button onclick="toggleCartModal()" class="text-gray-400 hover:text-gray-600 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
-      <div id="cartItemsContainer" class="flex-1 overflow-y-auto space-y-3 mb-4 pr-1">
-        <!-- Items de bolsa -->
-      </div>
+      <div id="cartItemsContainer" class="flex-1 overflow-y-auto space-y-3 mb-4 pr-1"></div>
 
       <div class="border-t border-gray-100 pt-4 space-y-3">
         <div>
           <label class="block text-xs font-bold text-gray-600 mb-1">Seleccionar Asesora / Vendedora *</label>
-          <select id="cartVendorSelect" class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm bg-white font-bold text-pink-main">
-            <!-- Dinámico -->
-          </select>
+          <select id="cartVendorSelect" class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm bg-white font-bold text-pink-main"></select>
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-600 mb-1">Nombre Completo *</label>
@@ -152,8 +143,8 @@
       <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
       
       <div class="text-center mb-6">
-        <div class="inline-block p-3 rounded-full bg-pink-100 text-pink-main mb-3 shadow-inner">
-          <img src="logo (5).png" class="w-14 h-14 rounded-2xl object-cover floating-logo">
+        <div class="inline-block p-2 rounded-3xl bg-pink-50 border-2 border-[#ff00bf] mb-3 shadow-inner">
+          <img src="logo (5).png" class="w-14 h-14 rounded-2xl object-cover floating-logo bg-white">
         </div>
         <h2 class="text-2xl font-extrabold text-pink-main">Acceso Personal</h2>
         <p class="text-gray-400 text-xs mt-1">Área exclusiva para administradores y vendedoras</p>
@@ -172,10 +163,10 @@
         <div>
           <label class="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">Avatar de Identidad</label>
           <div class="flex justify-around py-2 bg-pink-50 rounded-2xl">
-            <button type="button" onclick="selectAvatar('fa-user-ninja')" class="avatar-option p-2 rounded-xl text-xl hover:bg-white text-pink-400 transition"><i class="fa-solid fa-user-ninja"></i></button>
-            <button type="button" onclick="selectAvatar('fa-crown')" class="avatar-option p-2 rounded-xl text-xl hover:bg-white text-pink-400 transition"><i class="fa-solid fa-crown"></i></button>
-            <button type="button" onclick="selectAvatar('fa-gem')" class="avatar-option p-2 rounded-xl text-xl hover:bg-white text-pink-400 transition"><i class="fa-solid fa-gem"></i></button>
-            <button type="button" onclick="selectAvatar('fa-heart')" class="avatar-option p-2 rounded-xl text-xl hover:bg-white text-pink-400 transition"><i class="fa-solid fa-heart"></i></button>
+            <button type="button" onclick="selectAvatar('fa-user-ninja', this)" class="avatar-option p-2 rounded-xl text-xl hover:bg-white text-pink-400 transition"><i class="fa-solid fa-user-ninja"></i></button>
+            <button type="button" onclick="selectAvatar('fa-crown', this)" class="avatar-option p-2 rounded-xl text-xl bg-white text-pink-main transition"><i class="fa-solid fa-crown"></i></button>
+            <button type="button" onclick="selectAvatar('fa-gem', this)" class="avatar-option p-2 rounded-xl text-xl hover:bg-white text-pink-400 transition"><i class="fa-solid fa-gem"></i></button>
+            <button type="button" onclick="selectAvatar('fa-heart', this)" class="avatar-option p-2 rounded-xl text-xl hover:bg-white text-pink-400 transition"><i class="fa-solid fa-heart"></i></button>
           </div>
         </div>
 
@@ -185,18 +176,20 @@
   </div>
 
   <!-- VISTA 3: PANEL INTERNO DE GESTIÓN -->
-  <div id="appSection" class="hidden min-h-screen flex flex-col bg-gray-50">
-    <header class="glass-card shadow-sm border-b border-pink-100 no-print sticky top-0 z-30">
+  <div id="appSection" class="hidden min-h-screen flex flex-col bg-[#fff5fa]">
+    <header class="glass-card shadow-sm border-b border-pink-200 no-print sticky top-0 z-30">
       <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         <div class="flex items-center space-x-3">
-          <img src="logo (5).png" alt="Logo" class="w-11 h-11 rounded-2xl object-cover floating-logo border-2 border-[#ff00bf]">
+          <div id="userAvatarHeader" class="w-11 h-11 rounded-2xl border-2 border-[#ff00bf] overflow-hidden floating-logo bg-white shadow-sm">
+            <img src="logo (5).png" alt="Logo" class="w-full h-full object-cover">
+          </div>
           <div>
             <span id="userNameHeader" class="font-extrabold text-gray-900 text-base block leading-tight">Mari</span>
             <span id="userRoleHeader" class="text-[11px] text-pink-main font-bold uppercase tracking-wider block">Administradora</span>
           </div>
         </div>
 
-        <button onclick="logout()" class="px-4 py-2 rounded-2xl bg-white text-gray-600 hover:bg-gray-100 text-xs font-bold shadow-sm border border-gray-200 transition flex items-center gap-2">
+        <button onclick="logout()" class="px-4 py-2 rounded-2xl bg-white text-gray-700 hover:bg-pink-50 text-xs font-bold shadow-sm border border-pink-200 transition flex items-center gap-2">
           <i class="fa-solid fa-right-from-bracket text-pink-main"></i> Volver al Catálogo
         </button>
       </div>
@@ -318,60 +311,85 @@
     </div>
   </div>
 
-  <!-- SCRIPT GENERAL -->
+  <!-- SCRIPT PRINCIPAL BLINDADO -->
   <script>
+    function safeParse(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return fallback;
+        const parsed = JSON.parse(raw);
+        return Array.isArray(fallback) && !Array.isArray(parsed) ? fallback : (parsed || fallback);
+      } catch (e) {
+        localStorage.removeItem(key);
+        return fallback;
+      }
+    }
+
     let currentUser = null;
     let selectedAvatar = 'fa-crown';
     let cart = [];
+    let posCart = [];
 
-    let users = JSON.parse(localStorage.getItem('jm_users')) || [
+    let users = safeParse('jm_users', [
       { id: '1', user: 'mari', pass: '1234', role: 'admin', name: 'Mari', phone: '573112210988', avatar: 'fa-crown', paidMonth: {} }
-    ];
+    ]);
 
-    let products = JSON.parse(localStorage.getItem('jm_products')) || [
+    if (!users.some(u => u.role === 'admin')) {
+      users.unshift({ id: '1', user: 'mari', pass: '1234', role: 'admin', name: 'Mari', phone: '573112210988', avatar: 'fa-crown', paidMonth: {} });
+    }
+
+    let products = safeParse('jm_products', [
       { id: '1', name: 'Labial Matte Velvet Rose', cost: 8000, price: 18000, stock: 15, img: '' },
       { id: '2', name: 'Base Cobertura Total Glow', cost: 15000, price: 32000, stock: 2, img: '' },
       { id: '3', name: 'Paleta de Sombras Pastel Dreams', cost: 22000, price: 45000, stock: 10, img: '' }
-    ];
+    ]);
 
-    let clients = JSON.parse(localStorage.getItem('jm_clients')) || [
+    let clients = safeParse('jm_clients', [
       { id: '1', name: 'Camila Torres', phone: '3001234567', debt: 0 }
-    ];
+    ]);
 
-    let sales = JSON.parse(localStorage.getItem('jm_sales')) || [];
-    let customOrders = JSON.parse(localStorage.getItem('jm_custom_orders')) || [];
+    let sales = safeParse('jm_sales', []);
+    let customOrders = safeParse('jm_custom_orders', []);
 
-    window.onload = function() {
+    document.addEventListener('DOMContentLoaded', function() {
       saveData();
-      checkAuth();
       setupFileInput();
-      renderPublicCatalog();
-      populateVendorDropdown();
-    };
+      checkAuth();
+    });
 
     function saveData() {
-      localStorage.setItem('jm_users', JSON.stringify(users));
-      localStorage.setItem('jm_products', JSON.stringify(products));
-      localStorage.setItem('jm_clients', JSON.stringify(clients));
-      localStorage.setItem('jm_sales', JSON.stringify(sales));
-      localStorage.setItem('jm_custom_orders', JSON.stringify(customOrders));
+      try {
+        localStorage.setItem('jm_users', JSON.stringify(users));
+        localStorage.setItem('jm_products', JSON.stringify(products));
+        localStorage.setItem('jm_clients', JSON.stringify(clients));
+        localStorage.setItem('jm_sales', JSON.stringify(sales));
+        localStorage.setItem('jm_custom_orders', JSON.stringify(customOrders));
+      } catch (e) {
+        console.warn('Error guardando en memoria local:', e);
+      }
     }
 
     function showToast(message) {
       const toast = document.getElementById('toastNotification');
-      document.getElementById('toastMessage').innerText = message;
+      const msgEl = document.getElementById('toastMessage');
+      if (!toast || !msgEl) return;
+      msgEl.innerText = message;
       toast.classList.remove('translate-y-20', 'opacity-0');
       setTimeout(() => {
         toast.classList.add('translate-y-20', 'opacity-0');
       }, 3000);
     }
 
-    function selectAvatar(iconClass) {
+    function selectAvatar(iconClass, btnEl) {
       selectedAvatar = iconClass;
       document.querySelectorAll('.avatar-option').forEach(btn => {
-        btn.classList.remove('bg-pink-100', 'text-pink-main');
+        btn.classList.remove('bg-white', 'text-pink-main');
+        btn.classList.add('text-pink-400');
       });
-      event.currentTarget.classList.add('bg-pink-100', 'text-pink-main');
+      if (btnEl) {
+        btnEl.classList.remove('text-pink-400');
+        btnEl.classList.add('bg-white', 'text-pink-main');
+      }
     }
 
     function openLoginModal() {
@@ -386,34 +404,42 @@
       const u = document.getElementById('loginUser').value.trim();
       const p = document.getElementById('loginPass').value.trim();
 
-      const found = users.find(x => x.user.toLowerCase() === u.toLowerCase() && x.pass === p);
+      const found = users.find(x => (x.user || '').toLowerCase() === u.toLowerCase() && x.pass === p);
       if (found) {
-        currentUser = found;
-        currentUser.avatar = selectedAvatar;
+        currentUser = { ...found, avatar: selectedAvatar };
         localStorage.setItem('jm_session', JSON.stringify(currentUser));
         closeLoginModal();
         checkAuth();
-        showToast(`¡Bienvenida de nuevo, ${currentUser.name}!`);
+        showToast(`¡Bienvenid@ de nuevo, ${currentUser.name || currentUser.user}!`);
       } else {
         alert('Usuario o contraseña incorrectos');
       }
     });
 
     function checkAuth() {
-      const session = localStorage.getItem('jm_session');
-      if (session) {
-        currentUser = JSON.parse(session);
-        document.getElementById('publicCatalogSection').classList.add('hidden');
-        document.getElementById('appSection').classList.remove('hidden');
-        document.getElementById('userNameHeader').innerText = currentUser.name || currentUser.user;
-        document.getElementById('userRoleHeader').innerText = currentUser.role === 'admin' ? 'Administradora' : 'Vended@r';
-        renderNavigation();
-      } else {
-        document.getElementById('publicCatalogSection').classList.remove('hidden');
-        document.getElementById('appSection').classList.add('hidden');
-        renderPublicCatalog();
-        populateVendorDropdown();
+      try {
+        const sessionRaw = localStorage.getItem('jm_session');
+        if (sessionRaw) {
+          const parsedSession = JSON.parse(sessionRaw);
+          if (parsedSession && parsedSession.user) {
+            currentUser = parsedSession;
+            document.getElementById('publicCatalogSection').classList.add('hidden');
+            document.getElementById('appSection').classList.remove('hidden');
+            document.getElementById('userNameHeader').innerText = currentUser.name || currentUser.user;
+            document.getElementById('userRoleHeader').innerText = currentUser.role === 'admin' ? 'Administradora' : 'Vended@r';
+            renderNavigation();
+            return;
+          }
+        }
+      } catch (e) {
+        localStorage.removeItem('jm_session');
       }
+
+      currentUser = null;
+      document.getElementById('publicCatalogSection').classList.remove('hidden');
+      document.getElementById('appSection').classList.add('hidden');
+      renderPublicCatalog();
+      populateVendorDropdown();
     }
 
     function logout() {
@@ -441,7 +467,7 @@
               ${p.stock <= 0 ? '<span class="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase">Agotado</span>' : '<span class="absolute top-2 right-2 bg-green-500 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase">Disponible</span>'}
             </div>
             <h4 class="font-bold text-sm text-gray-900">${p.name}</h4>
-            <p class="text-pink-main font-extrabold text-lg mt-1">$${p.price.toLocaleString()}</p>
+            <p class="text-pink-main font-extrabold text-lg mt-1">$${Number(p.price || 0).toLocaleString()}</p>
           </div>
           <button onclick="addToCart('${p.id}')" ${p.stock <= 0 ? 'disabled' : ''} class="mt-4 w-full py-2.5 ${p.stock > 0 ? 'btn-lux' : 'bg-gray-200 text-gray-400 cursor-not-allowed'} font-bold text-xs rounded-xl shadow-sm flex items-center justify-center gap-1.5">
             <i class="fa-solid fa-cart-plus"></i> ${p.stock > 0 ? 'Agregar a Bolsa' : 'Agotado'}
@@ -485,7 +511,7 @@
               <img src="${item.img || 'https://via.placeholder.com/40'}" class="w-12 h-12 object-cover rounded-xl border">
               <div>
                 <h5 class="font-bold text-gray-800">${item.name}</h5>
-                <p class="text-xs text-gray-500">Cant: ${item.qty} x $${item.price.toLocaleString()}</p>
+                <p class="text-xs text-gray-500">Cant: ${item.qty} x $${Number(item.price || 0).toLocaleString()}</p>
               </div>
             </div>
             <div class="flex items-center gap-3">
@@ -528,23 +554,25 @@
     // NAVEGACIÓN INTERNA
     function renderNavigation() {
       const navTabs = document.getElementById('navTabs');
-      let html = `<button onclick="switchTab('dashboard')" class="tab-btn font-bold px-4 py-2 rounded-2xl bg-pink-100 text-pink-main text-sm shadow-xs">Dashboard</button>`;
+      if (!navTabs || !currentUser) return;
+
+      let html = `<button data-tab="dashboard" onclick="switchTab('dashboard')" class="tab-btn font-bold px-4 py-2 rounded-2xl bg-pink-100 text-pink-main text-sm shadow-xs whitespace-nowrap">Dashboard</button>`;
 
       if (currentUser.role === 'admin') {
         html += `
-          <button onclick="switchTab('inventory')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Inventario Maestro</button>
-          <button onclick="switchTab('analytics')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Dashboard Admin & Ranking</button>
-          <button onclick="switchTab('payments')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Control Pagos Vendedoras</button>
-          <button onclick="switchTab('admin_sales')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Registrar Venta (Admin)</button>
-          <button onclick="switchTab('clients')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Clientes & Facturas</button>
-          <button onclick="switchTab('custom_orders')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Encargos</button>
-          <button onclick="switchTab('users')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Usuarios</button>
+          <button data-tab="inventory" onclick="switchTab('inventory')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold whitespace-nowrap">Inventario Maestro</button>
+          <button data-tab="analytics" onclick="switchTab('analytics')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold whitespace-nowrap">Dashboard Admin & Ranking</button>
+          <button data-tab="payments" onclick="switchTab('payments')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold whitespace-nowrap">Control Pagos Vendedoras</button>
+          <button data-tab="admin_sales" onclick="switchTab('admin_sales')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold whitespace-nowrap">Registrar Venta (Admin)</button>
+          <button data-tab="clients" onclick="switchTab('clients')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold whitespace-nowrap">Clientes & Facturas</button>
+          <button data-tab="custom_orders" onclick="switchTab('custom_orders')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold whitespace-nowrap">Encargos</button>
+          <button data-tab="users" onclick="switchTab('users')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold whitespace-nowrap">Usuarios</button>
         `;
       } else {
         html += `
-          <button onclick="switchTab('vendor_inv')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Mi Inventario & Facturación</button>
-          <button onclick="switchTab('clients')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Clientes & Facturas</button>
-          <button onclick="switchTab('custom_orders')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Encargos</button>
+          <button data-tab="vendor_inv" onclick="switchTab('vendor_inv')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold whitespace-nowrap">Mi Inventario & Facturación</button>
+          <button data-tab="clients" onclick="switchTab('clients')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold whitespace-nowrap">Clientes & Facturas</button>
+          <button data-tab="custom_orders" onclick="switchTab('custom_orders')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold whitespace-nowrap">Encargos</button>
         `;
       }
       navTabs.innerHTML = html;
@@ -552,7 +580,17 @@
     }
 
     function switchTab(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        if (btn.getAttribute('data-tab') === tabName) {
+          btn.className = 'tab-btn font-bold px-4 py-2 rounded-2xl bg-pink-100 text-pink-main text-sm shadow-xs whitespace-nowrap';
+        } else {
+          btn.className = 'tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold whitespace-nowrap';
+        }
+      });
+
       const main = document.getElementById('mainContent');
+      if (!main) return;
+
       if (tabName === 'dashboard') renderDashboardTab(main);
       else if (tabName === 'inventory') renderInventoryTab(main);
       else if (tabName === 'analytics') renderAnalyticsTab(main);
@@ -565,7 +603,7 @@
     }
 
     function renderDashboardTab(container) {
-      const lowStockProducts = products.filter(p => p.stock < 3);
+      const lowStockProducts = products.filter(p => Number(p.stock) < 3);
 
       container.innerHTML = `
         <div class="space-y-6">
@@ -575,7 +613,7 @@
               <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900">¡Bienvenid@, ${currentUser.name || currentUser.user}! ✨</h1>
               <p class="text-gray-500 text-sm">Todo listo para seguir brillando y alcanzando las metas de la semana.</p>
             </div>
-            <div class="w-20 h-20 rounded-3xl bg-white flex items-center justify-center text-pink-main text-4xl shadow-md border-2 border-[#ff00bf] floating-logo overflow-hidden">
+            <div class="w-20 h-20 rounded-3xl bg-white flex items-center justify-center shadow-md border-2 border-[#ff00bf] floating-logo overflow-hidden">
               <img src="logo (5).png" class="w-full h-full object-cover">
             </div>
           </div>
@@ -622,8 +660,8 @@
 
     // INVENTARIO MAESTRO
     function renderInventoryTab(container) {
-      const totalExpected = products.reduce((acc, p) => acc + (p.price * p.stock), 0);
-      const totalCost = products.reduce((acc, p) => acc + (p.cost * p.stock), 0);
+      const totalExpected = products.reduce((acc, p) => acc + (Number(p.price || 0) * Number(p.stock || 0)), 0);
+      const totalCost = products.reduce((acc, p) => acc + (Number(p.cost || 0) * Number(p.stock || 0)), 0);
       const totalUtility = totalExpected - totalCost;
 
       container.innerHTML = `
@@ -651,7 +689,7 @@
             </div>
           </div>
 
-          <div class="glass-card rounded-3xl shadow-sm border border-pink-100 overflow-hidden">
+          <div class="glass-card rounded-3xl shadow-sm border border-pink-100 overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead class="bg-pink-50 text-pink-main text-xs uppercase font-extrabold tracking-wider">
                 <tr>
@@ -669,9 +707,9 @@
                   <tr>
                     <td class="p-4"><img src="${p.img || 'https://via.placeholder.com/50'}" class="w-12 h-12 object-cover rounded-2xl border"></td>
                     <td class="p-4 font-bold text-gray-900">${p.name} ${p.stock <= 0 ? '<span class="text-red-500 text-xs ml-2">(Agotado)</span>' : ''}</td>
-                    <td class="p-4 text-gray-600">$${p.cost.toLocaleString()}</td>
-                    <td class="p-4 text-pink-main font-extrabold">$${p.price.toLocaleString()}</td>
-                    <td class="p-4 text-green-600 font-bold">$${(p.price - p.cost).toLocaleString()}</td>
+                    <td class="p-4 text-gray-600">$${Number(p.cost || 0).toLocaleString()}</td>
+                    <td class="p-4 text-pink-main font-extrabold">$${Number(p.price || 0).toLocaleString()}</td>
+                    <td class="p-4 text-green-600 font-bold">$${(Number(p.price || 0) - Number(p.cost || 0)).toLocaleString()}</td>
                     <td class="p-4"><span class="px-3 py-1 rounded-full ${p.stock > 0 ? 'bg-pink-50 text-pink-main' : 'bg-red-100 text-red-600'} font-bold text-xs">${p.stock} unids</span></td>
                     <td class="p-4 space-x-2 no-print">
                       <button onclick="editProduct('${p.id}')" class="text-blue-500 hover:text-blue-700 p-2"><i class="fa-solid fa-pen"></i></button>
@@ -774,12 +812,10 @@
     }
 
     // PUNTO DE VENTA (POS / FACTURACIÓN)
-    let posCart = [];
-
     function renderPOSSection(container, mode) {
       const weeklyGoal = mode === 'admin' ? 300000 : 100000;
       const mySales = mode === 'admin' ? sales : sales.filter(s => s.vendor === currentUser.user);
-      const totalEarned = mySales.reduce((a, b) => a + b.total, 0);
+      const totalEarned = mySales.reduce((a, b) => a + Number(b.total || 0), 0);
       const goalPercentage = Math.min(100, Math.round((totalEarned / weeklyGoal) * 100));
 
       const quotes = [
@@ -818,7 +854,7 @@
                     <div>
                       <img src="${p.img || 'https://via.placeholder.com/100'}" class="w-full h-24 object-cover rounded-xl mb-2">
                       <h5 class="font-bold text-xs text-gray-900">${p.name}</h5>
-                      <p class="text-pink-main font-extrabold text-sm">$${p.price.toLocaleString()}</p>
+                      <p class="text-pink-main font-extrabold text-sm">$${Number(p.price || 0).toLocaleString()}</p>
                     </div>
                     <span class="text-[10px] text-gray-400 mt-2 font-bold">Stock: ${p.stock}</span>
                   </div>
@@ -840,7 +876,7 @@
                   </div>
                   <div>
                     <label class="block text-xs font-bold text-gray-600 mb-1">Estado de Pago</label>
-                    <select id="posPaymentStatus" class="w-full px-3 py-2 rounded-xl border text-xs bg-white font-bold text-pink-600">
+                    <select id="posPaymentStatus" class="w-full px-3 py-2 rounded-xl border text-xs bg-white font-bold text-[#ff00bf]">
                       <option value="Pagado">Pagado</option>
                       <option value="Fiado">Fiado (Crédito)</option>
                       <option value="Queda debiendo">Queda debiendo</option>
@@ -865,7 +901,7 @@
 
           <div class="pt-6">
             <h2 class="text-xl font-extrabold text-gray-900 mb-4">Historial de Ventas Realizadas</h2>
-            <div class="glass-card rounded-3xl shadow-sm border border-pink-100 overflow-hidden">
+            <div class="glass-card rounded-3xl shadow-sm border border-pink-100 overflow-x-auto">
               <table class="w-full text-left border-collapse">
                 <thead class="bg-pink-50 text-pink-main text-xs uppercase font-extrabold">
                   <tr>
@@ -887,12 +923,12 @@
                       <td class="p-4 font-bold">${s.clientName || 'Ocasional'}</td>
                       <td class="p-4">${s.product}</td>
                       <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-extrabold ${s.status === 'Pagado' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${s.status || 'Pagado'}</span></td>
-                      <td class="p-4 text-pink-main font-extrabold">$${s.total.toLocaleString()}</td>
-                      <td class="p-4 space-x-1">
-                        <button onclick="generateReceiptPDF('${s.id}')" class="text-blue-500 hover:text-blue-700 text-xs font-bold p-1" title="Imprimir Recibo PDF"><i class="fa-solid fa-file-pdf text-base"></i></button>
-                        <button onclick="sendReceiptWhatsApp('${s.id}')" class="text-green-500 hover:text-green-700 text-xs font-bold p-1" title="Enviar por WhatsApp"><i class="fa-brands fa-whatsapp text-base"></i></button>
-                        <button onclick="editSale('${s.id}')" class="text-amber-500 hover:text-amber-700 text-xs p-1" title="Editar Venta"><i class="fa-solid fa-pen"></i></button>
-                        <button onclick="deleteSale('${s.id}')" class="text-red-400 hover:text-red-600 text-xs p-1" title="Borrar Venta"><i class="fa-solid fa-trash"></i></button>
+                      <td class="p-4 text-pink-main font-extrabold">$${Number(s.total || 0).toLocaleString()}</td>
+                      <td class="p-4 space-x-1 whitespace-nowrap">
+                        <button onclick="generateReceiptPDF('${s.id}')" class="text-blue-500 hover:text-blue-700 text-xs font-bold p-1.5" title="Imprimir Recibo PDF"><i class="fa-solid fa-file-pdf text-base"></i></button>
+                        <button onclick="sendReceiptWhatsApp('${s.id}')" class="text-green-500 hover:text-green-700 text-xs font-bold p-1.5" title="Enviar por WhatsApp"><i class="fa-brands fa-whatsapp text-base"></i></button>
+                        <button onclick="editSale('${s.id}')" class="text-amber-500 hover:text-amber-700 text-xs p-1.5" title="Editar Venta"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteSale('${s.id}')" class="text-red-400 hover:text-red-600 text-xs p-1.5" title="Borrar Venta"><i class="fa-solid fa-trash"></i></button>
                       </td>
                     </tr>
                   `).join('')}
@@ -956,13 +992,13 @@
 
       posCart.forEach(item => {
         const prodRef = products.find(p => p.id === item.id);
-        if (prodRef) prodRef.stock -= item.qty;
+        if (prodRef) prodRef.stock = Math.max(0, prodRef.stock - item.qty);
 
         const utility = (item.price - item.cost) * item.qty;
         const commission = utility > 0 ? utility * 0.35 : 0;
 
         sales.push({
-          id: Date.now().toString() + Math.random(),
+          id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
           vendor: currentUser.user,
           clientName: clientName,
           product: `${item.qty}x ${item.name}`,
@@ -993,13 +1029,17 @@
     function editSale(saleId) {
       const s = sales.find(x => x.id === saleId);
       if (!s) return;
-      const nuevoEstado = prompt("Actualizar estado de pago (Pagado / Fiado / Queda debiendo):", s.status || "Pagado");
-      if (nuevoEstado) {
-        s.status = nuevoEstado;
-        saveData();
-        switchTab(currentUser.role === 'admin' ? 'admin_sales' : 'vendor_inv');
-        showToast('Venta actualizada.');
+      const nuevoCliente = prompt("Editar nombre del cliente:", s.clientName || "Cliente Ocasional");
+      if (nuevoCliente !== null && nuevoCliente.trim() !== "") {
+        s.clientName = nuevoCliente.trim();
       }
+      const nuevoEstado = prompt("Actualizar estado de pago (Pagado / Fiado / Queda debiendo):", s.status || "Pagado");
+      if (nuevoEstado !== null && nuevoEstado.trim() !== "") {
+        s.status = nuevoEstado.trim();
+      }
+      saveData();
+      switchTab(currentUser.role === 'admin' ? 'admin_sales' : 'vendor_inv');
+      showToast('Venta actualizada.');
     }
 
     function generateReceiptPDF(saleId) {
@@ -1016,7 +1056,7 @@
           <p><strong>Estado:</strong> ${s.status || 'Pagado'}</p>
           <hr style="border: 0; border-top: 1px dashed #eee;" />
           <p><strong>Producto:</strong> ${s.product}</p>
-          <p style="font-size: 16px; font-weight: bold; color: #ff00bf;">Total: $${s.total.toLocaleString()}</p>
+          <p style="font-size: 16px; font-weight: bold; color: #ff00bf;">Total: $${Number(s.total || 0).toLocaleString()}</p>
           <hr style="border: 0; border-top: 1px dashed #eee;" />
           <p style="text-align: center; font-size: 10px; color: #aaa;">¡Gracias por tu compra en Jema_makeup!</p>
         </div>
@@ -1031,14 +1071,14 @@
     function sendReceiptWhatsApp(saleId) {
       const s = sales.find(x => x.id === saleId);
       if (!s) return;
-      const text = `✨ *Comprobante Jema_makeup* ✨\n\n- Cliente: ${s.clientName}\n- Producto: ${s.product}\n- Total: $${s.total.toLocaleString()}\n- Estado: ${s.status}\n\n¡Gracias por tu compra! 💖`;
+      const text = `✨ *Comprobante Jema_makeup* ✨\n\n- Cliente: ${s.clientName}\n- Producto: ${s.product}\n- Total: $${Number(s.total || 0).toLocaleString()}\n- Estado: ${s.status}\n\n¡Gracias por tu compra! 💖`;
       window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
     }
 
     // DASHBOARD ADMIN & RANKING
     function renderAnalyticsTab(container) {
       const weeklyGoal = 300000;
-      const weeklySales = sales.reduce((acc, s) => acc + s.total, 0);
+      const weeklySales = sales.reduce((acc, s) => acc + Number(s.total || 0), 0);
       const goalPercentage = Math.min(100, Math.round((weeklySales / weeklyGoal) * 100));
       const vendors = users.filter(u => u.role === 'vendor');
 
@@ -1059,10 +1099,11 @@
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            ${vendors.length === 0 ? '<p class="text-gray-400 text-sm">No hay vendedoras creadas aún. Ve a la pestaña Usuarios para crear una.</p>' : ''}
             ${vendors.map((v, idx) => {
               const vSales = sales.filter(s => s.vendor === v.user);
-              const totalV = vSales.reduce((a, b) => a + b.total, 0);
-              const totalCommission = vSales.reduce((a, b) => a + (b.commission || 0), 0);
+              const totalV = vSales.reduce((a, b) => a + Number(b.total || 0), 0);
+              const totalCommission = vSales.reduce((a, b) => a + Number(b.commission || 0), 0);
               return `
                 <div class="glass-card p-6 rounded-3xl border border-pink-100 shadow-sm flex flex-col justify-between">
                   <div>
@@ -1099,8 +1140,8 @@
                       <span class="text-xs font-bold text-pink-main uppercase tracking-wider block mb-3">${y}</span>
                       <div class="grid grid-cols-2 md:grid-cols-6 gap-2">
                         ${months.map(m => {
-                          if (!v.paidMonth) v.paidMonth = {};
-                          if (!v.paidMonth[y]) v.paidMonth[y] = {};
+                          if (!v.paidMonth || typeof v.paidMonth !== 'object') v.paidMonth = {};
+                          if (!v.paidMonth[y] || typeof v.paidMonth[y] !== 'object') v.paidMonth[y] = {};
                           const isPaid = v.paidMonth[y][m] || false;
                           return `
                             <button onclick="toggleMonthPayment('${v.id}', ${y}, '${m}')" class="p-2 rounded-xl text-xs font-bold border transition ${isPaid ? 'bg-green-100 text-green-700 border-green-300' : 'bg-gray-50 text-gray-600 border-gray-200'}">
@@ -1122,8 +1163,8 @@
     function toggleMonthPayment(vendorId, year, month) {
       const v = users.find(x => x.id === vendorId);
       if (v) {
-        if (!v.paidMonth) v.paidMonth = {};
-        if (!v.paidMonth[year]) v.paidMonth[year] = {};
+        if (!v.paidMonth || typeof v.paidMonth !== 'object') v.paidMonth = {};
+        if (!v.paidMonth[year] || typeof v.paidMonth[year] !== 'object') v.paidMonth[year] = {};
         v.paidMonth[year][month] = !v.paidMonth[year][month];
         saveData();
         renderPaymentsTab(document.getElementById('mainContent'));
@@ -1140,7 +1181,7 @@
             <button onclick="openClientModal()" class="px-5 py-2.5 btn-lux rounded-2xl text-xs font-bold shadow-md">+ Registrar Cliente</button>
           </div>
 
-          <div class="glass-card rounded-3xl shadow-sm border border-pink-100 overflow-hidden">
+          <div class="glass-card rounded-3xl shadow-sm border border-pink-100 overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead class="bg-pink-50 text-pink-main text-xs uppercase font-extrabold">
                 <tr>
@@ -1155,7 +1196,7 @@
                   <tr>
                     <td class="p-4 font-bold text-gray-900">${c.name}</td>
                     <td class="p-4">${c.phone}</td>
-                    <td class="p-4 text-red-500 font-extrabold">$${(c.debt || 0).toLocaleString()}</td>
+                    <td class="p-4 text-red-500 font-extrabold">$${Number(c.debt || 0).toLocaleString()}</td>
                     <td class="p-4">
                       <button onclick="openAbonoModal('${c.id}')" class="px-3 py-1.5 bg-green-100 text-green-700 font-bold text-xs rounded-xl hover:bg-green-200 transition">Registrar Abono</button>
                     </td>
@@ -1167,7 +1208,7 @@
 
           <div class="pt-6">
             <h2 class="text-xl font-extrabold text-gray-900 mb-4">Todas las Facturas y Ventas Registradas</h2>
-            <div class="glass-card rounded-3xl shadow-sm border border-pink-100 overflow-hidden">
+            <div class="glass-card rounded-3xl shadow-sm border border-pink-100 overflow-x-auto">
               <table class="w-full text-left border-collapse">
                 <thead class="bg-pink-50 text-pink-main text-xs uppercase font-extrabold">
                   <tr>
@@ -1188,7 +1229,7 @@
                       <td class="p-4 text-pink-main font-semibold">${s.vendor}</td>
                       <td class="p-4">${s.product}</td>
                       <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-extrabold ${s.status === 'Pagado' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${s.status || 'Pagado'}</span></td>
-                      <td class="p-4 text-pink-main font-extrabold">$${s.total.toLocaleString()}</td>
+                      <td class="p-4 text-pink-main font-extrabold">$${Number(s.total || 0).toLocaleString()}</td>
                     </tr>
                   `).join('')}
                 </tbody>
@@ -1231,10 +1272,10 @@
     function openAbonoModal(clientId) {
       const c = clients.find(x => x.id === clientId);
       if (!c) return;
-      const montoStr = prompt(`Registrar abono para ${c.name}. Deuda actual: $${c.debt.toLocaleString()}\nIngrese cantidad (ej: 1000000 para $1.000.000):`);
+      const montoStr = prompt(`Registrar abono para ${c.name}. Deuda actual: $${Number(c.debt || 0).toLocaleString()}\nIngrese cantidad:`);
       const monto = parseFloat(montoStr);
       if (!isNaN(monto) && monto > 0) {
-        c.debt = Math.max(0, c.debt - monto);
+        c.debt = Math.max(0, Number(c.debt || 0) - monto);
         saveData();
         renderClientsTab(document.getElementById('mainContent'));
         showToast(`¡Abono registrado! Nuevo saldo: $${c.debt.toLocaleString()}`);
@@ -1250,7 +1291,7 @@
             <button onclick="promptNewCustomOrder()" class="px-5 py-2.5 btn-lux rounded-2xl text-xs font-bold shadow-md">+ Nuevo Encargo</button>
           </div>
 
-          <div class="glass-card rounded-3xl shadow-sm border border-pink-100 overflow-hidden">
+          <div class="glass-card rounded-3xl shadow-sm border border-pink-100 overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead class="bg-pink-50 text-pink-main text-xs uppercase font-extrabold">
                 <tr>
@@ -1281,7 +1322,7 @@
       const client = prompt('Nombre del cliente:');
       const desc = prompt('Descripción del encargo:');
       if (client && desc) {
-        customOrders.push({ id: Date.now().toString(), author: currentUser.name, client, description: desc, date: new Date().toLocaleDateString() });
+        customOrders.push({ id: Date.now().toString(), author: currentUser.name || currentUser.user, client, description: desc, date: new Date().toLocaleDateString() });
         saveData();
         renderCustomOrdersTab(document.getElementById('mainContent'));
         showToast('Encargo registrado correctamente.');
