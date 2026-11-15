@@ -1,30 +1,37 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="h-full">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jema_makeup - Catálogo y Tienda Virtual</title>
+  <title>Jema_makeup - Luxury Cosmetics & Management</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
     body {
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       background-color: #FFF5F7;
     }
-    .text-pink-main { color: #E86A92; }
-    .border-pink-main { border-color: #F4A2B8; }
-    .btn-pink {
-      background-color: #E86A92;
+    .text-pink-main { color: #D44D79; }
+    .bg-pink-main { background-color: #D44D79; }
+    .border-pink-main { border-color: #E8A1B5; }
+    .btn-lux {
+      background: linear-gradient(135deg, #E86A92 0%, #D44D79 100%);
       color: white;
-      transition: all 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .btn-pink:hover {
-      background-color: #D8557F;
-      box-shadow: 0 4px 12px rgba(232, 106, 146, 0.3);
+    .btn-lux:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 25px -5px rgba(212, 77, 121, 0.4);
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(232, 161, 181, 0.3);
     }
     .avatar-ring {
-      border: 3px solid #F4A2B8;
+      border: 3px solid #D44D79;
     }
     @media print {
       .no-print { display: none !important; }
@@ -34,134 +41,186 @@
     .print-only { display: none; }
   </style>
 </head>
-<body class="text-gray-700 min-h-screen flex flex-col">
+<body class="text-gray-800 min-h-full flex flex-col">
 
-  <!-- VISTA 1: CATÁLOGO PÚBLICO (PARA CLIENTES) -->
-  <div id="publicCatalogSection" class="min-h-screen bg-pink-50 flex flex-col">
-    <header class="bg-white border-b border-pink-100 p-4 shadow-sm sticky top-0 z-10">
-      <div class="max-w-6xl mx-auto flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-pink-main flex items-center gap-2">
-          <i class="fa-solid fa-heart"></i> Jema_makeup
-        </h1>
+  <!-- VISTA 1: CATÁLOGO PÚBLICO TIPO CARRITO (CLIENTES) -->
+  <div id="publicCatalogSection" class="min-h-screen bg-[#FFF5F7] flex flex-col">
+    <header class="glass-card shadow-sm p-4 sticky top-0 z-30 border-b border-pink-100">
+      <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+          <div class="w-10 h-10 rounded-full bg-pink-100 text-pink-main flex items-center justify-center font-bold text-xl shadow-inner">
+            <i class="fa-solid fa-gem"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-extrabold text-pink-main tracking-wide">JEMA_MAKEUP</h1>
+            <p class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Luxury Cosmetics</p>
+          </div>
+        </div>
         <div class="flex items-center space-x-3">
-          <button onclick="openLoginModal()" class="bg-gray-800 text-white px-4 py-2 rounded-full font-medium text-xs hover:bg-gray-700 shadow-sm">
-            <i class="fa-solid fa-lock mr-1"></i> Acceso Administradores
+          <button onclick="toggleCartModal()" class="relative bg-white text-pink-main px-4 py-2 rounded-2xl font-bold shadow-sm border border-pink-200 flex items-center gap-2 hover:bg-pink-50 transition">
+            <i class="fa-solid fa-bag-shopping"></i> <span class="hidden sm:inline">Bolsa</span>
+            <span id="cartCount" class="bg-pink-main text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
+          </button>
+          <button onclick="openLoginModal()" class="bg-gray-900 text-white px-4 py-2 rounded-2xl text-xs font-semibold hover:bg-gray-800 shadow-md transition flex items-center gap-1.5">
+            <i class="fa-solid fa-lock text-[10px]"></i> Acceso Personal
           </button>
         </div>
       </div>
     </header>
 
-    <main class="max-w-6xl mx-auto p-4 flex-1 w-full">
-      <div class="bg-white p-4 rounded-2xl shadow-sm mb-6 flex flex-col md:flex-row justify-between items-center gap-4 border border-pink-100">
-        <p class="text-gray-600 text-sm">¡Haz tu pedido directamente con nosotros! Envíos a todo Cali.</p>
-        <button onclick="shareCatalogWhatsApp()" class="btn-pink px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2">
-          <i class="fa-brands fa-whatsapp text-lg"></i> Compartir Catálogo
-        </button>
+    <main class="max-w-7xl mx-auto p-4 md:p-8 flex-1 w-full">
+      <div class="glass-card p-6 rounded-3xl shadow-sm mb-8 flex flex-col md:flex-row justify-between items-center gap-4 border border-pink-100">
+        <div>
+          <span class="text-xs font-bold text-pink-main uppercase tracking-wider block mb-1">Experiencia Exclusiva</span>
+          <h2 class="text-2xl font-bold text-gray-900">Catálogo de Alta Gama</h2>
+          <p class="text-gray-500 text-sm mt-0.5">Selecciona tus productos favoritos, arma tu bolsa y haz tu pedido directo al WhatsApp.</p>
+        </div>
+        <div class="flex items-center gap-2 bg-pink-50 px-4 py-2 rounded-2xl border border-pink-200">
+          <i class="fa-solid fa-truck-fast text-pink-main"></i>
+          <span class="text-xs font-semibold text-gray-700">Envíos seguros en Cali</span>
+        </div>
       </div>
 
-      <div id="publicProductGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <!-- Render productos públicos -->
+      <div id="publicProductGrid" class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <!-- Productos dinámicos -->
       </div>
     </main>
   </div>
 
-  <!-- VISTA 2: LOGIN PERSONAL -->
-  <div id="loginModalSection" class="hidden fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-    <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md border border-pink-100 relative">
+  <!-- MODAL CARRITO DE COMPRAS PÚBLICO -->
+  <div id="cartModal" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] flex flex-col border border-pink-100">
+      <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
+        <h3 class="text-xl font-extrabold text-pink-main flex items-center gap-2">
+          <i class="fa-solid fa-bag-shopping"></i> Tu Bolsa de Compras
+        </h3>
+        <button onclick="toggleCartModal()" class="text-gray-400 hover:text-gray-600 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div id="cartItemsContainer" class="flex-1 overflow-y-auto space-y-3 mb-4 pr-1">
+        <!-- Items de bolsa -->
+      </div>
+
+      <div class="border-t border-gray-100 pt-4 space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-gray-600 mb-1">Nombre Completo *</label>
+          <input type="text" id="orderClientName" class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-pink-300 outline-none" placeholder="Tu nombre">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-600 mb-1">Dirección y Barrio *</label>
+          <textarea id="orderClientAddress" rows="2" class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-pink-300 outline-none" placeholder="Dirección completa"></textarea>
+        </div>
+
+        <div class="flex justify-between items-center text-xl font-extrabold pt-2">
+          <span>Total a Pagar:</span>
+          <span id="cartTotalText" class="text-pink-main">$0</span>
+        </div>
+
+        <button onclick="sendWhatsAppOrder()" class="w-full py-3.5 bg-green-500 hover:bg-green-600 text-white font-bold rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-green-500/20 transition">
+          <i class="fa-brands fa-whatsapp text-xl"></i> Enviar Compra a WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VISTA 2: MODAL LOGIN PERSONAL -->
+  <div id="loginModalSection" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4 z-50">
+    <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md border border-pink-100 relative">
       <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
       
       <div class="text-center mb-6">
-        <div class="inline-block p-4 rounded-full bg-pink-100 text-pink-main text-3xl mb-3">
-          <i class="fa-solid fa-wand-magic-sparkles"></i>
+        <div class="inline-block p-4 rounded-full bg-pink-100 text-pink-main text-3xl mb-3 shadow-inner">
+          <i class="fa-solid fa-shield-halved"></i>
         </div>
-        <h2 class="text-2xl font-bold text-pink-main">Acceso al Personal</h2>
-        <p class="text-gray-500 text-sm mt-1">Ingresa tus credenciales</p>
+        <h2 class="text-2xl font-extrabold text-pink-main">Acceso Personal</h2>
+        <p class="text-gray-400 text-xs mt-1">Área exclusiva para administradores y vendedoras</p>
       </div>
 
       <form id="loginForm" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-600 mb-1">Usuario</label>
-          <input type="text" id="loginUser" required class="w-full px-4 py-2 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300">
+          <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Usuario</label>
+          <input type="text" id="loginUser" required class="w-full px-4 py-3 rounded-2xl border border-pink-200 focus:ring-2 focus:ring-pink-300 outline-none text-sm">
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-600 mb-1">Contraseña</label>
-          <input type="password" id="loginPass" required class="w-full px-4 py-2 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300">
+          <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Contraseña</label>
+          <input type="password" id="loginPass" required class="w-full px-4 py-3 rounded-2xl border border-pink-200 focus:ring-2 focus:ring-pink-300 outline-none text-sm">
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-600 mb-2">Elige tu Avatar</label>
-          <div class="flex justify-around py-2">
-            <button type="button" onclick="selectAvatar('fa-user-ninja')" class="avatar-option p-3 rounded-full text-2xl border-2 border-transparent hover:border-pink-300 text-pink-400"><i class="fa-solid fa-user-ninja"></i></button>
-            <button type="button" onclick="selectAvatar('fa-crown')" class="avatar-option p-3 rounded-full text-2xl border-2 border-transparent hover:border-pink-300 text-pink-400"><i class="fa-solid fa-crown"></i></button>
-            <button type="button" onclick="selectAvatar('fa-gem')" class="avatar-option p-3 rounded-full text-2xl border-2 border-transparent hover:border-pink-300 text-pink-400"><i class="fa-solid fa-gem"></i></button>
-            <button type="button" onclick="selectAvatar('fa-heart')" class="avatar-option p-3 rounded-full text-2xl border-2 border-transparent hover:border-pink-300 text-pink-400"><i class="fa-solid fa-heart"></i></button>
-            <button type="button" onclick="selectAvatar('fa-sparkles')" class="avatar-option p-3 rounded-full text-2xl border-2 border-transparent hover:border-pink-300 text-pink-400"><i class="fa-solid fa-sparkles"></i></button>
+          <label class="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">Avatar de Identidad</label>
+          <div class="flex justify-around py-2 bg-pink-50 rounded-2xl">
+            <button type="button" onclick="selectAvatar('fa-user-ninja')" class="avatar-option p-2 rounded-xl text-xl hover:bg-white text-pink-400 transition"><i class="fa-solid fa-user-ninja"></i></button>
+            <button type="button" onclick="selectAvatar('fa-crown')" class="avatar-option p-2 rounded-xl text-xl hover:bg-white text-pink-400 transition"><i class="fa-solid fa-crown"></i></button>
+            <button type="button" onclick="selectAvatar('fa-gem')" class="avatar-option p-2 rounded-xl text-xl hover:bg-white text-pink-400 transition"><i class="fa-solid fa-gem"></i></button>
+            <button type="button" onclick="selectAvatar('fa-heart')" class="avatar-option p-2 rounded-xl text-xl hover:bg-white text-pink-400 transition"><i class="fa-solid fa-heart"></i></button>
           </div>
         </div>
 
-        <button type="submit" class="w-full py-3 rounded-xl btn-pink font-semibold shadow-md">Ingresar al Sistema</button>
+        <button type="submit" class="w-full py-3.5 btn-lux font-bold rounded-2xl shadow-md">Ingresar al Sistema</button>
       </form>
     </div>
   </div>
 
-  <!-- VISTA 3: PANEL INTERNO (APP) -->
-  <div id="appSection" class="hidden min-h-screen flex flex-col">
-    <header class="bg-white shadow-sm border-b border-pink-100 no-print">
+  <!-- VISTA 3: PANEL INTERNO DE GESTIÓN -->
+  <div id="appSection" class="hidden min-h-screen flex flex-col bg-gray-50">
+    <header class="glass-card shadow-sm border-b border-pink-100 no-print sticky top-0 z-30">
       <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         <div class="flex items-center space-x-3">
-          <div id="userAvatarHeader" class="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center text-pink-main text-xl avatar-ring">
+          <div id="userAvatarHeader" class="w-11 h-11 rounded-2xl bg-pink-100 flex items-center justify-center text-pink-main text-xl avatar-ring shadow-sm">
             <i class="fa-solid fa-crown"></i>
           </div>
           <div>
-            <span id="userNameHeader" class="font-bold text-gray-800 text-base block leading-tight">Mari</span>
-            <span id="userRoleHeader" class="text-xs text-pink-main font-semibold block">Administradora</span>
+            <span id="userNameHeader" class="font-extrabold text-gray-900 text-base block leading-tight">Mari</span>
+            <span id="userRoleHeader" class="text-[11px] text-pink-main font-bold uppercase tracking-wider block">Administradora</span>
           </div>
         </div>
 
-        <div class="flex items-center space-x-2">
-          <button onclick="logout()" class="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm font-medium">
-            <i class="fa-solid fa-right-from-bracket mr-1"></i> Cerrar Sesión (Ir al Catálogo)
-          </button>
-        </div>
+        <button onclick="logout()" class="px-4 py-2 rounded-2xl bg-white text-gray-600 hover:bg-gray-100 text-xs font-bold shadow-sm border border-gray-200 transition flex items-center gap-2">
+          <i class="fa-solid fa-right-from-bracket text-pink-main"></i> Volver al Catálogo
+        </button>
       </div>
     </header>
 
-    <nav class="bg-white border-b border-pink-100 no-print">
-      <div class="max-w-7xl mx-auto px-4 flex overflow-x-auto space-x-2 py-2" id="navTabs"></div>
+    <nav class="bg-white border-b border-pink-100 no-print shadow-xs">
+      <div class="max-w-7xl mx-auto px-4 flex overflow-x-auto space-x-2 py-2.5" id="navTabs"></div>
     </nav>
 
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6" id="mainContent"></main>
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8" id="mainContent"></main>
   </div>
 
   <!-- MODAL PRODUCTO -->
-  <div id="productModal" class="hidden fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl">
+  <div id="productModal" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl border border-pink-100">
       <div class="flex justify-between items-center mb-4">
-        <h3 id="productModalTitle" class="text-xl font-bold text-pink-main">Producto</h3>
+        <h3 id="productModalTitle" class="text-xl font-extrabold text-pink-main">Producto</h3>
         <button onclick="closeProductModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
       <form id="productForm" class="space-y-4">
         <input type="hidden" id="productId">
         <div>
-          <label class="block text-sm font-medium text-gray-600 mb-1">Nombre del Producto</label>
-          <input type="text" id="prodName" required class="w-full px-4 py-2 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300">
+          <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Nombre del Producto</label>
+          <input type="text" id="prodName" required class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-pink-300 outline-none">
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-sm font-medium text-gray-600 mb-1">Costo ($)</label>
-            <input type="number" id="prodCost" required class="w-full px-4 py-2 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300">
+            <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Costo ($)</label>
+            <input type="number" id="prodCost" oninput="calculateModalUtility()" required class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-pink-300 outline-none">
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-600 mb-1">Precio Venta ($)</label>
-            <input type="number" id="prodPrice" required class="w-full px-4 py-2 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300">
+            <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Precio Venta ($)</label>
+            <input type="number" id="prodPrice" oninput="calculateModalUtility()" required class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-pink-300 outline-none">
           </div>
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-600 mb-1">Cantidad en Stock</label>
-          <input type="number" id="prodStock" required class="w-full px-4 py-2 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300">
+        <div class="bg-pink-50 p-3 rounded-2xl border border-pink-200 flex justify-between items-center">
+          <span class="text-xs font-bold text-gray-600">Utilidad calculada:</span>
+          <span id="modalUtilityPreview" class="text-sm font-extrabold text-green-600">$0</span>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-600 mb-1">Imagen (PNG / JPG)</label>
+          <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Cantidad en Stock</label>
+          <input type="number" id="prodStock" required class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-pink-300 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Imagen (PNG / JPG)</label>
           <input type="file" id="prodImgFile" accept="image/*" class="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-pink-50 file:text-pink-main hover:file:bg-pink-100">
           <input type="hidden" id="prodImgBase64">
           <div id="imgPreviewContainer" class="mt-2 hidden">
@@ -169,73 +228,75 @@
           </div>
         </div>
         <div class="flex justify-end space-x-2 pt-2">
-          <button type="button" onclick="closeProductModal()" class="px-4 py-2 rounded-xl bg-gray-100 text-gray-600 font-medium">Cancelar</button>
-          <button type="submit" class="px-4 py-2 rounded-xl btn-pink font-semibold">Guardar Producto</button>
+          <button type="button" onclick="closeProductModal()" class="px-4 py-2.5 rounded-xl bg-gray-100 text-gray-600 font-bold text-sm">Cancelar</button>
+          <button type="submit" class="px-5 py-2.5 btn-lux font-bold rounded-xl text-sm shadow-md">Guardar Producto</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- MODAL CLIENTE -->
-  <div id="clientModal" class="hidden fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl">
-      <h3 id="clientModalTitle" class="text-xl font-bold text-pink-main mb-4">Registrar Cliente</h3>
+  <div id="clientModal" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl border border-pink-100">
+      <h3 id="clientModalTitle" class="text-xl font-extrabold text-pink-main mb-4">Registrar Cliente</h3>
       <form id="clientForm" class="space-y-4">
         <input type="hidden" id="clientId">
         <div>
-          <label class="block text-sm font-medium text-gray-600 mb-1">Nombre Completo</label>
-          <input type="text" id="clientName" required class="w-full px-4 py-2 rounded-xl border border-pink-200">
+          <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Nombre Completo</label>
+          <input type="text" id="clientName" required class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm">
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-600 mb-1">Celular / Teléfono</label>
-          <input type="tel" id="clientPhone" required class="w-full px-4 py-2 rounded-xl border border-pink-200">
+          <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Celular / Teléfono</label>
+          <input type="tel" id="clientPhone" required class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm">
         </div>
         <div class="flex justify-end space-x-2 pt-2">
-          <button type="button" onclick="closeClientModal()" class="px-4 py-2 rounded-xl bg-gray-100 text-gray-600">Cancelar</button>
-          <button type="submit" class="px-4 py-2 rounded-xl btn-pink font-semibold">Guardar</button>
+          <button type="button" onclick="closeClientModal()" class="px-4 py-2.5 rounded-xl bg-gray-100 text-gray-600 font-bold text-sm">Cancelar</button>
+          <button type="submit" class="px-5 py-2.5 btn-lux font-bold rounded-xl text-sm shadow-md">Guardar Cliente</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- MODAL CREAR USUARIO -->
-  <div id="userModal" class="hidden fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl">
+  <div id="userModal" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl border border-pink-100">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold text-pink-main">Crear Nuevo Usuario</h3>
+        <h3 class="text-xl font-extrabold text-pink-main">Crear Nuevo Usuario</h3>
         <button onclick="closeUserModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
       <form id="userForm" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-600 mb-1">Nombre Completo</label>
-          <input type="text" id="newUserName" required class="w-full px-4 py-2 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300">
+          <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Nombre Completo</label>
+          <input type="text" id="newUserName" required class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm">
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-600 mb-1">Usuario (para iniciar sesión)</label>
-          <input type="text" id="newUserLogin" required class="w-full px-4 py-2 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300">
+          <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Usuario (Login)</label>
+          <input type="text" id="newUserLogin" required class="w-full px-4 py-2 rounded-xl border border-pink-200 text-sm">
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-600 mb-1">Contraseña</label>
-          <input type="password" id="newUserPass" required class="w-full px-4 py-2 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300">
+          <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Contraseña</label>
+          <input type="password" id="newUserPass" required class="w-full px-4 py-2 rounded-xl border border-pink-200 text-sm">
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-600 mb-1">Rol</label>
-          <select id="newUserRole" class="w-full px-4 py-2 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300">
+          <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Rol</label>
+          <select id="newUserRole" class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm">
             <option value="vendor">Vended@r</option>
             <option value="admin">Administrador</option>
           </select>
         </div>
         <div class="flex justify-end space-x-2 pt-2">
-          <button type="button" onclick="closeUserModal()" class="px-4 py-2 rounded-xl bg-gray-100 text-gray-600 font-medium">Cancelar</button>
-          <button type="submit" class="px-4 py-2 rounded-xl btn-pink font-semibold">Guardar Usuario</button>
+          <button type="button" onclick="closeUserModal()" class="px-4 py-2.5 rounded-xl bg-gray-100 text-gray-600 font-bold text-sm">Cancelar</button>
+          <button type="submit" class="px-5 py-2.5 btn-lux font-bold rounded-xl text-sm shadow-md">Guardar Usuario</button>
         </div>
       </form>
     </div>
   </div>
 
+  <!-- SCRIPT DE LA APLICACIÓN -->
   <script>
     let currentUser = null;
     let selectedAvatar = 'fa-crown';
+    let cart = [];
 
     let users = JSON.parse(localStorage.getItem('jm_users')) || [
       { id: '1', user: 'mari', pass: '1234', role: 'admin', name: 'Mari', avatar: 'fa-crown', paidMonth: true }
@@ -244,7 +305,7 @@
     let products = JSON.parse(localStorage.getItem('jm_products')) || [
       { id: '1', name: 'Labial Matte Velvet Rose', cost: 8000, price: 18000, stock: 15, img: '' },
       { id: '2', name: 'Base Cobertura Total Glow', cost: 15000, price: 32000, stock: 10, img: '' },
-      { id: '3', name: 'Paleta de Sombras Pastel Dreams', cost: 22000, price: 45000, stock: 8, img: '' }
+      { id: '3', name: 'Paleta de Sombras Pastel Dreams', cost: 22000, price: 45000, stock: 2, img: '' }
     ];
 
     let clients = JSON.parse(localStorage.getItem('jm_clients')) || [
@@ -252,6 +313,7 @@
     ];
 
     let sales = JSON.parse(localStorage.getItem('jm_sales')) || [];
+    let customOrders = JSON.parse(localStorage.getItem('jm_custom_orders')) || [];
 
     window.onload = function() {
       saveData();
@@ -265,14 +327,15 @@
       localStorage.setItem('jm_products', JSON.stringify(products));
       localStorage.setItem('jm_clients', JSON.stringify(clients));
       localStorage.setItem('jm_sales', JSON.stringify(sales));
+      localStorage.setItem('jm_custom_orders', JSON.stringify(customOrders));
     }
 
     function selectAvatar(iconClass) {
       selectedAvatar = iconClass;
       document.querySelectorAll('.avatar-option').forEach(btn => {
-        btn.classList.remove('border-pink-500', 'bg-pink-50');
+        btn.classList.remove('bg-pink-100', 'text-pink-main');
       });
-      event.currentTarget.classList.add('border-pink-500', 'bg-pink-50');
+      event.currentTarget.classList.add('bg-pink-100', 'text-pink-main');
     }
 
     function openLoginModal() {
@@ -322,52 +385,108 @@
       checkAuth();
     }
 
-    // CATÁLOGO PÚBLICO (ENLACE WHATSAPP 3112210988)
+    // CATÁLOGO PÚBLICO TIPO CARRITO
     function renderPublicCatalog() {
       const grid = document.getElementById('publicProductGrid');
       grid.innerHTML = products.map(p => `
-        <div class="bg-white p-3 rounded-2xl border border-pink-100 shadow-sm flex flex-col justify-between">
+        <div class="glass-card p-4 rounded-3xl shadow-sm flex flex-col justify-between border border-pink-100 hover:shadow-md transition">
           <div>
-            <img src="${p.img || 'https://via.placeholder.com/150'}" class="w-full h-32 object-cover rounded-xl mb-2">
-            <h4 class="font-bold text-sm text-gray-800">${p.name}</h4>
-            <p class="text-pink-main font-bold">$${p.price.toLocaleString()}</p>
-            <p class="text-xs text-gray-400 mt-1">Stock: ${p.stock > 0 ? p.stock + ' disponibles' : 'Agotado'}</p>
+            <div class="relative mb-3">
+              <img src="${p.img || 'https://via.placeholder.com/150'}" class="w-full h-40 object-cover rounded-2xl border border-pink-100">
+              ${p.stock <= 0 ? '<span class="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase">Agotado</span>' : '<span class="absolute top-2 right-2 bg-green-500 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase">Disponible</span>'}
+            </div>
+            <h4 class="font-bold text-sm text-gray-900">${p.name}</h4>
+            <p class="text-pink-main font-extrabold text-lg mt-1">$${p.price.toLocaleString()}</p>
           </div>
-          <button onclick="orderProductWhatsApp('${p.name}', ${p.price})" ${p.stock <= 0 ? 'disabled' : ''} class="mt-3 w-full py-2 ${p.stock > 0 ? 'bg-green-500 hover:bg-green-600 text-white' : 'bg-gray-100 text-gray-400 cursor-not-allowed'} font-semibold text-xs rounded-xl flex items-center justify-center gap-1">
-            <i class="fa-brands fa-whatsapp"></i> ${p.stock > 0 ? 'Pedir por WhatsApp' : 'Agotado'}
+          <button onclick="addToCart('${p.id}')" ${p.stock <= 0 ? 'disabled' : ''} class="mt-4 w-full py-2.5 ${p.stock > 0 ? 'btn-lux' : 'bg-gray-200 text-gray-400 cursor-not-allowed'} font-bold text-xs rounded-xl shadow-sm flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-cart-plus"></i> ${p.stock > 0 ? 'Agregar a Bolsa' : 'Agotado'}
           </button>
         </div>
       `).join('');
     }
 
-    function orderProductWhatsApp(productName, productPrice) {
-      const msg = `Hola Jema_makeup, ¡estoy interesad@ en comprar *${productName}* por un valor de *$${productPrice.toLocaleString()}*! ¿Me dan información para el pago y envío por favor? 💖`;
-      window.open(`https://wa.me/573112210988?text=${encodeURIComponent(msg)}`, '_blank');
+    function addToCart(productId) {
+      const p = products.find(x => x.id === productId);
+      if (p && p.stock > 0) {
+        const existing = cart.find(item => item.id === productId);
+        if (existing) {
+          if (existing.qty < p.stock) existing.qty++;
+          else alert('No hay más stock disponible.');
+        } else {
+          cart.push({ ...p, qty: 1 });
+        }
+        document.getElementById('cartCount').innerText = cart.reduce((a, b) => a + b.qty, 0);
+        alert(`¡${p.name} agregado a tu bolsa!`);
+      }
     }
 
-    function shareCatalogWhatsApp() {
-      let msg = `✨ *Catálogo Oficial Jema_makeup* ✨\n\nConoce nuestros productos disponibles:\n\n`;
-      products.forEach(p => msg += `💄 *${p.name}* - $${p.price.toLocaleString()}\n`);
-      msg += `\n¡Escríbenos al 311 221 0988 para hacer tu pedido directo! 💖`;
-      window.open(`https://wa.me/573112210988?text=${encodeURIComponent(msg)}`, '_blank');
+    function toggleCartModal() {
+      const modal = document.getElementById('cartModal');
+      modal.classList.toggle('hidden');
+      if (!modal.classList.contains('hidden')) renderCartItems();
+    }
+
+    function renderCartItems() {
+      const container = document.getElementById('cartItemsContainer');
+      if (cart.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-400 text-sm py-6">Tu bolsa de compras está vacía.</p>';
+      } else {
+        container.innerHTML = cart.map(item => `
+          <div class="flex justify-between items-center text-sm border-b border-gray-100 pb-3">
+            <div class="flex items-center gap-3">
+              <img src="${item.img || 'https://via.placeholder.com/40'}" class="w-12 h-12 object-cover rounded-xl border">
+              <div>
+                <h5 class="font-bold text-gray-800">${item.name}</h5>
+                <p class="text-xs text-gray-500">Cant: ${item.qty} x $${item.price.toLocaleString()}</p>
+              </div>
+            </div>
+            <span class="font-extrabold text-pink-main">$${(item.price * item.qty).toLocaleString()}</span>
+          </div>
+        `).join('');
+      }
+      const total = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+      document.getElementById('cartTotalText').innerText = `$${total.toLocaleString()}`;
+    }
+
+    function sendWhatsAppOrder() {
+      const name = document.getElementById('orderClientName').value.trim();
+      const address = document.getElementById('orderClientAddress').value.trim();
+
+      if (!name || !address) {
+        alert('Por favor ingresa tu nombre y dirección de entrega.');
+        return;
+      }
+
+      const total = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+      let text = `✨ *Nuevo Pedido Jema_makeup* ✨\n\n`;
+      cart.forEach(i => text += `- ${i.qty}x ${i.name} ($${(i.price * i.qty).toLocaleString()})\n`);
+      text += `\n*Total a Pagar:* $${total.toLocaleString()}`;
+      text += `\n*Cliente:* ${name}`;
+      text += `\n*Dirección:* ${address}`;
+
+      window.open(`https://wa.me/573112210988?text=${encodeURIComponent(text)}`, '_blank');
     }
 
     // NAVEGACIÓN INTERNA
     function renderNavigation() {
       const navTabs = document.getElementById('navTabs');
-      let html = `<button onclick="switchTab('dashboard')" class="tab-btn font-semibold px-4 py-2 rounded-xl bg-pink-100 text-pink-main border border-pink-200">Dashboard</button>`;
+      let html = `<button onclick="switchTab('dashboard')" class="tab-btn font-bold px-4 py-2 rounded-2xl bg-pink-100 text-pink-main text-sm shadow-xs">Dashboard</button>`;
 
       if (currentUser.role === 'admin') {
         html += `
-          <button onclick="switchTab('inventory')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50">Inventario Maestro</button>
-          <button onclick="switchTab('analytics')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50">Dashboard Admin & Ventas</button>
-          <button onclick="switchTab('clients')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50">Clientes</button>
-          <button onclick="switchTab('users')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50">Usuarios</button>
+          <button onclick="switchTab('inventory')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Inventario Maestro</button>
+          <button onclick="switchTab('analytics')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Dashboard Admin & Ranking</button>
+          <button onclick="switchTab('payments')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Control Pagos Vendedoras</button>
+          <button onclick="switchTab('admin_sales')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Registrar Venta (Admin)</button>
+          <button onclick="switchTab('clients')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Clientes & Abonos</button>
+          <button onclick="switchTab('custom_orders')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Encargos</button>
+          <button onclick="switchTab('users')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Usuarios</button>
         `;
       } else {
         html += `
-          <button onclick="switchTab('vendor_inv')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50">Mi Inventario & Ventas</button>
-          <button onclick="switchTab('clients')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50">Mis Clientes</button>
+          <button onclick="switchTab('vendor_inv')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Mi Inventario & Facturación</button>
+          <button onclick="switchTab('clients')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Clientes & Abonos</button>
+          <button onclick="switchTab('custom_orders')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Encargos</button>
         `;
       }
       navTabs.innerHTML = html;
@@ -379,46 +498,49 @@
       if (tabName === 'dashboard') renderDashboardTab(main);
       else if (tabName === 'inventory') renderInventoryTab(main);
       else if (tabName === 'analytics') renderAnalyticsTab(main);
+      else if (tabName === 'payments') renderPaymentsTab(main);
+      else if (tabName === 'admin_sales') renderPOSSection(main, 'admin');
       else if (tabName === 'clients') renderClientsTab(main);
+      else if (tabName === 'custom_orders') renderCustomOrdersTab(main);
       else if (tabName === 'users') renderUsersTab(main);
-      else if (tabName === 'vendor_inv') renderVendorTab(main);
+      else if (tabName === 'vendor_inv') renderPOSSection(main, 'vendor');
     }
 
     // DASHBOARD PRINCIPAL
     function renderDashboardTab(container) {
       container.innerHTML = `
         <div class="space-y-6">
-          <div class="bg-gradient-to-r from-pink-100 via-pink-50 to-white p-8 rounded-3xl border border-pink-200 shadow-sm text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-6">
-            <div class="space-y-2">
-              <span class="px-3 py-1 bg-white text-pink-main font-bold text-xs rounded-full uppercase">Panel Principal</span>
-              <h1 class="text-3xl md:text-4xl font-extrabold text-pink-main">¡Hola, ${currentUser.name || currentUser.user}! ✨</h1>
-              <p class="text-gray-600 text-base">Bienvenid@ al sistema de <strong>Jema_makeup</strong>.</p>
+          <div class="glass-card p-8 rounded-3xl border border-pink-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="space-y-2 text-center md:text-left">
+              <span class="px-3 py-1 bg-pink-100 text-pink-main font-bold text-xs rounded-full uppercase tracking-wider">Panel Jema_makeup</span>
+              <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900">¡Bienvenid@, ${currentUser.name || currentUser.user}! ✨</h1>
+              <p class="text-gray-500 text-sm">Todo listo para seguir brillando y alcanzando las metas de la semana.</p>
             </div>
-            <div class="w-20 h-20 rounded-full bg-white flex items-center justify-center text-pink-main text-4xl shadow-md border-2 border-pink-200">
+            <div class="w-20 h-20 rounded-3xl bg-white flex items-center justify-center text-pink-main text-4xl shadow-md border-2 border-pink-200">
               <i class="fa-solid ${currentUser.avatar || 'fa-crown'}"></i>
             </div>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-white p-6 rounded-2xl border border-pink-100 shadow-sm flex items-center justify-between">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="glass-card p-6 rounded-3xl shadow-sm flex items-center justify-between border border-pink-100">
               <div>
-                <span class="text-xs font-bold text-gray-400 block">PRODUCTOS</span>
-                <span class="text-3xl font-extrabold text-gray-800">${products.length}</span>
+                <span class="text-xs font-extrabold text-gray-400 uppercase tracking-widest block">Productos Totales</span>
+                <span class="text-3xl font-extrabold text-gray-900 mt-1 block">${products.length}</span>
               </div>
-              <div class="p-3 bg-pink-50 rounded-2xl text-pink-main text-2xl"><i class="fa-solid fa-boxes-stacked"></i></div>
+              <div class="p-4 bg-pink-100 rounded-2xl text-pink-main text-2xl"><i class="fa-solid fa-boxes-stacked"></i></div>
             </div>
-            <div class="bg-white p-6 rounded-2xl border border-pink-100 shadow-sm flex items-center justify-between">
+            <div class="glass-card p-6 rounded-3xl shadow-sm flex items-center justify-between border border-pink-100">
               <div>
-                <span class="text-xs font-bold text-gray-400 block">VENTAS TOTALES</span>
-                <span class="text-3xl font-extrabold text-pink-main">${sales.length}</span>
+                <span class="text-xs font-extrabold text-gray-400 uppercase tracking-widest block">Ventas Registradas</span>
+                <span class="text-3xl font-extrabold text-pink-main mt-1 block">${sales.length}</span>
               </div>
-              <div class="p-3 bg-pink-50 rounded-2xl text-pink-main text-2xl"><i class="fa-solid fa-bag-shopping"></i></div>
+              <div class="p-4 bg-pink-100 rounded-2xl text-pink-main text-2xl"><i class="fa-solid fa-bag-shopping"></i></div>
             </div>
-            <div class="bg-white p-6 rounded-2xl border border-pink-100 shadow-sm flex items-center justify-between">
+            <div class="glass-card p-6 rounded-3xl shadow-sm flex items-center justify-between border border-pink-100">
               <div>
-                <span class="text-xs font-bold text-gray-400 block">CLIENTES</span>
-                <span class="text-3xl font-extrabold text-gray-800">${clients.length}</span>
+                <span class="text-xs font-extrabold text-gray-400 uppercase tracking-widest block">Clientes Activos</span>
+                <span class="text-3xl font-extrabold text-gray-900 mt-1 block">${clients.length}</span>
               </div>
-              <div class="p-3 bg-pink-50 rounded-2xl text-pink-main text-2xl"><i class="fa-solid fa-users"></i></div>
+              <div class="p-4 bg-pink-100 rounded-2xl text-pink-main text-2xl"><i class="fa-solid fa-users"></i></div>
             </div>
           </div>
         </div>
@@ -433,37 +555,38 @@
 
       container.innerHTML = `
         <div class="space-y-6">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-white p-5 rounded-2xl border border-pink-100 shadow-sm">
-              <span class="text-xs text-gray-400 font-semibold block">VENTAS ESPERADAS</span>
-              <span class="text-2xl font-bold text-pink-main">$${totalExpected.toLocaleString()}</span>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="glass-card p-6 rounded-3xl shadow-sm border border-pink-100">
+              <span class="text-xs font-bold text-gray-400 uppercase tracking-wider block">Ventas Esperadas</span>
+              <span class="text-2xl font-extrabold text-pink-main mt-1 block">$${totalExpected.toLocaleString()}</span>
             </div>
-            <div class="bg-white p-5 rounded-2xl border border-pink-100 shadow-sm">
-              <span class="text-xs text-gray-400 font-semibold block">COSTO TOTAL</span>
-              <span class="text-2xl font-bold text-gray-700">$${totalCost.toLocaleString()}</span>
+            <div class="glass-card p-6 rounded-3xl shadow-sm border border-pink-100">
+              <span class="text-xs font-bold text-gray-400 uppercase tracking-wider block">Costo Total</span>
+              <span class="text-2xl font-extrabold text-gray-700 mt-1 block">$${totalCost.toLocaleString()}</span>
             </div>
-            <div class="bg-white p-5 rounded-2xl border border-pink-100 shadow-sm">
-              <span class="text-xs text-gray-400 font-semibold block">UTILIDAD PROYECTADA</span>
-              <span class="text-2xl font-bold text-green-500">$${totalUtility.toLocaleString()}</span>
+            <div class="glass-card p-6 rounded-3xl shadow-sm border border-pink-100">
+              <span class="text-xs font-bold text-gray-400 uppercase tracking-wider block">Utilidad Proyectada</span>
+              <span class="text-2xl font-extrabold text-green-600 mt-1 block">$${totalUtility.toLocaleString()}</span>
             </div>
           </div>
 
           <div class="flex justify-between items-center">
-            <h2 class="text-xl font-bold text-gray-800">Inventario Maestro</h2>
+            <h2 class="text-2xl font-extrabold text-gray-900">Inventario Maestro</h2>
             <div class="space-x-2">
-              <button onclick="window.print()" class="px-4 py-2 bg-gray-800 text-white rounded-xl text-sm font-semibold"><i class="fa-solid fa-print"></i> Imprimir</button>
-              <button onclick="openProductModal()" class="btn-pink px-4 py-2 rounded-xl text-sm font-semibold">+ Agregar Producto</button>
+              <button onclick="window.print()" class="px-4 py-2.5 bg-gray-900 text-white rounded-2xl text-xs font-bold shadow-md hover:bg-gray-800 transition"><i class="fa-solid fa-print mr-1"></i> Imprimir</button>
+              <button onclick="openProductModal()" class="px-5 py-2.5 btn-lux rounded-2xl text-xs font-bold shadow-md">+ Nuevo Producto</button>
             </div>
           </div>
 
-          <div class="bg-white rounded-2xl shadow-sm border border-pink-100 overflow-hidden">
+          <div class="glass-card rounded-3xl shadow-sm border border-pink-100 overflow-hidden">
             <table class="w-full text-left border-collapse">
-              <thead class="bg-pink-50 text-pink-main text-xs uppercase font-semibold">
+              <thead class="bg-pink-50 text-pink-main text-xs uppercase font-extrabold tracking-wider">
                 <tr>
                   <th class="p-4">Foto</th>
                   <th class="p-4">Producto</th>
                   <th class="p-4">Costo</th>
                   <th class="p-4">Precio Venta</th>
+                  <th class="p-4">Utilidad Unit.</th>
                   <th class="p-4">Stock</th>
                   <th class="p-4 no-print">Acciones</th>
                 </tr>
@@ -471,14 +594,15 @@
               <tbody class="divide-y divide-gray-100 text-sm">
                 ${products.map(p => `
                   <tr>
-                    <td class="p-4"><img src="${p.img || 'https://via.placeholder.com/50'}" class="w-12 h-12 object-cover rounded-xl border border-pink-100"></td>
-                    <td class="p-4 font-semibold">${p.name}</td>
-                    <td class="p-4">$${p.cost.toLocaleString()}</td>
-                    <td class="p-4 text-pink-main font-bold">$${p.price.toLocaleString()}</td>
-                    <td class="p-4"><span class="px-3 py-1 rounded-full bg-pink-50 text-pink-main font-bold text-xs">${p.stock} unids</span></td>
+                    <td class="p-4"><img src="${p.img || 'https://via.placeholder.com/50'}" class="w-12 h-12 object-cover rounded-2xl border"></td>
+                    <td class="p-4 font-bold text-gray-900">${p.name} ${p.stock <= 0 ? '<span class="text-red-500 text-xs ml-2">(Agotado)</span>' : ''}</td>
+                    <td class="p-4 text-gray-600">$${p.cost.toLocaleString()}</td>
+                    <td class="p-4 text-pink-main font-extrabold">$${p.price.toLocaleString()}</td>
+                    <td class="p-4 text-green-600 font-bold">$${(p.price - p.cost).toLocaleString()}</td>
+                    <td class="p-4"><span class="px-3 py-1 rounded-full ${p.stock > 0 ? 'bg-pink-50 text-pink-main' : 'bg-red-100 text-red-600'} font-bold text-xs">${p.stock} unids</span></td>
                     <td class="p-4 space-x-2 no-print">
-                      <button onclick="editProduct('${p.id}')" class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen"></i></button>
-                      <button onclick="deleteProduct('${p.id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>
+                      <button onclick="editProduct('${p.id}')" class="text-blue-500 hover:text-blue-700 p-2"><i class="fa-solid fa-pen"></i></button>
+                      <button onclick="deleteProduct('${p.id}')" class="text-red-400 hover:text-red-600 p-2"><i class="fa-solid fa-trash"></i></button>
                     </td>
                   </tr>
                 `).join('')}
@@ -491,18 +615,27 @@
 
     function setupFileInput() {
       const fileInput = document.getElementById('prodImgFile');
-      fileInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function(evt) {
-            document.getElementById('prodImgBase64').value = evt.target.result;
-            document.getElementById('imgPreview').src = evt.target.result;
-            document.getElementById('imgPreviewContainer').classList.remove('hidden');
-          };
-          reader.readAsDataURL(file);
-        }
-      });
+      if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+              document.getElementById('prodImgBase64').value = evt.target.result;
+              document.getElementById('imgPreview').src = evt.target.result;
+              document.getElementById('imgPreviewContainer').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+    }
+
+    function calculateModalUtility() {
+      const cost = parseFloat(document.getElementById('prodCost').value) || 0;
+      const price = parseFloat(document.getElementById('prodPrice').value) || 0;
+      const utility = Math.max(0, price - cost);
+      document.getElementById('modalUtilityPreview').innerText = `$${utility.toLocaleString()}`;
     }
 
     function openProductModal(prod = null) {
@@ -513,6 +646,7 @@
       document.getElementById('prodPrice').value = prod ? prod.price : '';
       document.getElementById('prodStock').value = prod ? prod.stock : '';
       document.getElementById('prodImgBase64').value = prod ? prod.img : '';
+      calculateModalUtility();
 
       if (prod && prod.img) {
         document.getElementById('imgPreview').src = prod.img;
@@ -556,7 +690,7 @@
     }
 
     function deleteProduct(id) {
-      if (confirm('¿Estás segura de eliminar este producto?')) {
+      if (confirm('¿Estás segura de eliminar este producto del catálogo?')) {
         products = products.filter(x => x.id !== id);
         saveData();
         renderInventoryTab(document.getElementById('mainContent'));
@@ -564,154 +698,343 @@
       }
     }
 
-    // DASHBOARD ADMIN, VENTAS, COMISIONES Y RANKING
-    function renderAnalyticsTab(container) {
-      const weeklyGoal = 300000; // Meta admin $300.000 semanal
-      const weeklySales = sales.reduce((acc, s) => acc + s.total, 0);
-      const goalPercentage = Math.min(100, Math.round((weeklySales / weeklyGoal) * 100));
-      const missing = Math.max(0, weeklyGoal - weeklySales);
+    // PUNTO DE VENTA (POS / FACTURACIÓN) PARA VENDEDORAS Y ADMIN
+    let posCart = [];
 
-      const vendors = users.filter(u => u.role === 'vendor');
+    function renderPOSSection(container, mode) {
+      const weeklyGoal = mode === 'admin' ? 300000 : 100000;
+      const mySales = mode === 'admin' ? sales : sales.filter(s => s.vendor === currentUser.user);
+      const totalEarned = mySales.reduce((a, b) => a + b.total, 0);
+      const goalPercentage = Math.min(100, Math.round((totalEarned / weeklyGoal) * 100));
 
-      // Calcular ranking
-      const vendorStats = vendors.map(v => {
-        const vSales = sales.filter(s => s.vendor === v.user);
-        const totalV = vSales.reduce((a, b) => a + b.total, 0);
-        const totalCommission = vSales.reduce((a, b) => a + (b.commission || 0), 0);
-        return { name: v.name, salesCount: vSales.length, totalV, totalCommission, paid: v.paidMonth, id: v.id };
-      }).sort((a, b) => b.totalV - a.totalV);
-
-      // Productos más y menos vendidos
-      const prodCounts = {};
-      sales.forEach(s => {
-        prodCounts[s.product] = (prodCounts[s.product] || 0) + 1;
-      });
-      const sortedProds = Object.entries(prodCounts).sort((a, b) => b[1] - a[1]);
-      const topProd = sortedProds.length > 0 ? sortedProds[0][0] : 'N/A';
-      const lowProd = sortedProds.length > 0 ? sortedProds[sortedProds.length - 1][0] : 'N/A';
+      const quotes = [
+        "¡Cada venta es un paso más hacia tus grandes sueños! 💖",
+        "Tu esfuerzo y dedicación inspiran a todo el equipo Jema. ✨",
+        "¡A romper récords hoy! Tienes todo el talento necesario. 🚀",
+        "La actitud positiva es el mejor maquillaje. ¡Brilla hoy! 💄"
+      ];
+      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
       container.innerHTML = `
         <div class="space-y-6">
-          <div class="bg-white p-6 rounded-3xl border border-pink-100 shadow-sm">
-            <div class="flex justify-between items-center mb-2">
-              <h3 class="text-lg font-bold text-pink-main">Meta Semanal Administradora: $${weeklyGoal.toLocaleString()} COP</h3>
-              <span class="text-sm font-semibold text-gray-500">${goalPercentage}% Logrado</span>
+          <div class="glass-card p-6 rounded-3xl border border-pink-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+              <span class="text-xs font-bold text-pink-main uppercase tracking-wider block mb-1">Motivación del Día</span>
+              <p class="text-gray-800 font-bold text-base">"${randomQuote}"</p>
             </div>
-            <div class="w-full bg-gray-100 h-4 rounded-full overflow-hidden mb-3">
-              <div class="bg-pink-main h-full transition-all duration-500" style="width: ${goalPercentage}%"></div>
-            </div>
-            <p class="text-sm text-gray-600 font-medium">
-              ${missing > 0 ? `¡Vamos por más! Faltan <strong>$${missing.toLocaleString()}</strong> para cumplir la meta semanal.` : '¡Felicidades! 🎉 Se ha alcanzado la meta semanal.'}
-            </p>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="bg-white p-5 rounded-2xl border border-pink-100 shadow-sm">
-              <span class="text-xs font-bold text-gray-400 block mb-1">PRODUCTO CON MÁS SALIDA</span>
-              <span class="text-lg font-bold text-pink-main"><i class="fa-solid fa-fire text-orange-400 mr-2"></i> ${topProd}</span>
-            </div>
-            <div class="bg-white p-5 rounded-2xl border border-pink-100 shadow-sm">
-              <span class="text-xs font-bold text-gray-400 block mb-1">PRODUCTO CON MENOS SALIDA</span>
-              <span class="text-lg font-bold text-gray-700"><i class="fa-solid fa-snowflake text-blue-300 mr-2"></i> ${lowProd}</span>
+            <div class="w-full md:w-72 bg-white p-4 rounded-2xl border border-pink-100 shadow-xs">
+              <div class="flex justify-between items-center mb-1 text-xs font-bold">
+                <span class="text-gray-500">Meta Semanal ($${weeklyGoal.toLocaleString()})</span>
+                <span class="text-pink-main">${goalPercentage}%</span>
+              </div>
+              <div class="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
+                <div class="bg-pink-main h-full transition-all duration-500" style="width: ${goalPercentage}%"></div>
+              </div>
             </div>
           </div>
 
-          <h2 class="text-xl font-bold text-gray-800">Ranking y Comisiones de Vendedoras (35% de Utilidad)</h2>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            ${vendorStats.map((v, index) => `
-              <div class="bg-white p-5 rounded-2xl border border-pink-100 shadow-sm flex flex-col justify-between">
-                <div>
-                  <div class="flex justify-between items-center mb-2">
-                    <span class="px-2.5 py-1 bg-pink-100 text-pink-main font-extrabold text-xs rounded-full">Puesto #${index + 1}</span>
-                    <button onclick="toggleVendorPayment('${v.id}')" class="px-3 py-1 rounded-full font-bold text-xs ${v.paid ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
-                      ${v.paid ? '✔ Pagada' : '✖ Pendiente'}
-                    </button>
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Selector de Productos -->
+            <div class="lg:col-span-2 space-y-4">
+              <h2 class="text-xl font-extrabold text-gray-900">Seleccionar Productos para Facturar</h2>
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                ${products.map(p => `
+                  <div onclick="posAddToCart('${p.id}')" class="glass-card p-4 rounded-2xl border border-pink-100 shadow-xs cursor-pointer hover:border-pink-300 transition flex flex-col justify-between">
+                    <div>
+                      <img src="${p.img || 'https://via.placeholder.com/100'}" class="w-full h-24 object-cover rounded-xl mb-2">
+                      <h5 class="font-bold text-xs text-gray-900">${p.name}</h5>
+                      <p class="text-pink-main font-extrabold text-sm">$${p.price.toLocaleString()}</p>
+                    </div>
+                    <span class="text-[10px] text-gray-400 mt-2 font-bold">Stock: ${p.stock}</span>
                   </div>
-                  <h4 class="font-bold text-gray-800 text-lg">${v.name}</h4>
-                  <p class="text-sm text-gray-500">${v.salesCount} ventas realizadas</p>
-                  <p class="text-gray-800 font-bold mt-2">Ventas: $${v.totalV.toLocaleString()}</p>
-                  <p class="text-green-600 font-bold">Comisión (35% utilidad): $${v.totalCommission.toLocaleString()}</p>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Factura / Carrito -->
+            <div class="glass-card p-6 rounded-3xl border border-pink-200 shadow-sm flex flex-col justify-between space-y-4">
+              <div>
+                <h3 class="text-lg font-extrabold text-pink-main mb-3 flex items-center gap-2"><i class="fa-solid fa-file-invoice-dollar"></i> Factura de Venta</h3>
+                
+                <div class="space-y-3 mb-4">
+                  <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Cliente</label>
+                    <select id="posClientSelect" class="w-full px-3 py-2 rounded-xl border text-xs bg-white">
+                      <option value="Cliente Ocasional">Cliente Ocasional (Rápido)</option>
+                      ${clients.map(c => `<option value="${c.name}">${c.name} (${c.phone})</option>`).join('')}
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Estado de Pago</label>
+                    <select id="posPaymentStatus" class="w-full px-3 py-2 rounded-xl border text-xs bg-white font-bold text-pink-600">
+                      <option value="Pagado">Pagado</option>
+                      <option value="Fiado">Fiado (Crédito)</option>
+                      <option value="Queda debiendo">Queda debiendo</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div id="posCartItems" class="space-y-2 max-h-48 overflow-y-auto pr-1 border-t border-b border-gray-100 py-3">
+                  <p class="text-xs text-gray-400 text-center">Selecciona productos a la izquierda.</p>
                 </div>
               </div>
-            `).join('')}
+
+              <div>
+                <div class="flex justify-between items-center text-lg font-extrabold mb-4">
+                  <span>Total:</span>
+                  <span id="posTotalText" class="text-pink-main">$0</span>
+                </div>
+                <button onclick="completePOSSale()" class="w-full py-3 btn-lux font-bold rounded-2xl text-sm shadow-md">Registrar Venta & Facturar</button>
+              </div>
+            </div>
           </div>
 
-          <div class="flex justify-between items-center pt-4">
-            <h2 class="text-xl font-bold text-gray-800">Historial General de Ventas</h2>
-            <button onclick="window.print()" class="px-4 py-2 bg-gray-800 text-white rounded-xl text-sm font-semibold"><i class="fa-solid fa-print"></i> Imprimir</button>
-          </div>
-
-          <div class="bg-white rounded-2xl border border-pink-100 shadow-sm overflow-hidden">
-            <table class="w-full text-left border-collapse">
-              <thead class="bg-pink-50 text-pink-main text-xs uppercase font-semibold">
-                <tr>
-                  <th class="p-4">Foto</th>
-                  <th class="p-4">Fecha</th>
-                  <th class="p-4">Vendedora</th>
-                  <th class="p-4">Producto</th>
-                  <th class="p-4">Comisión Admin (35%)</th>
-                  <th class="p-4">Total Venta</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-100 text-sm">
-                ${sales.length === 0 ? '<tr><td colspan="6" class="p-4 text-center text-gray-400">No hay ventas registradas aún.</td></tr>' : ''}
-                ${sales.map(s => `
+          <!-- Historial de Ventas del Vendedor o Admin -->
+          <div class="pt-6">
+            <h2 class="text-xl font-extrabold text-gray-900 mb-4">Historial de Ventas Realizadas</h2>
+            <div class="glass-card rounded-3xl shadow-sm border border-pink-100 overflow-hidden">
+              <table class="w-full text-left border-collapse">
+                <thead class="bg-pink-50 text-pink-main text-xs uppercase font-extrabold">
                   <tr>
-                    <td class="p-4"><img src="${s.productImg || 'https://via.placeholder.com/40'}" class="w-10 h-10 object-cover rounded-xl border border-pink-100"></td>
-                    <td class="p-4">${s.date}</td>
-                    <td class="p-4 font-semibold">${s.vendor}</td>
-                    <td class="p-4 font-medium">${s.product}</td>
-                    <td class="p-4 text-green-600 font-bold">$${(s.commission || 0).toLocaleString()}</td>
-                    <td class="p-4 text-pink-main font-bold">$${s.total.toLocaleString()}</td>
+                    <th class="p-4">Foto</th>
+                    <th class="p-4">Fecha</th>
+                    <th class="p-4">Cliente</th>
+                    <th class="p-4">Producto</th>
+                    <th class="p-4">Estado</th>
+                    <th class="p-4">Total</th>
+                    <th class="p-4">Acciones</th>
                   </tr>
-                `).join('')}
-              </tbody>
-            </table>
+                </thead>
+                <tbody class="divide-y divide-gray-100 text-sm">
+                  ${mySales.length === 0 ? '<tr><td colspan="7" class="p-4 text-center text-gray-400">No hay ventas registradas.</td></tr>' : ''}
+                  ${mySales.map(s => `
+                    <tr>
+                      <td class="p-4"><img src="${s.productImg || 'https://via.placeholder.com/40'}" class="w-10 h-10 object-cover rounded-xl border"></td>
+                      <td class="p-4 text-xs">${s.date}</td>
+                      <td class="p-4 font-bold">${s.clientName || 'Ocasional'}</td>
+                      <td class="p-4">${s.product}</td>
+                      <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-extrabold ${s.status === 'Pagado' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${s.status || 'Pagado'}</span></td>
+                      <td class="p-4 text-pink-main font-extrabold">$${s.total.toLocaleString()}</td>
+                      <td class="p-4 space-x-2">
+                        <button onclick="generateReceiptPDF('${s.id}')" class="text-blue-500 hover:text-blue-700 text-xs font-bold" title="Generar Recibo"><i class="fa-solid fa-file-pdf text-base"></i></button>
+                        <button onclick="deleteSale('${s.id}')" class="text-red-400 hover:text-red-600 text-xs" title="Borrar Venta"><i class="fa-solid fa-trash"></i></button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+      renderPOSCart();
+    }
+
+    function posAddToCart(productId) {
+      const p = products.find(x => x.id === productId);
+      if (p && p.stock > 0) {
+        const existing = posCart.find(item => item.id === productId);
+        if (existing) {
+          if (existing.qty < p.stock) existing.qty++;
+          else alert('Stock insuficiente.');
+        } else {
+          posCart.push({ ...p, qty: 1 });
+        }
+        renderPOSCart();
+      } else {
+        alert('Producto agotado.');
+      }
+    }
+
+    function renderPOSCart() {
+      const container = document.getElementById('posCartItems');
+      if (!container) return;
+      if (posCart.length === 0) {
+        container.innerHTML = '<p class="text-xs text-gray-400 text-center">Bolsa vacía.</p>';
+      } else {
+        container.innerHTML = posCart.map(item => `
+          <div class="flex justify-between items-center text-xs">
+            <span>${item.qty}x ${item.name}</span>
+            <span class="font-bold text-pink-main">$${(item.price * item.qty).toLocaleString()}</span>
+          </div>
+        `).join('');
+      }
+      const total = posCart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+      document.getElementById('posTotalText').innerText = `$${total.toLocaleString()}`;
+    }
+
+    function completePOSSale() {
+      if (posCart.length === 0) {
+        alert('Agrega al menos un producto.');
+        return;
+      }
+      const clientName = document.getElementById('posClientSelect').value;
+      const status = document.getElementById('posPaymentStatus').value;
+
+      posCart.forEach(item => {
+        const prodRef = products.find(p => p.id === item.id);
+        if (prodRef) prodRef.stock -= item.qty;
+
+        const utility = (item.price - item.cost) * item.qty;
+        const commission = utility > 0 ? utility * 0.35 : 0; // 35% de utilidad para vendedora
+
+        sales.push({
+          id: Date.now().toString() + Math.random(),
+          vendor: currentUser.user,
+          clientName: clientName,
+          product: `${item.qty}x ${item.name}`,
+          productImg: item.img,
+          total: item.price * item.qty,
+          utility: utility,
+          commission: commission,
+          status: status,
+          date: new Date().toLocaleDateString()
+        });
+      });
+
+      posCart = [];
+      saveData();
+      switchTab(currentUser.role === 'admin' ? 'admin_sales' : 'vendor_inv');
+      alert('¡Venta registrada con éxito!');
+    }
+
+    function deleteSale(saleId) {
+      if (confirm('¿Deseas eliminar este registro de venta?')) {
+        sales = sales.filter(s => s.id !== saleId);
+        saveData();
+        switchTab(currentUser.role === 'admin' ? 'admin_sales' : 'vendor_inv');
+      }
+    }
+
+    function generateReceiptPDF(saleId) {
+      const s = sales.find(x => x.id === saleId);
+      if (!s) return;
+      const receiptHTML = `
+        <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 400px; margin: auto; border: 1px solid #ddd; border-radius: 10px;">
+          <h2 style="text-align: center; color: #D44D79;">JEMA_MAKEUP</h2>
+          <p style="text-align: center; font-size: 12px; color: #777;">Comprobante de Venta Exclusiva</p>
+          <hr style="border: 0; border-top: 1px dashed #eee;" />
+          <p><strong>Fecha:</strong> ${s.date}</p>
+          <p><strong>Cliente:</strong> ${s.clientName || 'Ocasional'}</p>
+          <p><strong>Vendedora:</strong> ${s.vendor}</p>
+          <p><strong>Estado:</strong> ${s.status || 'Pagado'}</p>
+          <hr style="border: 0; border-top: 1px dashed #eee;" />
+          <p><strong>Producto:</strong> ${s.product}</p>
+          <p style="font-size: 16px; font-weight: bold; color: #D44D79;">Total: $${s.total.toLocaleString()}</p>
+          <hr style="border: 0; border-top: 1px dashed #eee;" />
+          <p style="text-align: center; font-size: 10px; color: #aaa;">¡Gracias por tu compra en Jema_makeup!</p>
+        </div>
+      `;
+      const win = window.open('', '_print', 'width=500,height=600');
+      win.document.write(receiptHTML);
+      win.document.close();
+      win.focus();
+      setTimeout(() => win.print(), 500);
+    }
+
+    // DASHBOARD ADMIN & FILTROS POR VENDEDORA
+    function renderAnalyticsTab(container) {
+      const weeklyGoal = 300000;
+      const weeklySales = sales.reduce((acc, s) => acc + s.total, 0);
+      const goalPercentage = Math.min(100, Math.round((weeklySales / weeklyGoal) * 100));
+      const vendors = users.filter(u => u.role === 'vendor');
+
+      container.innerHTML = `
+        <div class="space-y-6">
+          <div class="glass-card p-6 rounded-3xl border border-pink-200 shadow-sm">
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="text-lg font-extrabold text-pink-main">Meta Semanal Administradora: $${weeklyGoal.toLocaleString()} COP</h3>
+              <span class="text-sm font-bold text-gray-500">${goalPercentage}% Logrado</span>
+            </div>
+            <div class="w-full bg-gray-100 h-4 rounded-full overflow-hidden">
+              <div class="bg-pink-main h-full transition-all duration-500" style="width: ${goalPercentage}%"></div>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center">
+            <h2 class="text-xl font-extrabold text-gray-900">Rendimiento por Vendedora</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            ${vendors.map((v, idx) => {
+              const vSales = sales.filter(s => s.vendor === v.user);
+              const totalV = vSales.reduce((a, b) => a + b.total, 0);
+              const totalCommission = vSales.reduce((a, b) => a + (b.commission || 0), 0);
+              return `
+                <div class="glass-card p-6 rounded-3xl border border-pink-100 shadow-sm flex flex-col justify-between">
+                  <div>
+                    <span class="px-2.5 py-1 bg-pink-100 text-pink-main font-bold text-xs rounded-full">Ranking #${idx + 1}</span>
+                    <h4 class="font-extrabold text-gray-900 text-xl mt-3">${v.name}</h4>
+                    <p class="text-xs text-gray-500 mt-1">${vSales.length} ventas realizadas</p>
+                    <p class="text-gray-900 font-extrabold text-lg mt-3">Ventas: $${totalV.toLocaleString()}</p>
+                    <p class="text-green-600 font-bold text-sm">Comisión (35% util): $${totalCommission.toLocaleString()}</p>
+                  </div>
+                </div>
+              `;
+            }).join('')}
           </div>
         </div>
       `;
     }
 
-    function toggleVendorPayment(userId) {
-      const u = users.find(x => x.id === userId);
-      if (u) {
-        u.paidMonth = !u.paidMonth;
-        saveData();
-        renderAnalyticsTab(document.getElementById('mainContent'));
-      }
+    // CONTROL DE PAGOS MENSUALES POR VENDEDORA
+    function renderPaymentsTab(container) {
+      const vendors = users.filter(u => u.role === 'vendor');
+      const years = [2026, 2027, 2028];
+      const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+      container.innerHTML = `
+        <div class="space-y-6">
+          <h2 class="text-2xl font-extrabold text-gray-900">Control de Pagos Mensuales a Vendedoras</h2>
+          <div class="glass-card p-6 rounded-3xl border border-pink-100 shadow-sm space-y-6">
+            ${vendors.map(v => `
+              <div class="border-b border-gray-100 pb-4 last:border-0">
+                <h4 class="font-bold text-lg text-gray-900 mb-3">${v.name} (${v.user})</h4>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  ${years.map(y => `
+                    <div class="bg-white p-3 rounded-2xl border border-pink-100">
+                      <span class="text-xs font-bold text-pink-main block mb-2">${y}</span>
+                      <select class="w-full text-xs p-2 rounded-xl border font-bold bg-pink-50 text-gray-700">
+                        <option value="Pendiente">❌ Pendiente</option>
+                        <option value="Pagado">✔ Pagado</option>
+                      </select>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
     }
 
-    // CLIENTES
+    // CLIENTES & ABONOS CON FORMATEO DE PUNTOS
     function renderClientsTab(container) {
       container.innerHTML = `
-        <div class="space-y-4">
+        <div class="space-y-6">
           <div class="flex justify-between items-center">
-            <h2 class="text-xl font-bold text-gray-800">Directorio de Clientes</h2>
-            <button onclick="openClientModal()" class="btn-pink px-4 py-2 rounded-xl text-sm font-semibold">+ Registrar Cliente</button>
+            <h2 class="text-2xl font-extrabold text-gray-900">Gestión de Clientes & Abonos</h2>
+            <button onclick="openClientModal()" class="px-5 py-2.5 btn-lux rounded-2xl text-xs font-bold shadow-md">+ Registrar Cliente</button>
           </div>
 
-          <div class="bg-white rounded-2xl border border-pink-100 shadow-sm overflow-hidden">
+          <div class="glass-card rounded-3xl shadow-sm border border-pink-100 overflow-hidden">
             <table class="w-full text-left border-collapse">
-              <thead class="bg-pink-50 text-pink-main text-xs uppercase font-semibold">
+              <thead class="bg-pink-50 text-pink-main text-xs uppercase font-extrabold">
                 <tr>
                   <th class="p-4">Nombre</th>
                   <th class="p-4">Celular</th>
-                  <th class="p-4">Estado Cuenta</th>
-                  <th class="p-4">Acciones</th>
+                  <th class="p-4">Deuda Pendiente</th>
+                  <th class="p-4">Acción Abono</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-100 text-sm">
                 ${clients.map(c => `
                   <tr>
-                    <td class="p-4 font-semibold">${c.name}</td>
+                    <td class="p-4 font-bold text-gray-900">${c.name}</td>
                     <td class="p-4">${c.phone}</td>
+                    <td class="p-4 text-red-500 font-extrabold">$${(c.debt || 0).toLocaleString()}</td>
                     <td class="p-4">
-                      ${c.debt > 0 ? `<span class="text-red-500 font-bold">Debe $${c.debt.toLocaleString()}</span>` : '<span class="text-green-500 font-bold">Al Día</span>'}
-                    </td>
-                    <td class="p-4 space-x-2">
-                      <button onclick="editClient('${c.id}')" class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen"></i></button>
-                      <button onclick="deleteClient('${c.id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>
+                      <button onclick="openAbonoModal('${c.id}')" class="px-3 py-1.5 bg-green-100 text-green-700 font-bold text-xs rounded-xl hover:bg-green-200 transition">Registrar Abono</button>
                     </td>
                   </tr>
                 `).join('')}
@@ -729,7 +1052,6 @@
       document.getElementById('clientPhone').value = client ? client.phone : '';
       document.getElementById('clientModal').classList.remove('hidden');
     }
-
     function closeClientModal() {
       document.getElementById('clientModal').classList.add('hidden');
     }
@@ -744,41 +1066,88 @@
         const c = clients.find(x => x.id === id);
         if (c) { c.name = name; c.phone = phone; }
       } else {
-        clients.push({ id: Date.now().toString(), name, phone, debt: 0 });
+        clients.push({ id: Date.now().toString(), name, phone, debt: 50000 }); // Ejemplo inicial de deuda con puntos
       }
       saveData();
       closeClientModal();
       renderClientsTab(document.getElementById('mainContent'));
     });
 
-    function editClient(id) {
-      const c = clients.find(x => x.id === id);
-      if (c) openClientModal(c);
-    }
-
-    function deleteClient(id) {
-      if (confirm('¿Deseas eliminar este cliente?')) {
-        clients = clients.filter(x => x.id !== id);
+    function openAbonoModal(clientId) {
+      const c = clients.find(x => x.id === clientId);
+      if (!c) return;
+      const montoStr = prompt(`Registrar abono para ${c.name}. Deuda actual: $${c.debt.toLocaleString()}\nIngrese cantidad (ej: 1000000 para $1.000.000):`);
+      const monto = parseFloat(montoStr);
+      if (!isNaN(monto) && monto > 0) {
+        c.debt = Math.max(0, c.debt - monto);
         saveData();
         renderClientsTab(document.getElementById('mainContent'));
+        alert(`¡Abono registrado con éxito! Nuevo saldo: $${c.debt.toLocaleString()}`);
+      }
+    }
+
+    // SECCIÓN DE ENCARGOS
+    function renderCustomOrdersTab(container) {
+      container.innerHTML = `
+        <div class="space-y-6">
+          <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-extrabold text-gray-900">Encargos Especiales</h2>
+            <button onclick="promptNewCustomOrder()" class="px-5 py-2.5 btn-lux rounded-2xl text-xs font-bold shadow-md">+ Nuevo Encargo</button>
+          </div>
+
+          <div class="glass-card rounded-3xl shadow-sm border border-pink-100 overflow-hidden">
+            <table class="w-full text-left border-collapse">
+              <thead class="bg-pink-50 text-pink-main text-xs uppercase font-extrabold">
+                <tr>
+                  <th class="p-4">Cliente</th>
+                  <th class="p-4">Descripción del Encargo</th>
+                  <th class="p-4">Fecha</th>
+                  <th class="p-4">Estado</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100 text-sm">
+                ${customOrders.length === 0 ? '<tr><td colspan="4" class="p-4 text-center text-gray-400">No hay encargos registrados.</td></tr>' : ''}
+                ${customOrders.map(o => `
+                  <tr>
+                    <td class="p-4 font-bold">${o.client}</td>
+                    <td class="p-4">${o.description}</td>
+                    <td class="p-4 text-xs">${o.date}</td>
+                    <td class="p-4"><span class="px-3 py-1 rounded-full bg-pink-100 text-pink-main font-bold text-xs">Pendiente</span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function promptNewCustomOrder() {
+      const client = prompt('Nombre del cliente:');
+      const desc = prompt('Descripción del encargo:');
+      if (client && desc) {
+        customOrders.push({ id: Date.now().toString(), client, description: desc, date: new Date().toLocaleDateString() });
+        saveData();
+        renderCustomOrdersTab(document.getElementById('mainContent'));
+        alert('¡Encargo registrado!');
       }
     }
 
     // USUARIOS
     function renderUsersTab(container) {
       container.innerHTML = `
-        <div class="space-y-4">
+        <div class="space-y-6">
           <div class="flex justify-between items-center">
-            <h2 class="text-xl font-bold text-gray-800">Gestión de Usuarios</h2>
-            <button onclick="registerNewUser()" class="btn-pink px-4 py-2 rounded-xl text-sm font-semibold">+ Crear Usuario</button>
+            <h2 class="text-2xl font-extrabold text-gray-900">Gestión de Usuarios</h2>
+            <button onclick="openUserModal()" class="px-5 py-2.5 btn-lux rounded-2xl text-xs font-bold shadow-md">+ Crear Usuario</button>
           </div>
-          <div class="bg-white rounded-2xl border border-pink-100 p-4 shadow-sm">
+          <div class="glass-card rounded-3xl shadow-sm border border-pink-100 p-6">
             <ul class="divide-y divide-gray-100">
               ${users.map(u => `
                 <li class="py-3 flex justify-between items-center">
                   <div>
-                    <span class="font-bold text-gray-800">${u.name} (${u.user})</span>
-                    <span class="ml-2 text-xs px-2 py-0.5 rounded-full ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-pink-100 text-pink-700'}">${u.role === 'admin' ? 'Administrador' : 'Vended@r'}</span>
+                    <span class="font-bold text-gray-900">${u.name} (${u.user})</span>
+                    <span class="ml-2 text-xs px-2.5 py-0.5 rounded-full ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-pink-100 text-pink-700'} font-bold">${u.role === 'admin' ? 'Administrador' : 'Vended@r'}</span>
                   </div>
                 </li>
               `).join('')}
@@ -788,11 +1157,10 @@
       `;
     }
 
-    function registerNewUser() {
+    function openUserModal() {
       document.getElementById('userForm').reset();
       document.getElementById('userModal').classList.remove('hidden');
     }
-
     function closeUserModal() {
       document.getElementById('userModal').classList.add('hidden');
     }
@@ -804,123 +1172,12 @@
       const pass = document.getElementById('newUserPass').value.trim();
       const role = document.getElementById('newUserRole').value;
 
-      if (users.some(u => u.user.toLowerCase() === user.toLowerCase())) {
-        alert('Este usuario ya existe. Por favor elige otro.');
-        return;
-      }
-
       users.push({ id: Date.now().toString(), name, user, pass, role, paidMonth: false });
       saveData();
       closeUserModal();
       renderUsersTab(document.getElementById('mainContent'));
       alert('¡Usuario creado correctamente!');
     });
-
-    // VENDEDORA (INVENTARIO SIMPLIFICADO Y META $100.000 SEMANAL, SIN VER COMISIONES)
-    function renderVendorTab(container) {
-      const mySales = sales.filter(s => s.vendor === currentUser.user);
-      const totalEarned = mySales.reduce((a, b) => a + b.total, 0);
-
-      const weeklyGoalVendor = 100000;
-      const goalPercentage = Math.min(100, Math.round((totalEarned / weeklyGoalVendor) * 100));
-      const missing = Math.max(0, weeklyGoalVendor - totalEarned);
-
-      container.innerHTML = `
-        <div class="space-y-6">
-          <div class="bg-white p-6 rounded-3xl border border-pink-100 shadow-sm">
-            <div class="flex justify-between items-center mb-2">
-              <h3 class="text-lg font-bold text-pink-main">Mi Meta Semanal: $${weeklyGoalVendor.toLocaleString()} COP</h3>
-              <span class="text-sm font-semibold text-gray-500">${goalPercentage}% Logrado</span>
-            </div>
-            <div class="w-full bg-gray-100 h-4 rounded-full overflow-hidden mb-3">
-              <div class="bg-pink-main h-full transition-all duration-500" style="width: ${goalPercentage}%"></div>
-            </div>
-            <p class="text-sm text-gray-600 font-medium">
-              ${missing > 0 ? `¡Tú puedes! Faltan <strong>$${missing.toLocaleString()}</strong> para cumplir tu meta semanal.` : '¡Felicitaciones! 🎉 Has alcanzado tu meta semanal.'}
-            </p>
-          </div>
-
-          <div class="grid grid-cols-2 gap-4">
-            <div class="bg-white p-4 rounded-2xl border border-pink-100 shadow-sm text-center">
-              <span class="text-xs text-gray-400 font-bold block">MIS VENTAS</span>
-              <span class="text-2xl font-bold text-pink-main">${mySales.length}</span>
-            </div>
-            <div class="bg-white p-4 rounded-2xl border border-pink-100 shadow-sm text-center">
-              <span class="text-xs text-gray-400 font-bold block">TOTAL VENDIDO</span>
-              <span class="text-2xl font-bold text-green-500">$${totalEarned.toLocaleString()}</span>
-            </div>
-          </div>
-
-          <h2 class="text-xl font-bold text-gray-800">Inventario Disponible para Vender</h2>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            ${products.map(p => `
-              <div class="bg-white p-4 rounded-2xl border border-pink-100 shadow-sm flex flex-col justify-between">
-                <div>
-                  <img src="${p.img || 'https://via.placeholder.com/150'}" class="w-full h-32 object-cover rounded-xl mb-3">
-                  <h4 class="font-bold text-gray-800">${p.name}</h4>
-                  <p class="text-pink-main font-bold text-lg">$${p.price.toLocaleString()}</p>
-                  <p class="text-xs text-gray-400">Stock: ${p.stock} unids</p>
-                </div>
-                <button onclick="registerVendorSale('${p.id}')" ${p.stock <= 0 ? 'disabled' : ''} class="mt-3 w-full py-2 btn-pink rounded-xl font-semibold text-sm ${p.stock <= 0 ? 'opacity-50 cursor-not-allowed' : ''}">
-                  ${p.stock > 0 ? 'Registrar Venta' : 'Agotado'}
-                </button>
-              </div>
-            `).join('')}
-          </div>
-
-          <h2 class="text-xl font-bold text-gray-800 pt-4">Mi Registro Histórico de Ventas</h2>
-
-          <div class="bg-white rounded-2xl border border-pink-100 shadow-sm overflow-hidden">
-            <table class="w-full text-left border-collapse">
-              <thead class="bg-pink-50 text-pink-main text-xs uppercase font-semibold">
-                <tr>
-                  <th class="p-4">Foto</th>
-                  <th class="p-4">Producto Vendido</th>
-                  <th class="p-4">Fecha</th>
-                  <th class="p-4">Total</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-100 text-sm">
-                ${mySales.length === 0 ? '<tr><td colspan="4" class="p-4 text-center text-gray-400">Aún no has registrado ninguna venta.</td></tr>' : ''}
-                ${mySales.map(s => `
-                  <tr>
-                    <td class="p-4"><img src="${s.productImg || 'https://via.placeholder.com/40'}" class="w-10 h-10 object-cover rounded-xl border border-pink-100"></td>
-                    <td class="p-4 font-semibold text-gray-800">${s.product}</td>
-                    <td class="p-4 text-gray-500">${s.date}</td>
-                    <td class="p-4 text-pink-main font-bold">$${s.total.toLocaleString()}</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      `;
-    }
-
-    function registerVendorSale(productId) {
-      const p = products.find(x => x.id === productId);
-      if (p && p.stock > 0) {
-        p.stock -= 1;
-        // Calcular utilidad y comisión del 35% de la utilidad
-        const utility = p.price - p.cost;
-        const commission = utility > 0 ? utility * 0.35 : 0;
-
-        sales.push({
-          id: Date.now().toString(),
-          vendor: currentUser.user,
-          product: p.name,
-          productImg: p.img,
-          total: p.price,
-          commission: commission,
-          date: new Date().toLocaleDateString()
-        });
-        saveData();
-        renderVendorTab(document.getElementById('mainContent'));
-        renderPublicCatalog();
-        alert('¡Venta registrada con éxito!');
-      }
-    }
   </script>
 </body>
 </html>
