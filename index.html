@@ -32,7 +32,6 @@
     window.dbSet = set;
     window.dbGet = get;
 
-    // Disparar evento cuando Firebase esté listo para cargar los datos
     window.dispatchEvent(new Event('firebase-ready'));
   </script>
 
@@ -429,13 +428,22 @@
         }
       }
       setupFileInput();
-      checkAuth();
+      initPublicView();
     });
 
     document.addEventListener('DOMContentLoaded', function() {
       setupFileInput();
-      checkAuth();
+      initPublicView();
     });
+
+    function initPublicView() {
+      // Siempre iniciamos mostrando el catálogo público por defecto
+      currentUser = null;
+      document.getElementById('publicCatalogSection').classList.remove('hidden');
+      document.getElementById('appSection').classList.add('hidden');
+      renderPublicCatalog();
+      populateVendorDropdown();
+    }
 
     function showToast(message) {
       const toast = document.getElementById('toastNotification');
@@ -475,45 +483,25 @@
       const found = users.find(x => (x.user || '').toLowerCase() === u.toLowerCase() && x.pass === p);
       if (found) {
         currentUser = { ...found, avatar: selectedAvatar };
-        localStorage.setItem('jm_session', JSON.stringify(currentUser));
         closeLoginModal();
-        checkAuth();
+        document.getElementById('publicCatalogSection').classList.add('hidden');
+        document.getElementById('appSection').classList.remove('hidden');
+        document.getElementById('userNameHeader').innerText = currentUser.name || currentUser.user;
+        document.getElementById('userRoleHeader').innerText = currentUser.role === 'admin' ? 'Administradora' : 'Vended@r';
+        renderNavigation();
         showToast(`¡Bienvenid@ de nuevo, ${currentUser.name || currentUser.user}!`);
       } else {
         alert('Usuario o contraseña incorrectos');
       }
     });
 
-    function checkAuth() {
-      try {
-        const sessionRaw = localStorage.getItem('jm_session');
-        if (sessionRaw) {
-          const parsedSession = JSON.parse(sessionRaw);
-          if (parsedSession && parsedSession.user) {
-            currentUser = parsedSession;
-            document.getElementById('publicCatalogSection').classList.add('hidden');
-            document.getElementById('appSection').classList.remove('hidden');
-            document.getElementById('userNameHeader').innerText = currentUser.name || currentUser.user;
-            document.getElementById('userRoleHeader').innerText = currentUser.role === 'admin' ? 'Administradora' : 'Vended@r';
-            renderNavigation();
-            return;
-          }
-        }
-      } catch (e) {
-        localStorage.removeItem('jm_session');
-      }
-
+    function logout() {
       currentUser = null;
       document.getElementById('publicCatalogSection').classList.remove('hidden');
       document.getElementById('appSection').classList.add('hidden');
       renderPublicCatalog();
       populateVendorDropdown();
-    }
-
-    function logout() {
-      localStorage.removeItem('jm_session');
-      currentUser = null;
-      checkAuth();
+      showToast('Has salido al catálogo público.');
     }
 
     // CATÁLOGO PÚBLICO
