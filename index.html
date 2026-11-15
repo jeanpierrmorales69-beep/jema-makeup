@@ -407,7 +407,6 @@
         document.getElementById('appSection').classList.remove('hidden');
         document.getElementById('userNameHeader').innerText = currentUser.name || currentUser.user;
         document.getElementById('userRoleHeader').innerText = currentUser.role === 'admin' ? 'Administradora' : 'Vended@r';
-        document.getElementById('userAvatarHeader').innerHTML = `<img src="logo (5).png" class="w-full h-full rounded-2xl object-cover">`;
         renderNavigation();
       } else {
         document.getElementById('publicCatalogSection').classList.remove('hidden');
