@@ -249,19 +249,26 @@
     </div>
   </div>
 
-  <!-- MODAL CLIENTE -->
+  <!-- MODAL CLIENTE (CREAR / EDITAR) -->
   <div id="clientModal" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl border border-pink-200">
-      <h3 id="clientModalTitle" class="text-xl font-extrabold text-pink-main mb-4">Registrar Cliente</h3>
+      <div class="flex justify-between items-center mb-4">
+        <h3 id="clientModalTitle" class="text-xl font-extrabold text-pink-main">Registrar Cliente</h3>
+        <button onclick="closeClientModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
       <form id="clientForm" class="space-y-4">
         <input type="hidden" id="clientId">
         <div>
           <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Nombre Completo</label>
-          <input type="text" id="clientName" required class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm">
+          <input type="text" id="clientName" required class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-[#ff00bf] outline-none">
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Celular / Teléfono</label>
-          <input type="tel" id="clientPhone" required class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm">
+          <input type="tel" id="clientPhone" required class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-[#ff00bf] outline-none">
+        </div>
+        <div id="clientDebtEditGroup" class="hidden">
+          <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Deuda Pendiente ($)</label>
+          <input type="number" id="clientDebt" class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-[#ff00bf] outline-none">
         </div>
         <div class="flex justify-end space-x-2 pt-2">
           <button type="button" onclick="closeClientModal()" class="px-4 py-2.5 rounded-xl bg-gray-100 text-gray-600 font-bold text-sm">Cancelar</button>
@@ -329,6 +336,7 @@
     let selectedAvatar = 'fa-crown';
     let cart = [];
     let posCart = [];
+    let selectedAnalyticsVendor = 'ALL';
 
     let users = safeParse('jm_users', [
       { id: '1', user: 'mari', pass: '1234', role: 'admin', name: 'Mari', phone: '573112210988', avatar: 'fa-crown', paidMonth: {} }
@@ -994,16 +1002,23 @@
         const prodRef = products.find(p => p.id === item.id);
         if (prodRef) prodRef.stock = Math.max(0, prodRef.stock - item.qty);
 
-        const utility = (item.price - item.cost) * item.qty;
+        const totalItemCost = Number(item.cost || 0) * item.qty;
+        const totalItemPrice = Number(item.price || 0) * item.qty;
+        const utility = totalItemPrice - totalItemCost;
         const commission = utility > 0 ? utility * 0.35 : 0;
 
         sales.push({
           id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
           vendor: currentUser.user,
+          vendorName: currentUser.name || currentUser.user,
           clientName: clientName,
           product: `${item.qty}x ${item.name}`,
+          productName: item.name,
+          qty: item.qty,
+          unitCost: Number(item.cost || 0),
+          totalCost: totalItemCost,
           productImg: item.img,
-          total: item.price * item.qty,
+          total: totalItemPrice,
           utility: utility,
           commission: commission,
           status: status,
@@ -1075,12 +1090,30 @@
       window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
     }
 
-    // DASHBOARD ADMIN & RANKING
+    // DASHBOARD ADMIN, RANKING Y FILTRO DETALLADO POR VENDEDOR (EXCLUSIVO ADMIN)
+    function filterAnalyticsByVendor(vendorUser) {
+      selectedAnalyticsVendor = vendorUser;
+      renderAnalyticsTab(document.getElementById('mainContent'));
+    }
+
     function renderAnalyticsTab(container) {
       const weeklyGoal = 300000;
       const weeklySales = sales.reduce((acc, s) => acc + Number(s.total || 0), 0);
       const goalPercentage = Math.min(100, Math.round((weeklySales / weeklyGoal) * 100));
-      const vendors = users.filter(u => u.role === 'vendor');
+      const allSellers = users.filter(u => u.role === 'vendor' || u.role === 'admin');
+      const vendorsOnly = users.filter(u => u.role === 'vendor');
+
+      const filteredSales = selectedAnalyticsVendor === 'ALL'
+        ? sales
+        : sales.filter(s => s.vendor === selectedAnalyticsVendor);
+
+      const fTotalVentas = filteredSales.reduce((acc, s) => acc + Number(s.total || 0), 0);
+      const fTotalCosto = filteredSales.reduce((acc, s) => {
+        if (typeof s.totalCost === 'number') return acc + s.totalCost;
+        return acc + Math.max(0, Number(s.total || 0) - Number(s.utility || 0));
+      }, 0);
+      const fTotalUtilidad = filteredSales.reduce((acc, s) => acc + Number(s.utility || 0), 0);
+      const fTotalComision = filteredSales.reduce((acc, s) => acc + Number(s.commission || 0), 0);
 
       container.innerHTML = `
         <div class="space-y-6">
@@ -1094,20 +1127,23 @@
             </div>
           </div>
 
-          <div class="flex justify-between items-center">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <h2 class="text-xl font-extrabold text-gray-900">Rendimiento por Vendedora</h2>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            ${vendors.length === 0 ? '<p class="text-gray-400 text-sm">No hay vendedoras creadas aún. Ve a la pestaña Usuarios para crear una.</p>' : ''}
-            ${vendors.map((v, idx) => {
+            ${vendorsOnly.length === 0 ? '<p class="text-gray-400 text-sm">No hay vendedoras creadas aún. Ve a la pestaña Usuarios para crear una.</p>' : ''}
+            ${vendorsOnly.map((v, idx) => {
               const vSales = sales.filter(s => s.vendor === v.user);
               const totalV = vSales.reduce((a, b) => a + Number(b.total || 0), 0);
               const totalCommission = vSales.reduce((a, b) => a + Number(b.commission || 0), 0);
               return `
-                <div class="glass-card p-6 rounded-3xl border border-pink-100 shadow-sm flex flex-col justify-between">
+                <div onclick="filterAnalyticsByVendor('${v.user}')" class="glass-card p-6 rounded-3xl border ${selectedAnalyticsVendor === v.user ? 'border-2 border-[#ff00bf] bg-pink-50/40' : 'border-pink-100'} shadow-sm flex flex-col justify-between cursor-pointer">
                   <div>
-                    <span class="px-2.5 py-1 bg-pink-100 text-pink-main font-bold text-xs rounded-full">Ranking #${idx + 1}</span>
+                    <div class="flex justify-between items-center">
+                      <span class="px-2.5 py-1 bg-pink-100 text-pink-main font-bold text-xs rounded-full">Ranking #${idx + 1}</span>
+                      <span class="text-[11px] font-bold text-pink-main underline">Ver detalle <i class="fa-solid fa-arrow-right"></i></span>
+                    </div>
                     <h4 class="font-extrabold text-gray-900 text-xl mt-3">${v.name}</h4>
                     <p class="text-xs text-gray-500 mt-1">${vSales.length} ventas realizadas</p>
                     <p class="text-gray-900 font-extrabold text-lg mt-3">Ventas: $${totalV.toLocaleString()}</p>
@@ -1116,6 +1152,79 @@
                 </div>
               `;
             }).join('')}
+          </div>
+
+          <!-- AUDITORÍA Y FILTRO POR VENDEDOR (EXCLUSIVO ADMINISTRACIÓN) -->
+          <div class="glass-card p-6 rounded-3xl border border-pink-200 shadow-sm space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-pink-100 pb-4">
+              <div>
+                <span class="text-xs font-bold text-pink-main uppercase tracking-wider block">Auditoría Financiera Privada</span>
+                <h3 class="text-xl font-extrabold text-gray-900">Detalle de Ventas, Costos y Utilidades por Vendedor</h3>
+              </div>
+              <div class="w-full md:w-72">
+                <label class="block text-xs font-bold text-gray-600 mb-1">Filtrar por Vendedor:</label>
+                <select onchange="filterAnalyticsByVendor(this.value)" class="w-full px-4 py-2.5 rounded-2xl border-2 border-pink-200 text-sm bg-white font-bold text-pink-main focus:outline-none focus:border-[#ff00bf]">
+                  <option value="ALL" ${selectedAnalyticsVendor === 'ALL' ? 'selected' : ''}>Todas las Vendedoras / Admin</option>
+                  ${allSellers.map(u => `
+                    <option value="${u.user}" ${selectedAnalyticsVendor === u.user ? 'selected' : ''}>${u.name} (${u.role === 'admin' ? 'Admin' : 'Vendedora'})</option>
+                  `).join('')}
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div class="bg-white p-4 rounded-2xl border border-pink-100 shadow-xs">
+                <span class="text-[11px] font-bold text-gray-400 uppercase block">Total Vendido</span>
+                <span class="text-xl font-extrabold text-gray-900 mt-1 block">$${fTotalVentas.toLocaleString()}</span>
+              </div>
+              <div class="bg-white p-4 rounded-2xl border border-pink-100 shadow-xs">
+                <span class="text-[11px] font-bold text-gray-400 uppercase block">Costo Productos</span>
+                <span class="text-xl font-extrabold text-gray-600 mt-1 block">$${fTotalCosto.toLocaleString()}</span>
+              </div>
+              <div class="bg-white p-4 rounded-2xl border border-pink-100 shadow-xs">
+                <span class="text-[11px] font-bold text-gray-400 uppercase block">Utilidad Neta</span>
+                <span class="text-xl font-extrabold text-green-600 mt-1 block">$${fTotalUtilidad.toLocaleString()}</span>
+              </div>
+              <div class="bg-white p-4 rounded-2xl border border-pink-100 shadow-xs">
+                <span class="text-[11px] font-bold text-gray-400 uppercase block">Comisión Vendedor</span>
+                <span class="text-xl font-extrabold text-pink-main mt-1 block">$${fTotalComision.toLocaleString()}</span>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-2xl border border-pink-100">
+              <table class="w-full text-left border-collapse">
+                <thead class="bg-pink-50 text-pink-main text-xs uppercase font-extrabold">
+                  <tr>
+                    <th class="p-3.5">Fecha</th>
+                    <th class="p-3.5">Vendedor</th>
+                    <th class="p-3.5">Cliente</th>
+                    <th class="p-3.5">Producto Vendido</th>
+                    <th class="p-3.5">Precio Venta</th>
+                    <th class="p-3.5">Costo Prod.</th>
+                    <th class="p-3.5">Utilidad</th>
+                    <th class="p-3.5">Estado</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 text-sm bg-white">
+                  ${filteredSales.length === 0 ? '<tr><td colspan="8" class="p-5 text-center text-gray-400">Este vendedor aún no tiene ventas registradas.</td></tr>' : ''}
+                  ${filteredSales.map(s => {
+                    const costVal = typeof s.totalCost === 'number' ? s.totalCost : Math.max(0, Number(s.total || 0) - Number(s.utility || 0));
+                    return `
+                      <tr>
+                        <td class="p-3.5 text-xs text-gray-500">${s.date}</td>
+                        <td class="p-3.5 font-bold text-pink-main">${s.vendorName || s.vendor}</td>
+                        <td class="p-3.5 font-semibold text-gray-800">${s.clientName || 'Ocasional'}</td>
+                        <td class="p-3.5">${s.product}</td>
+                        <td class="p-3.5 font-extrabold text-gray-900">$${Number(s.total || 0).toLocaleString()}</td>
+                        <td class="p-3.5 text-gray-600">$${costVal.toLocaleString()}</td>
+                        <td class="p-3.5 font-extrabold text-green-600">$${Number(s.utility || 0).toLocaleString()}</td>
+                        <td class="p-3.5"><span class="px-2.5 py-1 rounded-full text-xs font-extrabold ${s.status === 'Pagado' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${s.status || 'Pagado'}</span></td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       `;
@@ -1172,7 +1281,7 @@
       }
     }
 
-    // CLIENTES, ABONOS & HISTORIAL DE FACTURAS
+    // CLIENTES (EDITAR Y ELIMINAR), ABONOS & HISTORIAL DE FACTURAS
     function renderClientsTab(container) {
       container.innerHTML = `
         <div class="space-y-6">
@@ -1189,9 +1298,11 @@
                   <th class="p-4">Celular</th>
                   <th class="p-4">Deuda Pendiente</th>
                   <th class="p-4">Acción Abono</th>
+                  <th class="p-4">Editar / Eliminar</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-100 text-sm">
+                ${clients.length === 0 ? '<tr><td colspan="5" class="p-4 text-center text-gray-400">No hay clientes registrados.</td></tr>' : ''}
                 ${clients.map(c => `
                   <tr>
                     <td class="p-4 font-bold text-gray-900">${c.name}</td>
@@ -1199,6 +1310,10 @@
                     <td class="p-4 text-red-500 font-extrabold">$${Number(c.debt || 0).toLocaleString()}</td>
                     <td class="p-4">
                       <button onclick="openAbonoModal('${c.id}')" class="px-3 py-1.5 bg-green-100 text-green-700 font-bold text-xs rounded-xl hover:bg-green-200 transition">Registrar Abono</button>
+                    </td>
+                    <td class="p-4 space-x-2 whitespace-nowrap">
+                      <button onclick="editClient('${c.id}')" class="text-blue-500 hover:text-blue-700 p-2 rounded-xl hover:bg-blue-50 transition" title="Editar Cliente"><i class="fa-solid fa-pen"></i></button>
+                      <button onclick="deleteClient('${c.id}')" class="text-red-400 hover:text-red-600 p-2 rounded-xl hover:bg-red-50 transition" title="Eliminar Cliente"><i class="fa-solid fa-trash"></i></button>
                     </td>
                   </tr>
                 `).join('')}
@@ -1245,10 +1360,34 @@
       document.getElementById('clientId').value = client ? client.id : '';
       document.getElementById('clientName').value = client ? client.name : '';
       document.getElementById('clientPhone').value = client ? client.phone : '';
+      
+      const debtGroup = document.getElementById('clientDebtEditGroup');
+      if (client) {
+        debtGroup.classList.remove('hidden');
+        document.getElementById('clientDebt').value = Number(client.debt || 0);
+      } else {
+        debtGroup.classList.add('hidden');
+        document.getElementById('clientDebt').value = 0;
+      }
       document.getElementById('clientModal').classList.remove('hidden');
     }
+
     function closeClientModal() {
       document.getElementById('clientModal').classList.add('hidden');
+    }
+
+    function editClient(clientId) {
+      const c = clients.find(x => x.id === clientId);
+      if (c) openClientModal(c);
+    }
+
+    function deleteClient(clientId) {
+      if (confirm('¿Estás segura de eliminar este cliente?')) {
+        clients = clients.filter(x => x.id !== clientId);
+        saveData();
+        renderClientsTab(document.getElementById('mainContent'));
+        showToast('Cliente eliminado.');
+      }
     }
 
     document.getElementById('clientForm').addEventListener('submit', function(e) {
@@ -1256,17 +1395,22 @@
       const id = document.getElementById('clientId').value;
       const name = document.getElementById('clientName').value.trim();
       const phone = document.getElementById('clientPhone').value.trim();
+      const debt = parseFloat(document.getElementById('clientDebt').value) || 0;
 
       if (id) {
         const c = clients.find(x => x.id === id);
-        if (c) { c.name = name; c.phone = phone; }
+        if (c) {
+          c.name = name;
+          c.phone = phone;
+          c.debt = Math.max(0, debt);
+        }
       } else {
         clients.push({ id: Date.now().toString(), name, phone, debt: 0 });
       }
       saveData();
       closeClientModal();
       renderClientsTab(document.getElementById('mainContent'));
-      showToast('Cliente guardado.');
+      showToast(id ? 'Cliente actualizado.' : 'Cliente guardado.');
     });
 
     function openAbonoModal(clientId) {
