@@ -10,37 +10,37 @@
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: #FFF0F3;
+      background-color: #fff5fa;
     }
-    .text-pink-main { color: #C94A72; }
-    .bg-pink-main { background-color: #C94A72; }
-    .border-pink-main { border-color: #E699B1; }
+    .text-pink-main { color: #ff00bf; }
+    .bg-pink-main { background-color: #ff00bf; }
+    .border-pink-main { border-color: #ff00bf; }
     .btn-lux {
-      background: linear-gradient(135deg, #E67E9F 0%, #C94A72 100%);
+      background: linear-gradient(135deg, #ff41d0 0%, #ff00bf 100%);
       color: white;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .btn-lux:hover {
       opacity: 0.95;
       transform: translateY(-2px);
-      box-shadow: 0 10px 25px -5px rgba(201, 74, 114, 0.4);
+      box-shadow: 0 10px 25px -5px rgba(255, 0, 191, 0.4);
     }
     .glass-card {
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(12px);
-      border: 1px solid rgba(230, 153, 177, 0.35);
+      border: 1px solid rgba(255, 0, 191, 0.2);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     .glass-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 12px 30px -10px rgba(201, 74, 114, 0.15);
+      box-shadow: 0 12px 30px -10px rgba(255, 0, 191, 0.15);
     }
     .avatar-ring {
-      border: 3px solid #C94A72;
+      border: 3px solid #ff00bf;
     }
     @keyframes floatAnimation {
       0% { transform: translateY(0px) scale(1); }
-      50% { transform: translateY(-6px) scale(1.03); filter: drop-shadow(0 8px 12px rgba(201, 74, 114, 0.25)); }
+      50% { transform: translateY(-6px) scale(1.03); filter: drop-shadow(0 8px 12px rgba(255, 0, 191, 0.3)); }
       100% { transform: translateY(0px) scale(1); }
     }
     .floating-logo {
@@ -58,16 +58,16 @@
 
   <!-- NOTIFICACIÓN FLOTANTE (TOAST) -->
   <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-gray-900 text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-sm font-bold">
-    <i class="fa-solid fa-circle-check text-pink-400 text-lg"></i>
+    <i class="fa-solid fa-circle-check text-[#ff00bf] text-lg"></i>
     <span id="toastMessage">¡Acción realizada con éxito!</span>
   </div>
 
   <!-- VISTA 1: CATÁLOGO PÚBLICO TIPO CARRITO -->
-  <div id="publicCatalogSection" class="min-h-screen bg-[#FFF0F3] flex flex-col">
+  <div id="publicCatalogSection" class="min-h-screen bg-[#fff5fa] flex flex-col">
     <header class="glass-card shadow-sm p-4 sticky top-0 z-30 border-b border-pink-100">
       <div class="max-w-7xl mx-auto flex justify-between items-center">
         <div class="flex items-center space-x-3">
-          <img src="logo (5).png" alt="Jema Makeup" class="w-12 h-12 rounded-2xl object-cover floating-logo border-2 border-pink-300 shadow-md">
+          <img src="logo (5).png" alt="Jema Makeup" class="w-12 h-12 rounded-2xl object-cover floating-logo border-2 border-[#ff00bf] shadow-md">
           <div>
             <h1 class="text-xl font-extrabold text-pink-main tracking-wide">JEMA_MAKEUP</h1>
             <p class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Luxury Cosmetics</p>
@@ -86,7 +86,7 @@
     </header>
 
     <main class="max-w-7xl mx-auto p-4 md:p-8 flex-1 w-full">
-      <div class="glass-card p-6 rounded-3xl shadow-sm mb-8 flex flex-col md:flex-row justify-between items-center gap-4 border border-pink-100">
+      <div class="glass-card p-6 rounded-3xl shadow-sm mb-8 flex flex-col md:flex-row justify-between items-center gap-4 border border-pink-200">
         <div>
           <span class="text-xs font-bold text-pink-main uppercase tracking-wider block mb-1">Experiencia Exclusiva</span>
           <h2 class="text-2xl font-extrabold text-gray-900">Catálogo de Alta Gama</h2>
@@ -106,7 +106,7 @@
 
   <!-- MODAL CARRITO DE COMPRAS PÚBLICO -->
   <div id="cartModal" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] flex flex-col border border-pink-100">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] flex flex-col border border-pink-200">
       <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
         <h3 class="text-xl font-extrabold text-pink-main flex items-center gap-2">
           <i class="fa-solid fa-bag-shopping"></i> Tu Bolsa de Compras
@@ -127,11 +127,11 @@
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-600 mb-1">Nombre Completo *</label>
-          <input type="text" id="orderClientName" class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-pink-300 outline-none" placeholder="Tu nombre">
+          <input type="text" id="orderClientName" class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-[#ff00bf] outline-none" placeholder="Tu nombre">
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-600 mb-1">Dirección y Barrio (Opcional)</label>
-          <textarea id="orderClientAddress" rows="2" class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-pink-300 outline-none" placeholder="Dirección opcional"></textarea>
+          <textarea id="orderClientAddress" rows="2" class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-[#ff00bf] outline-none" placeholder="Dirección opcional"></textarea>
         </div>
 
         <div class="flex justify-between items-center text-xl font-extrabold pt-2">
@@ -148,7 +148,7 @@
 
   <!-- MODAL LOGIN PERSONAL -->
   <div id="loginModalSection" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4 z-50">
-    <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md border border-pink-100 relative">
+    <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md border border-pink-200 relative">
       <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
       
       <div class="text-center mb-6">
@@ -162,11 +162,11 @@
       <form id="loginForm" class="space-y-4">
         <div>
           <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Usuario</label>
-          <input type="text" id="loginUser" required class="w-full px-4 py-3 rounded-2xl border border-pink-200 focus:ring-2 focus:ring-pink-300 outline-none text-sm">
+          <input type="text" id="loginUser" required class="w-full px-4 py-3 rounded-2xl border border-pink-200 focus:ring-2 focus:ring-[#ff00bf] outline-none text-sm">
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Contraseña</label>
-          <input type="password" id="loginPass" required class="w-full px-4 py-3 rounded-2xl border border-pink-200 focus:ring-2 focus:ring-pink-300 outline-none text-sm">
+          <input type="password" id="loginPass" required class="w-full px-4 py-3 rounded-2xl border border-pink-200 focus:ring-2 focus:ring-[#ff00bf] outline-none text-sm">
         </div>
 
         <div>
@@ -189,7 +189,7 @@
     <header class="glass-card shadow-sm border-b border-pink-100 no-print sticky top-0 z-30">
       <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         <div class="flex items-center space-x-3">
-          <img src="logo (5).png" alt="Logo" class="w-11 h-11 rounded-2xl object-cover floating-logo border-2 border-pink-300">
+          <img src="logo (5).png" alt="Logo" class="w-11 h-11 rounded-2xl object-cover floating-logo border-2 border-[#ff00bf]">
           <div>
             <span id="userNameHeader" class="font-extrabold text-gray-900 text-base block leading-tight">Mari</span>
             <span id="userRoleHeader" class="text-[11px] text-pink-main font-bold uppercase tracking-wider block">Administradora</span>
@@ -211,7 +211,7 @@
 
   <!-- MODAL PRODUCTO -->
   <div id="productModal" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl border border-pink-100">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl border border-pink-200">
       <div class="flex justify-between items-center mb-4">
         <h3 id="productModalTitle" class="text-xl font-extrabold text-pink-main">Producto</h3>
         <button onclick="closeProductModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
@@ -220,16 +220,16 @@
         <input type="hidden" id="productId">
         <div>
           <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Nombre del Producto</label>
-          <input type="text" id="prodName" required class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-pink-300 outline-none">
+          <input type="text" id="prodName" required class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-[#ff00bf] outline-none">
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Costo ($)</label>
-            <input type="number" id="prodCost" oninput="calculateModalUtility()" required class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-pink-300 outline-none">
+            <input type="number" id="prodCost" oninput="calculateModalUtility()" required class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-[#ff00bf] outline-none">
           </div>
           <div>
             <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Precio Venta ($)</label>
-            <input type="number" id="prodPrice" oninput="calculateModalUtility()" required class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-pink-300 outline-none">
+            <input type="number" id="prodPrice" oninput="calculateModalUtility()" required class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-[#ff00bf] outline-none">
           </div>
         </div>
         <div class="bg-pink-50 p-3 rounded-2xl border border-pink-200 flex justify-between items-center">
@@ -238,7 +238,7 @@
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Cantidad en Stock</label>
-          <input type="number" id="prodStock" required class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-pink-300 outline-none">
+          <input type="number" id="prodStock" required class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-[#ff00bf] outline-none">
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Imagen (PNG / JPG)</label>
@@ -258,7 +258,7 @@
 
   <!-- MODAL CLIENTE -->
   <div id="clientModal" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl border border-pink-100">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl border border-pink-200">
       <h3 id="clientModalTitle" class="text-xl font-extrabold text-pink-main mb-4">Registrar Cliente</h3>
       <form id="clientForm" class="space-y-4">
         <input type="hidden" id="clientId">
@@ -280,7 +280,7 @@
 
   <!-- MODAL CREAR O EDITAR USUARIO -->
   <div id="userModal" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl border border-pink-100">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl border border-pink-200">
       <div class="flex justify-between items-center mb-4">
         <h3 id="userModalTitle" class="text-xl font-extrabold text-pink-main">Crear o Editar Usuario</h3>
         <button onclick="closeUserModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
@@ -435,7 +435,7 @@
       const grid = document.getElementById('publicProductGrid');
       if (!grid) return;
       grid.innerHTML = products.map(p => `
-        <div class="glass-card p-4 rounded-3xl shadow-sm flex flex-col justify-between border border-pink-100 hover:shadow-md transition">
+        <div class="glass-card p-4 rounded-3xl shadow-sm flex flex-col justify-between border border-pink-200 hover:shadow-md transition">
           <div>
             <div class="relative mb-3">
               <img src="${p.img || 'https://via.placeholder.com/150'}" class="w-full h-40 object-cover rounded-2xl border border-pink-100">
@@ -576,7 +576,7 @@
               <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900">¡Bienvenid@, ${currentUser.name || currentUser.user}! ✨</h1>
               <p class="text-gray-500 text-sm">Todo listo para seguir brillando y alcanzando las metas de la semana.</p>
             </div>
-            <div class="w-20 h-20 rounded-3xl bg-white flex items-center justify-center text-pink-main text-4xl shadow-md border-2 border-pink-200 floating-logo overflow-hidden">
+            <div class="w-20 h-20 rounded-3xl bg-white flex items-center justify-center text-pink-main text-4xl shadow-md border-2 border-[#ff00bf] floating-logo overflow-hidden">
               <img src="logo (5).png" class="w-full h-full object-cover">
             </div>
           </div>
@@ -889,10 +889,11 @@
                       <td class="p-4">${s.product}</td>
                       <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-extrabold ${s.status === 'Pagado' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${s.status || 'Pagado'}</span></td>
                       <td class="p-4 text-pink-main font-extrabold">$${s.total.toLocaleString()}</td>
-                      <td class="p-4 space-x-2">
-                        <button onclick="generateReceiptPDF('${s.id}')" class="text-blue-500 hover:text-blue-700 text-xs font-bold" title="Imprimir Recibo PDF"><i class="fa-solid fa-file-pdf text-base"></i></button>
-                        <button onclick="sendReceiptWhatsApp('${s.id}')" class="text-green-500 hover:text-green-700 text-xs font-bold" title="Enviar por WhatsApp"><i class="fa-brands fa-whatsapp text-base"></i></button>
-                        <button onclick="deleteSale('${s.id}')" class="text-red-400 hover:text-red-600 text-xs" title="Borrar Venta"><i class="fa-solid fa-trash"></i></button>
+                      <td class="p-4 space-x-1">
+                        <button onclick="generateReceiptPDF('${s.id}')" class="text-blue-500 hover:text-blue-700 text-xs font-bold p-1" title="Imprimir Recibo PDF"><i class="fa-solid fa-file-pdf text-base"></i></button>
+                        <button onclick="sendReceiptWhatsApp('${s.id}')" class="text-green-500 hover:text-green-700 text-xs font-bold p-1" title="Enviar por WhatsApp"><i class="fa-brands fa-whatsapp text-base"></i></button>
+                        <button onclick="editSale('${s.id}')" class="text-amber-500 hover:text-amber-700 text-xs p-1" title="Editar Venta"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteSale('${s.id}')" class="text-red-400 hover:text-red-600 text-xs p-1" title="Borrar Venta"><i class="fa-solid fa-trash"></i></button>
                       </td>
                     </tr>
                   `).join('')}
@@ -990,12 +991,24 @@
       }
     }
 
+    function editSale(saleId) {
+      const s = sales.find(x => x.id === saleId);
+      if (!s) return;
+      const nuevoEstado = prompt("Actualizar estado de pago (Pagado / Fiado / Queda debiendo):", s.status || "Pagado");
+      if (nuevoEstado) {
+        s.status = nuevoEstado;
+        saveData();
+        switchTab(currentUser.role === 'admin' ? 'admin_sales' : 'vendor_inv');
+        showToast('Venta actualizada.');
+      }
+    }
+
     function generateReceiptPDF(saleId) {
       const s = sales.find(x => x.id === saleId);
       if (!s) return;
       const receiptHTML = `
         <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 400px; margin: auto; border: 1px solid #ddd; border-radius: 10px;">
-          <h2 style="text-align: center; color: #C94A72;">JEMA_MAKEUP</h2>
+          <h2 style="text-align: center; color: #ff00bf;">JEMA_MAKEUP</h2>
           <p style="text-align: center; font-size: 12px; color: #777;">Comprobante de Venta</p>
           <hr style="border: 0; border-top: 1px dashed #eee;" />
           <p><strong>Fecha:</strong> ${s.date}</p>
@@ -1004,7 +1017,7 @@
           <p><strong>Estado:</strong> ${s.status || 'Pagado'}</p>
           <hr style="border: 0; border-top: 1px dashed #eee;" />
           <p><strong>Producto:</strong> ${s.product}</p>
-          <p style="font-size: 16px; font-weight: bold; color: #C94A72;">Total: $${s.total.toLocaleString()}</p>
+          <p style="font-size: 16px; font-weight: bold; color: #ff00bf;">Total: $${s.total.toLocaleString()}</p>
           <hr style="border: 0; border-top: 1px dashed #eee;" />
           <p style="text-align: center; font-size: 10px; color: #aaa;">¡Gracias por tu compra en Jema_makeup!</p>
         </div>
@@ -1301,7 +1314,7 @@
                   <tr>
                     <td class="p-3 font-bold text-gray-900">${u.name}</td>
                     <td class="p-3">${u.user}</td>
-                    <td class="p-3 font-mono text-pink-600 font-bold">${u.pass}</td>
+                    <td class="p-3 font-mono text-[#ff00bf] font-bold">${u.pass}</td>
                     <td class="p-3">${u.phone || 'N/A'}</td>
                     <td class="p-3"><span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-pink-100 text-pink-700'}">${u.role === 'admin' ? 'Administrador' : 'Vended@r'}</span></td>
                     <td class="p-3 space-x-2">
