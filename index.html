@@ -10,28 +10,41 @@
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: #FFF5F7;
+      background-color: #FFF0F3;
     }
-    .text-pink-main { color: #D44D79; }
-    .bg-pink-main { background-color: #D44D79; }
-    .border-pink-main { border-color: #E8A1B5; }
+    .text-pink-main { color: #C94A72; }
+    .bg-pink-main { background-color: #C94A72; }
+    .border-pink-main { border-color: #E699B1; }
     .btn-lux {
-      background: linear-gradient(135deg, #E86A92 0%, #D44D79 100%);
+      background: linear-gradient(135deg, #E67E9F 0%, #C94A72 100%);
       color: white;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .btn-lux:hover {
       opacity: 0.95;
-      transform: translateY(-1px);
-      box-shadow: 0 10px 25px -5px rgba(212, 77, 121, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(201, 74, 114, 0.4);
     }
     .glass-card {
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(12px);
-      border: 1px solid rgba(232, 161, 181, 0.3);
+      border: 1px solid rgba(230, 153, 177, 0.35);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .glass-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px -10px rgba(201, 74, 114, 0.15);
     }
     .avatar-ring {
-      border: 3px solid #D44D79;
+      border: 3px solid #C94A72;
+    }
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-5px); }
+      100% { transform: translateY(0px); }
+    }
+    .floating-badge {
+      animation: float 3s ease-in-out infinite;
     }
     @media print {
       .no-print { display: none !important; }
@@ -45,16 +58,16 @@
 
   <!-- NOTIFICACIÓN FLOTANTE (TOAST) -->
   <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-gray-900 text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-sm font-bold">
-    <i class="fa-solid fa-circle-check text-green-400 text-lg"></i>
+    <i class="fa-solid fa-circle-check text-pink-400 text-lg"></i>
     <span id="toastMessage">¡Acción realizada con éxito!</span>
   </div>
 
   <!-- VISTA 1: CATÁLOGO PÚBLICO TIPO CARRITO -->
-  <div id="publicCatalogSection" class="min-h-screen bg-[#FFF5F7] flex flex-col">
+  <div id="publicCatalogSection" class="min-h-screen bg-[#FFF0F3] flex flex-col">
     <header class="glass-card shadow-sm p-4 sticky top-0 z-30 border-b border-pink-100">
       <div class="max-w-7xl mx-auto flex justify-between items-center">
         <div class="flex items-center space-x-2">
-          <div class="w-10 h-10 rounded-full bg-pink-100 text-pink-main flex items-center justify-center font-bold text-xl shadow-inner">
+          <div class="w-10 h-10 rounded-full bg-pink-100 text-pink-main flex items-center justify-center font-bold text-xl shadow-inner floating-badge">
             <i class="fa-solid fa-gem"></i>
           </div>
           <div>
@@ -78,12 +91,12 @@
       <div class="glass-card p-6 rounded-3xl shadow-sm mb-8 flex flex-col md:flex-row justify-between items-center gap-4 border border-pink-100">
         <div>
           <span class="text-xs font-bold text-pink-main uppercase tracking-wider block mb-1">Experiencia Exclusiva</span>
-          <h2 class="text-2xl font-bold text-gray-900">Catálogo de Alta Gama</h2>
+          <h2 class="text-2xl font-extrabold text-gray-900">Catálogo de Alta Gama</h2>
           <p class="text-gray-500 text-sm mt-0.5">Selecciona tus productos, elige tu asesora preferida y envía tu pedido directamente a su WhatsApp.</p>
         </div>
-        <div class="flex items-center gap-2 bg-pink-50 px-4 py-2 rounded-2xl border border-pink-200">
-          <i class="fa-solid fa-truck-fast text-pink-main"></i>
-          <span class="text-xs font-semibold text-gray-700">Envíos seguros en Cali</span>
+        <div class="flex items-center gap-2 bg-pink-50 px-4 py-2 rounded-2xl border border-pink-200 floating-badge">
+          <i class="fa-solid fa-sparkles text-pink-main"></i>
+          <span class="text-xs font-semibold text-gray-700">Belleza sin límites</span>
         </div>
       </div>
 
@@ -269,14 +282,15 @@
     </div>
   </div>
 
-  <!-- MODAL CREAR USUARIO (VENDEDORA CON WHATSAPP) -->
+  <!-- MODAL CREAR O EDITAR USUARIO -->
   <div id="userModal" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl border border-pink-100">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-extrabold text-pink-main">Crear Nueva Vendedora</h3>
+        <h3 id="userModalTitle" class="text-xl font-extrabold text-pink-main">Crear o Editar Usuario</h3>
         <button onclick="closeUserModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
       <form id="userForm" class="space-y-4">
+        <input type="hidden" id="userId">
         <div>
           <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Nombre de la Vendedora</label>
           <input type="text" id="newUserName" required class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm" placeholder="Ej: Dana">
@@ -291,7 +305,7 @@
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Contraseña</label>
-          <input type="password" id="newUserPass" required class="w-full px-4 py-2 rounded-xl border border-pink-200 text-sm">
+          <input type="text" id="newUserPass" required class="w-full px-4 py-2 rounded-xl border border-pink-200 text-sm">
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wider">Rol</label>
@@ -320,8 +334,8 @@
 
     let products = JSON.parse(localStorage.getItem('jm_products')) || [
       { id: '1', name: 'Labial Matte Velvet Rose', cost: 8000, price: 18000, stock: 15, img: '' },
-      { id: '2', name: 'Base Cobertura Total Glow', cost: 15000, price: 32000, stock: 10, img: '' },
-      { id: '3', name: 'Paleta de Sombras Pastel Dreams', cost: 22000, price: 45000, stock: 2, img: '' }
+      { id: '2', name: 'Base Cobertura Total Glow', cost: 15000, price: 32000, stock: 2, img: '' },
+      { id: '3', name: 'Paleta de Sombras Pastel Dreams', cost: 22000, price: 45000, stock: 0, img: '' }
     ];
 
     let clients = JSON.parse(localStorage.getItem('jm_clients')) || [
@@ -527,14 +541,14 @@
           <button onclick="switchTab('analytics')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Dashboard Admin & Ranking</button>
           <button onclick="switchTab('payments')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Control Pagos Vendedoras</button>
           <button onclick="switchTab('admin_sales')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Registrar Venta (Admin)</button>
-          <button onclick="switchTab('clients')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Clientes & Abonos</button>
+          <button onclick="switchTab('clients')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Clientes & Facturas</button>
           <button onclick="switchTab('custom_orders')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Encargos</button>
           <button onclick="switchTab('users')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Usuarios</button>
         `;
       } else {
         html += `
           <button onclick="switchTab('vendor_inv')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Mi Inventario & Facturación</button>
-          <button onclick="switchTab('clients')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Clientes & Abonos</button>
+          <button onclick="switchTab('clients')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Clientes & Facturas</button>
           <button onclick="switchTab('custom_orders')" class="tab-btn px-4 py-2 rounded-xl text-gray-600 hover:bg-pink-50 text-sm font-semibold">Encargos</button>
         `;
       }
@@ -556,6 +570,9 @@
     }
 
     function renderDashboardTab(container) {
+      // Alerta de stock bajo (< 3 unidades)
+      const lowStockProducts = products.filter(p => p.stock < 3);
+
       container.innerHTML = `
         <div class="space-y-6">
           <div class="glass-card p-8 rounded-3xl border border-pink-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
@@ -564,10 +581,24 @@
               <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900">¡Bienvenid@, ${currentUser.name || currentUser.user}! ✨</h1>
               <p class="text-gray-500 text-sm">Todo listo para seguir brillando y alcanzando las metas de la semana.</p>
             </div>
-            <div class="w-20 h-20 rounded-3xl bg-white flex items-center justify-center text-pink-main text-4xl shadow-md border-2 border-pink-200">
+            <div class="w-20 h-20 rounded-3xl bg-white flex items-center justify-center text-pink-main text-4xl shadow-md border-2 border-pink-200 floating-badge">
               <i class="fa-solid ${currentUser.avatar || 'fa-crown'}"></i>
             </div>
           </div>
+
+          ${lowStockProducts.length > 0 ? `
+            <div class="bg-red-50 border-2 border-red-200 p-5 rounded-3xl shadow-sm flex items-start gap-4">
+              <div class="p-3 bg-red-100 text-red-500 rounded-2xl text-xl"><i class="fa-solid fa-triangle-exclamation"></i></div>
+              <div>
+                <h4 class="font-extrabold text-red-800 text-base">¡Alerta de Inventario Bajo!</h4>
+                <p class="text-xs text-red-600 mt-1">Los siguientes productos se están agotando o ya no tienen stock:</p>
+                <div class="flex flex-wrap gap-2 mt-2">
+                  ${lowStockProducts.map(p => `<span class="px-3 py-1 bg-white text-red-700 text-xs font-extrabold rounded-full border border-red-200 shadow-xs">${p.name} (${p.stock} unids)</span>`).join('')}
+                </div>
+              </div>
+            </div>
+          ` : ''}
+
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="glass-card p-6 rounded-3xl shadow-sm flex items-center justify-between border border-pink-100">
               <div>
@@ -807,7 +838,7 @@
                 <div class="space-y-3 mb-4">
                   <div>
                     <label class="block text-xs font-bold text-gray-600 mb-1">Cliente</label>
-                    <select id="posClientSelect" class="w-full px-3 py-2 rounded-xl border text-xs bg-white">
+                    <select id="posClientSelect" class="w-full px-3 py-2 rounded-xl border text-xs bg-white font-semibold">
                       <option value="Cliente Ocasional">Cliente Ocasional</option>
                       ${clients.map(c => `<option value="${c.name}">${c.name} (${c.phone})</option>`).join('')}
                     </select>
@@ -968,7 +999,7 @@
       if (!s) return;
       const receiptHTML = `
         <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 400px; margin: auto; border: 1px solid #ddd; border-radius: 10px;">
-          <h2 style="text-align: center; color: #D44D79;">JEMA_MAKEUP</h2>
+          <h2 style="text-align: center; color: #C94A72;">JEMA_MAKEUP</h2>
           <p style="text-align: center; font-size: 12px; color: #777;">Comprobante de Venta</p>
           <hr style="border: 0; border-top: 1px dashed #eee;" />
           <p><strong>Fecha:</strong> ${s.date}</p>
@@ -977,7 +1008,7 @@
           <p><strong>Estado:</strong> ${s.status || 'Pagado'}</p>
           <hr style="border: 0; border-top: 1px dashed #eee;" />
           <p><strong>Producto:</strong> ${s.product}</p>
-          <p style="font-size: 16px; font-weight: bold; color: #D44D79;">Total: $${s.total.toLocaleString()}</p>
+          <p style="font-size: 16px; font-weight: bold; color: #C94A72;">Total: $${s.total.toLocaleString()}</p>
           <hr style="border: 0; border-top: 1px dashed #eee;" />
           <p style="text-align: center; font-size: 10px; color: #aaa;">¡Gracias por tu compra en Jema_makeup!</p>
         </div>
@@ -1041,9 +1072,9 @@
       `;
     }
 
-    // CONTROL DE PAGOS MENSUALES POR VENDEDORA (AÑOS Y MESES)
+    // CONTROL DE PAGOS MENSUALES (CORREGIDO Y FUNCIONAL)
     function renderPaymentsTab(container) {
-      const vendors = users.filter(u => u.role === 'vendor');
+      const vendors = users.filter(u => u.role === 'vendor' || u.role === 'admin');
       const years = [2026, 2027, 2028];
       const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
@@ -1092,7 +1123,7 @@
       }
     }
 
-    // CLIENTES & ABONOS CON FORMATEO DE PUNTOS
+    // CLIENTES, ABONOS & HISTORIAL DE FACTURAS
     function renderClientsTab(container) {
       container.innerHTML = `
         <div class="space-y-6">
@@ -1124,6 +1155,37 @@
                 `).join('')}
               </tbody>
             </table>
+          </div>
+
+          <div class="pt-6">
+            <h2 class="text-xl font-extrabold text-gray-900 mb-4">Todas las Facturas y Ventas Registradas</h2>
+            <div class="glass-card rounded-3xl shadow-sm border border-pink-100 overflow-hidden">
+              <table class="w-full text-left border-collapse">
+                <thead class="bg-pink-50 text-pink-main text-xs uppercase font-extrabold">
+                  <tr>
+                    <th class="p-4">Fecha</th>
+                    <th class="p-4">Cliente / Ocasional</th>
+                    <th class="p-4">Asesora</th>
+                    <th class="p-4">Producto</th>
+                    <th class="p-4">Estado</th>
+                    <th class="p-4">Total</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 text-sm">
+                  ${sales.length === 0 ? '<tr><td colspan="6" class="p-4 text-center text-gray-400">No hay facturas registradas.</td></tr>' : ''}
+                  ${sales.map(s => `
+                    <tr>
+                      <td class="p-4 text-xs">${s.date}</td>
+                      <td class="p-4 font-bold text-gray-900">${s.clientName || 'Cliente Ocasional'}</td>
+                      <td class="p-4 text-pink-main font-semibold">${s.vendor}</td>
+                      <td class="p-4">${s.product}</td>
+                      <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-extrabold ${s.status === 'Pagado' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${s.status || 'Pagado'}</span></td>
+                      <td class="p-4 text-pink-main font-extrabold">$${s.total.toLocaleString()}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       `;
@@ -1218,7 +1280,7 @@
       }
     }
 
-    // USUARIOS
+    // GESTIÓN DE USUARIOS (VER CONTRASEÑA, WHATSAPP, EDITAR Y BORRAR)
     function renderUsersTab(container) {
       container.innerHTML = `
         <div class="space-y-6">
@@ -1226,44 +1288,91 @@
             <h2 class="text-2xl font-extrabold text-gray-900">Gestión de Usuarios</h2>
             <button onclick="openUserModal()" class="px-5 py-2.5 btn-lux rounded-2xl text-xs font-bold shadow-md">+ Crear Vendedora</button>
           </div>
-          <div class="glass-card rounded-3xl shadow-sm border border-pink-100 p-6">
-            <ul class="divide-y divide-gray-100">
-              ${users.map(u => `
-                <li class="py-3 flex justify-between items-center">
-                  <div>
-                    <span class="font-bold text-gray-900">${u.name} (${u.user})</span> - <span class="text-xs text-gray-500">WhatsApp: ${u.phone || 'N/A'}</span>
-                    <span class="ml-2 text-xs px-2.5 py-0.5 rounded-full ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-pink-100 text-pink-700'} font-bold">${u.role === 'admin' ? 'Administrador' : 'Vended@r'}</span>
-                  </div>
-                </li>
-              `).join('')}
-            </ul>
+          <div class="glass-card rounded-3xl shadow-sm border border-pink-100 p-6 overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead class="bg-pink-50 text-pink-main text-xs uppercase font-extrabold">
+                <tr>
+                  <th class="p-3">Nombre</th>
+                  <th class="p-3">Usuario (Login)</th>
+                  <th class="p-3">Contraseña</th>
+                  <th class="p-3">WhatsApp</th>
+                  <th class="p-3">Rol</th>
+                  <th class="p-3">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                ${users.map(u => `
+                  <tr>
+                    <td class="p-3 font-bold text-gray-900">${u.name}</td>
+                    <td class="p-3">${u.user}</td>
+                    <td class="p-3 font-mono text-pink-600 font-bold">${u.pass}</td>
+                    <td class="p-3">${u.phone || 'N/A'}</td>
+                    <td class="p-3"><span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-pink-100 text-pink-700'}">${u.role === 'admin' ? 'Administrador' : 'Vended@r'}</span></td>
+                    <td class="p-3 space-x-2">
+                      <button onclick="editUser('${u.id}')" class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen"></i></button>
+                      <button onclick="deleteUser('${u.id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
           </div>
         </div>
       `;
     }
 
-    function openUserModal() {
-      document.getElementById('userForm').reset();
+    function openUserModal(userObj = null) {
+      document.getElementById('userModalTitle').innerText = userObj ? 'Editar Usuario' : 'Crear Nueva Vendedora';
+      document.getElementById('userId').value = userObj ? userObj.id : '';
+      document.getElementById('newUserName').value = userObj ? userObj.name : '';
+      document.getElementById('newUserPhone').value = userObj ? userObj.phone : '';
+      document.getElementById('newUserLogin').value = userObj ? userObj.user : '';
+      document.getElementById('newUserPass').value = userObj ? userObj.pass : '';
+      document.getElementById('newUserRole').value = userObj ? userObj.role : 'vendor';
       document.getElementById('userModal').classList.remove('hidden');
     }
+
     function closeUserModal() {
       document.getElementById('userModal').classList.add('hidden');
     }
 
     document.getElementById('userForm').addEventListener('submit', function(e) {
       e.preventDefault();
+      const id = document.getElementById('userId').value;
       const name = document.getElementById('newUserName').value.trim();
       const phone = document.getElementById('newUserPhone').value.trim();
       const user = document.getElementById('newUserLogin').value.trim();
       const pass = document.getElementById('newUserPass').value.trim();
       const role = document.getElementById('newUserRole').value;
 
-      users.push({ id: Date.now().toString(), name, phone, user, pass, role, paidMonth: {} });
+      if (id) {
+        const u = users.find(x => x.id === id);
+        if (u) { u.name = name; u.phone = phone; u.user = user; u.pass = pass; u.role = role; }
+      } else {
+        users.push({ id: Date.now().toString(), name, phone, user, pass, role, paidMonth: {} });
+      }
+
       saveData();
       closeUserModal();
       renderUsersTab(document.getElementById('mainContent'));
-      showToast('¡Vendedora creada correctamente!');
+      populateVendorDropdown();
+      showToast('¡Usuario guardado correctamente!');
     });
+
+    function editUser(id) {
+      const u = users.find(x => x.id === id);
+      if (u) openUserModal(u);
+    }
+
+    function deleteUser(id) {
+      if (confirm('¿Estás segura de eliminar este usuario?')) {
+        users = users.filter(x => x.id !== id);
+        saveData();
+        renderUsersTab(document.getElementById('mainContent'));
+        populateVendorDropdown();
+        showToast('Usuario eliminado.');
+      }
+    }
   </script>
 </body>
 </html>
