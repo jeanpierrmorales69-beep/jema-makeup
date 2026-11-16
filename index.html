@@ -381,6 +381,9 @@
       { id: '3', name: 'Paleta de Sombras Pastel Dreams', cost: 22000, price: 45000, stock: 10, img: '' }
     ]);
 
+    // ID del producto estrella (por defecto el primero o null)
+    let starProductId = safeParse('jm_star_product', '1');
+
     let clients = safeParse('jm_clients', [
       { id: '1', name: 'Camila Torres', phone: '3001234567', debt: 0 }
     ]);
@@ -396,6 +399,7 @@
         localStorage.setItem('jm_clients', JSON.stringify(clients));
         localStorage.setItem('jm_sales', JSON.stringify(sales));
         localStorage.setItem('jm_custom_orders', JSON.stringify(customOrders));
+        localStorage.setItem('jm_star_product', JSON.stringify(starProductId));
 
         if (window.db && window.dbRef && window.dbSet) {
           await window.dbSet(window.dbRef(window.db, 'jemamakeup/data'), {
@@ -403,7 +407,8 @@
             products: products,
             clients: clients,
             sales: sales,
-            customOrders: customOrders
+            customOrders: customOrders,
+            starProductId: starProductId
           });
         }
       } catch (e) {
@@ -422,8 +427,8 @@
             if (cloudData.clients) clients = cloudData.clients;
             if (cloudData.sales) sales = cloudData.sales;
             if (cloudData.customOrders) customOrders = cloudData.customOrders;
+            if (cloudData.starProductId !== undefined) starProductId = cloudData.starProductId;
 
-            // Actualizar vista actual según el estado
             if (currentUser) {
               const activeTabEl = document.querySelector('.tab-btn.bg-pink-100');
               if (activeTabEl) {
@@ -512,7 +517,7 @@
       showToast('Has salido al catálogo público.');
     }
 
-    // CATÁLOGO PÚBLICO
+    // CATÁLOGO PÚBLICO (Muestra el producto estrella primero si está definido)
     function populateVendorDropdown() {
       const select = document.getElementById('cartVendorSelect');
       if (!select) return;
@@ -523,21 +528,36 @@
     function renderPublicCatalog() {
       const grid = document.getElementById('publicProductGrid');
       if (!grid) return;
-      grid.innerHTML = products.map(p => `
-        <div class="glass-card p-4 rounded-3xl shadow-sm flex flex-col justify-between border border-pink-200 hover:shadow-md transition">
-          <div>
-            <div class="relative mb-3">
-              <img src="${p.img || 'https://via.placeholder.com/150'}" class="w-full h-40 object-cover rounded-2xl border border-pink-100">
-              ${p.stock <= 0 ? '<span class="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase">Agotado</span>' : '<span class="absolute top-2 right-2 bg-green-500 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase">Disponible</span>'}
+
+      // Ordenar para que el producto estrella aparezca de primero
+      let sortedProducts = [...products];
+      if (starProductId) {
+        const idx = sortedProducts.findIndex(p => p.id === starProductId);
+        if (idx > -1) {
+          const star = sortedProducts.splice(idx, 1)[0];
+          sortedProducts.unshift(star);
+        }
+      }
+
+      grid.innerHTML = sortedProducts.map(p => {
+        const isStar = (p.id === starProductId);
+        return `
+          <div class="glass-card p-4 rounded-3xl shadow-sm flex flex-col justify-between border ${isStar ? 'border-2 border-[#ff00bf] ring-4 ring-pink-100' : 'border-pink-200'} hover:shadow-md transition relative">
+            ${isStar ? '<span class="absolute -top-3 left-4 bg-gradient-to-r from-pink-500 to-[#ff00bf] text-white text-[10px] font-extrabold px-3 py-1 rounded-full uppercase shadow-md"><i class="fa-solid fa-star mr-1"></i> Producto Estrella</span>' : ''}
+            <div>
+              <div class="relative mb-3 mt-1">
+                <img src="${p.img || 'https://via.placeholder.com/150'}" class="w-full h-40 object-cover rounded-2xl border border-pink-100">
+                ${p.stock <= 0 ? '<span class="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase">Agotado</span>' : '<span class="absolute top-2 right-2 bg-green-500 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase">Disponible</span>'}
+              </div>
+              <h4 class="font-bold text-sm text-gray-900">${p.name}</h4>
+              <p class="text-pink-main font-extrabold text-lg mt-1">$${Number(p.price || 0).toLocaleString()}</p>
             </div>
-            <h4 class="font-bold text-sm text-gray-900">${p.name}</h4>
-            <p class="text-pink-main font-extrabold text-lg mt-1">$${Number(p.price || 0).toLocaleString()}</p>
+            <button onclick="addToCart('${p.id}')" ${p.stock <= 0 ? 'disabled' : ''} class="mt-4 w-full py-2.5 ${p.stock > 0 ? 'btn-lux' : 'bg-gray-200 text-gray-400 cursor-not-allowed'} font-bold text-xs rounded-xl shadow-sm flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-cart-plus"></i> ${p.stock > 0 ? 'Agregar a Bolsa' : 'Agotado'}
+            </button>
           </div>
-          <button onclick="addToCart('${p.id}')" ${p.stock <= 0 ? 'disabled' : ''} class="mt-4 w-full py-2.5 ${p.stock > 0 ? 'btn-lux' : 'bg-gray-200 text-gray-400 cursor-not-allowed'} font-bold text-xs rounded-xl shadow-sm flex items-center justify-center gap-1.5">
-            <i class="fa-solid fa-cart-plus"></i> ${p.stock > 0 ? 'Agregar a Bolsa' : 'Agotado'}
-          </button>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     function addToCart(productId) {
@@ -722,14 +742,40 @@
       `;
     }
 
-    // INVENTARIO MAESTRO
+    // INVENTARIO MAESTRO CON SECCIÓN DE PRODUCTO ESTRELLA
     function renderInventoryTab(container) {
       const totalExpected = products.reduce((acc, p) => acc + (Number(p.price || 0) * Number(p.stock || 0)), 0);
       const totalCost = products.reduce((acc, p) => acc + (Number(p.cost || 0) * Number(p.stock || 0)), 0);
       const totalUtility = totalExpected - totalCost;
 
+      const starProduct = products.find(p => p.id === starProductId) || products[0];
+
       container.innerHTML = `
         <div class="space-y-6">
+          <!-- SECCIÓN PRODUCTO ESTRELLA / DESTACADO -->
+          <div class="glass-card p-6 rounded-3xl border-2 border-[#ff00bf] shadow-md bg-gradient-to-r from-pink-50/80 via-white to-pink-50/40">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div class="flex items-center gap-4">
+                <div class="w-16 h-16 rounded-2xl overflow-hidden border-2 border-[#ff00bf] shadow-md bg-white flex-shrink-0">
+                  <img src="${starProduct ? (starProduct.img || 'https://via.placeholder.com/100') : 'https://via.placeholder.com/100'}" class="w-full h-full object-cover">
+                </div>
+                <div>
+                  <span class="px-3 py-1 bg-pink-main text-white font-extrabold text-[10px] rounded-full uppercase tracking-wider inline-flex items-center gap-1 shadow-xs mb-1">
+                    <i class="fa-solid fa-star"></i> Producto Estrella / Tendencia Actual
+                  </span>
+                  <h3 class="text-xl font-extrabold text-gray-900">${starProduct ? starProduct.name : 'Ningún producto seleccionado'}</h3>
+                  <p class="text-pink-main font-extrabold text-sm mt-0.5">Precio: $${Number(starProduct ? starProduct.price : 0).toLocaleString()} <span class="text-gray-400 font-normal text-xs ml-2">(Stock: ${starProduct ? starProduct.stock : 0} unids)</span></p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 w-full md:w-auto">
+                <select id="starProductSelect" onchange="changeStarProduct(this.value)" class="flex-1 md:w-56 px-4 py-2.5 rounded-2xl border-2 border-pink-300 text-xs bg-white font-bold text-pink-main focus:outline-none focus:border-[#ff00bf]">
+                  <option value="">Seleccionar Estrella...</option>
+                  ${products.map(p => `<option value="${p.id}" ${p.id === starProductId ? 'selected' : ''}>⭐ ${p.name}</option>`).join('')}
+                </select>
+              </div>
+            </div>
+          </div>
+
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="glass-card p-6 rounded-3xl shadow-sm border border-pink-100">
               <span class="text-xs font-bold text-gray-400 uppercase tracking-wider block">Ventas Esperadas</span>
@@ -770,14 +816,19 @@
                 ${products.map(p => `
                   <tr>
                     <td class="p-4"><img src="${p.img || 'https://via.placeholder.com/50'}" class="w-12 h-12 object-cover rounded-2xl border"></td>
-                    <td class="p-4 font-bold text-gray-900">${p.name} ${p.stock <= 0 ? '<span class="text-red-500 text-xs ml-2">(Agotado)</span>' : ''}</td>
+                    <td class="p-4 font-bold text-gray-900">
+                      ${p.name} 
+                      ${p.id === starProductId ? '<span class="ml-2 px-2 py-0.5 bg-pink-100 text-pink-main text-[10px] font-extrabold rounded-full">⭐ Estrella</span>' : ''}
+                      ${p.stock <= 0 ? '<span class="text-red-500 text-xs ml-2">(Agotado)</span>' : ''}
+                    </td>
                     <td class="p-4 text-gray-600">$${Number(p.cost || 0).toLocaleString()}</td>
                     <td class="p-4 text-pink-main font-extrabold">$${Number(p.price || 0).toLocaleString()}</td>
                     <td class="p-4 text-green-600 font-bold">$${(Number(p.price || 0) - Number(p.cost || 0)).toLocaleString()}</td>
                     <td class="p-4"><span class="px-3 py-1 rounded-full ${p.stock > 0 ? 'bg-pink-50 text-pink-main' : 'bg-red-100 text-red-600'} font-bold text-xs">${p.stock} unids</span></td>
                     <td class="p-4 space-x-2 no-print">
-                      <button onclick="editProduct('${p.id}')" class="text-blue-500 hover:text-blue-700 p-2"><i class="fa-solid fa-pen"></i></button>
-                      <button onclick="deleteProduct('${p.id}')" class="text-red-400 hover:text-red-600 p-2"><i class="fa-solid fa-trash"></i></button>
+                      <button onclick="editProduct('${p.id}')" class="text-blue-500 hover:text-blue-700 p-2" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                      <button onclick="setAsStar('${p.id}')" class="text-amber-500 hover:text-amber-700 p-2" title="Hacer Producto Estrella"><i class="fa-solid fa-star"></i></button>
+                      <button onclick="deleteProduct('${p.id}')" class="text-red-400 hover:text-red-600 p-2" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
                     </td>
                   </tr>
                 `).join('')}
@@ -786,6 +837,24 @@
           </div>
         </div>
       `;
+    }
+
+    function changeStarProduct(id) {
+      if (id) {
+        starProductId = id;
+        saveData();
+        renderInventoryTab(document.getElementById('mainContent'));
+        renderPublicCatalog();
+        showToast('⭐ ¡Nuevo producto estrella seleccionado!');
+      }
+    }
+
+    function setAsStar(id) {
+      starProductId = id;
+      saveData();
+      renderInventoryTab(document.getElementById('mainContent'));
+      renderPublicCatalog();
+      showToast('⭐ ¡Producto marcado como estrella con éxito!');
     }
 
     function setupFileInput() {
@@ -850,7 +919,9 @@
         const p = products.find(x => x.id === id);
         if (p) { p.name = name; p.cost = cost; p.price = price; p.stock = stock; p.img = img; }
       } else {
-        products.push({ id: Date.now().toString(), name, cost, price, stock, img });
+        const newId = Date.now().toString();
+        products.push({ id: newId, name, cost, price, stock, img });
+        if (!starProductId) starProductId = newId; // Si no hay estrella, asignarlo
       }
 
       saveData();
@@ -868,6 +939,9 @@
     function deleteProduct(id) {
       if (confirm('¿Estás segura de eliminar este producto del catálogo?')) {
         products = products.filter(x => x.id !== id);
+        if (starProductId === id) {
+          starProductId = products.length > 0 ? products[0].id : null;
+        }
         saveData();
         renderInventoryTab(document.getElementById('mainContent'));
         renderPublicCatalog();
@@ -914,9 +988,10 @@
               <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                 ${products.length === 0 ? '<p class="text-gray-400 text-sm">No hay productos registrados en el inventario.</p>' : ''}
                 ${products.map(p => `
-                  <div onclick="posAddToCart('${p.id}')" class="glass-card p-4 rounded-2xl border border-pink-100 shadow-xs cursor-pointer hover:border-pink-300 transition flex flex-col justify-between">
+                  <div onclick="posAddToCart('${p.id}')" class="glass-card p-4 rounded-2xl border ${p.id === starProductId ? 'border-2 border-[#ff00bf]' : 'border-pink-100'} shadow-xs cursor-pointer hover:border-pink-300 transition flex flex-col justify-between relative">
+                    ${p.id === starProductId ? '<span class="absolute top-2 left-2 bg-[#ff00bf] text-white text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase"><i class="fa-solid fa-star"></i> Estrella</span>' : ''}
                     <div>
-                      <img src="${p.img || 'https://via.placeholder.com/100'}" class="w-full h-24 object-cover rounded-xl mb-2">
+                      <img src="${p.img || 'https://via.placeholder.com/100'}" class="w-full h-24 object-cover rounded-xl mb-2 mt-1">
                       <h5 class="font-bold text-xs text-gray-900">${p.name}</h5>
                       <p class="text-pink-main font-extrabold text-sm">$${Number(p.price || 0).toLocaleString()}</p>
                     </div>
@@ -1337,7 +1412,7 @@
       }
     }
 
-    // CLIENTES (EDITAR Y ELIMINAR), ABONOS & HISTORIAL DE FACTURAS
+    // CLIENTES
     function renderClientsTab(container) {
       container.innerHTML = `
         <div class="space-y-6">
@@ -1550,7 +1625,6 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-100">
-                ${users.main ? '' : ''}
                 ${users.map(u => `
                   <tr>
                     <td class="p-3 font-bold text-gray-900">${u.name}</td>
