@@ -404,7 +404,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT PRINCIPAL CON FACTURA UNIFICADA COMPLETA, ABONOS Y ENVÍO POR WHATSAPP -->
+  <!-- SCRIPT PRINCIPAL -->
   <script>
     let currentUser = null;
     let selectedAvatar = 'fa-crown';
@@ -415,12 +415,11 @@
     let users = [
       { id: '1', user: 'mari', pass: '1234', role: 'admin', name: 'Mari', phone: '573112210988', avatar: 'fa-crown', paidMonth: {} }
     ];
-    let products = [
-      { id: '1', name: 'Labial Matte Velvet Rose', cost: 8000, price: 18000, stock: 15, img: '' },
-      { id: '2', name: 'Base Cobertura Total Glow', cost: 15000, price: 32000, stock: 2, img: '' },
-      { id: '3', name: 'Paleta de Sombras Pastel Dreams', cost: 22000, price: 45000, stock: 10, img: '' }
-    ];
-    let starProductId = '1';
+    
+    // Lista inicial vacía por defecto para evitar productos fantasma al borrar todo
+    let products = [];
+    let starProductId = null;
+
     let clients = [
       { id: '1', name: 'Camila Torres', phone: '3001234567', debt: 0, owner: 'mari', ownerName: 'Mari', history: [] }
     ];
@@ -445,7 +444,6 @@
       return customOrders.filter(o => (o.owner || o.author || '').toLowerCase() === (currentUser.user || '').toLowerCase());
     }
 
-    // Helper para renderizar el listado completo de productos de una factura (compatible con facturas antiguas y unificadas)
     function formatInvoiceItemsHTML(sale) {
       if (Array.isArray(sale.items) && sale.items.length > 0) {
         return `<ul class="space-y-0.5 text-xs">
@@ -481,7 +479,8 @@
           if (snapshot.exists()) {
             const cloudData = snapshot.val();
             if (cloudData.users) users = cloudData.users;
-            if (cloudData.products) products = cloudData.products;
+            // Se lee estrictamente lo que hay en la base de datos sin rellenar con productos por defecto
+            if (cloudData.products !== undefined) products = cloudData.products;
             if (cloudData.clients) clients = cloudData.clients;
             if (cloudData.sales) sales = cloudData.sales;
             if (cloudData.customOrders) customOrders = cloudData.customOrders;
@@ -497,7 +496,7 @@
           if (snapshot.exists()) {
             const cloudData = snapshot.val();
             if (cloudData.users) users = cloudData.users;
-            if (cloudData.products) products = cloudData.products;
+            if (cloudData.products !== undefined) products = cloudData.products;
             if (cloudData.clients) clients = cloudData.clients;
             if (cloudData.sales) sales = cloudData.sales;
             if (cloudData.customOrders) customOrders = cloudData.customOrders;
@@ -599,7 +598,6 @@
       showToast('Has salido al catálogo público.');
     }
 
-    // CATÁLOGO PÚBLICO
     function populateVendorDropdown() {
       const select = document.getElementById('cartVendorSelect');
       if (!select) return;
@@ -610,6 +608,11 @@
     function renderPublicCatalog() {
       const grid = document.getElementById('publicProductGrid');
       if (!grid) return;
+
+      if (products.length === 0) {
+        grid.innerHTML = '<div class="col-span-full py-12 text-center text-gray-400"><p class="text-sm font-semibold">No hay productos disponibles en el catálogo por el momento.</p></div>';
+        return;
+      }
 
       let sortedProducts = [...products];
       if (starProductId) {
@@ -716,7 +719,6 @@
       window.open(`https://wa.me/${vendorPhone}?text=${encodeURIComponent(text)}`, '_blank');
     }
 
-    // NAVEGACIÓN INTERNA RESPONSIVE
     function renderNavigation() {
       const navTabs = document.getElementById('navTabs');
       if (!navTabs || !currentUser) return;
@@ -767,7 +769,6 @@
       else if (tabName === 'vendor_inv') renderPOSSection(main, 'vendor');
     }
 
-    // DASHBOARD PERSONALIZADO POR PERFIL
     function renderDashboardTab(container) {
       const lowStockProducts = products.filter(p => Number(p.stock) < 3);
       const visibleSales = getVisibleSales();
@@ -827,13 +828,12 @@
       `;
     }
 
-    // INVENTARIO MAESTRO CON PRODUCTO ESTRELLA
     function renderInventoryTab(container) {
       const totalExpected = products.reduce((acc, p) => acc + (Number(p.price || 0) * Number(p.stock || 0)), 0);
       const totalCost = products.reduce((acc, p) => acc + (Number(p.cost || 0) * Number(p.stock || 0)), 0);
       const totalUtility = totalExpected - totalCost;
 
-      const starProduct = products.find(p => p.id === starProductId) || products[0];
+      const starProduct = products.find(p => p.id === starProductId) || (products.length > 0 ? products[0] : null);
 
       container.innerHTML = `
         <div class="space-y-4 md:space-y-6">
@@ -897,6 +897,7 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-100 text-xs md:text-sm">
+                ${products.length === 0 ? '<tr><td colspan="7" class="p-6 text-center text-gray-400">El inventario maestro está vacío. Agrega un producto para comenzar.</td></tr>' : ''}
                 ${products.map(p => `
                   <tr>
                     <td class="p-3.5 md:p-4"><img src="${p.img || 'https://via.placeholder.com/50'}" class="w-10 h-10 md:w-12 md:h-12 object-cover rounded-2xl border bg-gray-50"></td>
@@ -1033,7 +1034,6 @@
       }
     }
 
-    // PUNTO DE VENTA (FACTURA UNIFICADA CON TODOS LOS PRODUCTOS + ABONO INICIAL / FIADO / PAGADO COMPLETO)
     function renderPOSSection(container, mode) {
       const weeklyGoal = mode === 'admin' ? 300000 : 100000;
       const mySales = getVisibleSales();
@@ -1071,7 +1071,7 @@
             <div class="lg:col-span-2 space-y-3">
               <h2 class="text-lg md:text-xl font-extrabold text-gray-900">Seleccionar Productos para Facturar</h2>
               <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                ${products.length === 0 ? '<p class="text-gray-400 text-xs">No hay productos registrados.</p>' : ''}
+                ${products.length === 0 ? '<p class="col-span-full text-gray-400 text-xs py-4 text-center">No hay productos en el inventario.</p>' : ''}
                 ${products.map(p => `
                   <div onclick="posAddToCart('${p.id}')" class="glass-card p-3 rounded-2xl border ${p.id === starProductId ? 'border-2 border-[#ff00bf]' : 'border-pink-100'} shadow-2xs cursor-pointer hover:border-pink-300 transition flex flex-col justify-between relative active:scale-95">
                     ${p.id === starProductId ? '<span class="absolute top-2 left-2 bg-[#ff00bf] text-white text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase"><i class="fa-solid fa-star"></i> Estrella</span>' : ''}
@@ -1107,7 +1107,6 @@
                     </select>
                   </div>
 
-                  <!-- CAMPO DINÁMICO PARA ABONO INICIAL -->
                   <div id="posAbonoContainer" class="hidden bg-pink-50 p-3 rounded-2xl border border-pink-200 space-y-2">
                     <div>
                       <label class="block text-[11px] font-bold text-gray-700 mb-1">¿Cuánto abona hoy? ($)</label>
@@ -1248,7 +1247,6 @@
       renderPOSCart();
     }
 
-    // REGISTRO DE FACTURA UNIFICADA (TODOS LOS PRODUCTOS EN UN MISMO REGISTRO)
     function completePOSSale() {
       if (posCart.length === 0) {
         alert('Agrega al menos un producto a la factura.');
@@ -1288,7 +1286,6 @@
         ? totalFactura
         : (status === 'Abono Inicial' ? abonoInicial : 0);
 
-      // Construir el detalle completo de todos los productos de la factura
       let totalCostoFactura = 0;
       const itemsDetalle = posCart.map(item => {
         const prodRef = products.find(p => p.id === item.id);
@@ -1314,7 +1311,6 @@
       const comisionFactura = utilidadFactura > 0 ? utilidadFactura * 0.35 : 0;
       const fechaHoy = new Date().toLocaleDateString();
 
-      // Actualizar deuda e historial del cliente si aplica
       if (clientObj) {
         if (!Array.isArray(clientObj.history)) clientObj.history = [];
 
@@ -1350,7 +1346,6 @@
         }
       }
 
-      // Guardar UNA SOLA FACTURA con todos los productos incluidos
       sales.unshift({
         id: Date.now().toString() + '_' + Math.random().toString(36).substr(2, 4),
         vendor: currentUser.user,
@@ -1402,7 +1397,6 @@
       showToast('Factura actualizada.');
     }
 
-    // RECIBO PDF COMPLETO CON TODOS LOS PRODUCTOS DE LA FACTURA
     function generateReceiptPDF(saleId) {
       const s = sales.find(x => x.id === saleId);
       if (!s) return;
@@ -1461,7 +1455,6 @@
       setTimeout(() => win.print(), 500);
     }
 
-    // ENVÍO DE FACTURA COMPLETA POR WHATSAPP (TODOS LOS PRODUCTOS + TOTAL + ABONO/SALDO)
     function sendReceiptWhatsApp(saleId) {
       const s = sales.find(x => x.id === saleId);
       if (!s) return;
@@ -1495,7 +1488,6 @@
 
       text += `\n\n¡Gracias por confiar en Jema_makeup! 💖`;
 
-      // Si el cliente tiene celular guardado, abrir directamente su chat de WhatsApp
       const clientObj = clients.find(c => c.id === s.clientId || (c.name || '').toLowerCase() === (s.clientName || '').toLowerCase());
       let rawPhone = (s.clientPhone || (clientObj ? clientObj.phone : '') || '').replace(/\D/g, '');
       if (rawPhone.length === 10 && rawPhone.startsWith('3')) {
@@ -1509,7 +1501,6 @@
       window.open(waUrl, '_blank');
     }
 
-    // DASHBOARD ADMIN, RANKING Y FILTRO DETALLADO POR VENDEDOR
     function filterAnalyticsByVendor(vendorUser) {
       selectedAnalyticsVendor = vendorUser;
       renderAnalyticsTab(document.getElementById('mainContent'));
@@ -1644,7 +1635,6 @@
       `;
     }
 
-    // CONTROL DE PAGOS MENSUALES
     function renderPaymentsTab(container) {
       const vendors = users.filter(u => u.role === 'vendor' || u.role === 'admin');
       const years = [2026, 2027, 2028];
@@ -1695,7 +1685,6 @@
       }
     }
 
-    // CLIENTES CON ESTADO DE PAGO / ABONOS Y ENVÍO COMPLETO DE FACTURAS POR WHATSAPP
     function renderClientsTab(container) {
       const isAdmin = currentUser.role === 'admin';
       const visibleClients = getVisibleClients();
@@ -1956,7 +1945,6 @@
       }
     }
 
-    // ENCARGOS PRIVADOS POR VENDEDORA (GLOBAL SOLO PARA ADMIN, SOLO PRODUCTO Y CANTIDAD)
     function renderCustomOrdersTab(container) {
       const isAdmin = currentUser.role === 'admin';
       const visibleOrders = getVisibleCustomOrders();
@@ -2042,7 +2030,6 @@
       }
     }
 
-    // GESTIÓN DE USUARIOS
     function renderUsersTab(container) {
       container.innerHTML = `
         <div class="space-y-4 md:space-y-6">
