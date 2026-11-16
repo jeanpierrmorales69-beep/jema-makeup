@@ -10,9 +10,8 @@
   <!-- FIREBASE SDK (Modular v10 CDN) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // Credenciales de tu proyecto JemaMakeupDB[cite: 5, 6]
     const firebaseConfig = {
       apiKey: "AIzaSyBzYoM4RsZE1VwJRD_lFIQ8ub9pzCWzA4",
       authDomain: "jemamakeupdb.firebaseapp.com",
@@ -31,6 +30,7 @@
     window.dbRef = ref;
     window.dbSet = set;
     window.dbGet = get;
+    window.dbOnValue = onValue;
 
     window.dispatchEvent(new Event('firebase-ready'));
   </script>
@@ -347,7 +347,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT PRINCIPAL CON FIREBASE -->
+  <!-- SCRIPT PRINCIPAL CON FIREBASE Y TIEMPO REAL -->
   <script>
     function safeParse(key, fallback) {
       try {
@@ -388,7 +388,7 @@
     let sales = safeParse('jm_sales', []);
     let customOrders = safeParse('jm_custom_orders', []);
 
-    // Sincronización automática con Firebase
+    // Función unificada de guardado en la nube con Firebase
     async function saveData() {
       try {
         localStorage.setItem('jm_users', JSON.stringify(users));
@@ -411,10 +411,10 @@
       }
     }
 
-    window.addEventListener('firebase-ready', async function() {
-      if (window.db && window.dbRef && window.dbGet) {
-        try {
-          const snapshot = await window.dbGet(window.dbRef(window.db, 'jemamakeup/data'));
+    // Sincronización automática en tiempo real entre dispositivos
+    window.addEventListener('firebase-ready', function() {
+      if (window.db && window.dbRef && window.dbOnValue) {
+        window.dbOnValue(window.dbRef(window.db, 'jemamakeup/data'), (snapshot) => {
           if (snapshot.exists()) {
             const cloudData = snapshot.val();
             if (cloudData.users) users = cloudData.users;
@@ -422,10 +422,19 @@
             if (cloudData.clients) clients = cloudData.clients;
             if (cloudData.sales) sales = cloudData.sales;
             if (cloudData.customOrders) customOrders = cloudData.customOrders;
+
+            // Actualizar vista actual según el estado
+            if (currentUser) {
+              const activeTabEl = document.querySelector('.tab-btn.bg-pink-100');
+              if (activeTabEl) {
+                switchTab(activeTabEl.getAttribute('data-tab'));
+              }
+            } else {
+              renderPublicCatalog();
+              populateVendorDropdown();
+            }
           }
-        } catch (e) {
-          console.warn('Usando datos locales por error de red con Firebase:', e);
-        }
+        });
       }
       setupFileInput();
       initPublicView();
@@ -437,7 +446,6 @@
     });
 
     function initPublicView() {
-      // Siempre iniciamos mostrando el catálogo público por defecto
       currentUser = null;
       document.getElementById('publicCatalogSection').classList.remove('hidden');
       document.getElementById('appSection').classList.add('hidden');
@@ -1138,7 +1146,7 @@
       window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
     }
 
-    // DASHBOARD ADMIN, RANKING Y FILTRO DETALLADO POR VENDEDOR (EXCLUSIVO ADMIN)
+    // DASHBOARD ADMIN, RANKING Y FILTRO DETALLADO POR VENDEDOR
     function filterAnalyticsByVendor(vendorUser) {
       selectedAnalyticsVendor = vendorUser;
       renderAnalyticsTab(document.getElementById('mainContent'));
@@ -1202,7 +1210,7 @@
             }).join('')}
           </div>
 
-          <!-- AUDITORÍA Y FILTRO POR VENDEDOR (EXCLUSIVO ADMINISTRACIÓN) -->
+          <!-- AUDITORÍA Y FILTRO POR VENDEDOR -->
           <div class="glass-card p-6 rounded-3xl border border-pink-200 shadow-sm space-y-6">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-pink-100 pb-4">
               <div>
@@ -1432,7 +1440,7 @@
     function deleteClient(clientId) {
       if (confirm('¿Estás segura de eliminar este cliente?')) {
         clients = clients.filter(x => x.id !== clientId);
-        saveData();
+        saveData(); // <--- Sincroniza inmediatamente con Firebase
         renderClientsTab(document.getElementById('mainContent'));
         showToast('Cliente eliminado.');
       }
@@ -1455,7 +1463,7 @@
       } else {
         clients.push({ id: Date.now().toString(), name, phone, debt: 0 });
       }
-      saveData();
+      saveData(); // <--- Sincroniza inmediatamente con Firebase
       closeClientModal();
       renderClientsTab(document.getElementById('mainContent'));
       showToast(id ? 'Cliente actualizado.' : 'Cliente guardado.');
@@ -1468,7 +1476,7 @@
       const monto = parseFloat(montoStr);
       if (!isNaN(monto) && monto > 0) {
         c.debt = Math.max(0, Number(c.debt || 0) - monto);
-        saveData();
+        saveData(); // <--- Sincroniza inmediatamente con Firebase
         renderClientsTab(document.getElementById('mainContent'));
         showToast(`¡Abono registrado! Nuevo saldo: $${c.debt.toLocaleString()}`);
       }
