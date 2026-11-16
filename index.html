@@ -87,7 +87,7 @@
   <!-- PANTALLA DE CARGA INICIAL -->
   <div id="loadingScreen" class="fixed inset-0 bg-[#fff5fa] z-50 flex flex-col items-center justify-center transition-opacity duration-300">
     <div class="w-20 h-20 rounded-3xl bg-white p-2 border-2 border-[#ff00bf] shadow-xl floating-logo flex items-center justify-center mb-4">
-      <img src="logo (5).png" class="w-full h-full object-cover rounded-2xl">
+      <img src="logo (5).png" class="w-full h-full object-contain rounded-2xl">
     </div>
     <h2 class="text-pink-main font-extrabold text-lg tracking-wider animate-pulse">JEMA_MAKEUP</h2>
     <p class="text-gray-400 text-xs mt-1">Sincronizando experiencia exclusiva...</p>
@@ -104,7 +104,7 @@
     <header class="glass-card shadow-xs p-3.5 md:p-4 sticky top-0 z-30 border-b border-pink-100">
       <div class="max-w-7xl mx-auto flex justify-between items-center">
         <div class="flex items-center space-x-2.5">
-          <img src="logo (5).png" alt="Jema Makeup" class="w-10 h-10 md:w-12 md:h-12 rounded-2xl object-cover floating-logo border-2 border-[#ff00bf] shadow-sm bg-white">
+          <img src="logo (5).png" alt="Jema Makeup" class="w-10 h-10 md:w-12 md:h-12 rounded-2xl object-contain floating-logo border-2 border-[#ff00bf] shadow-sm bg-white p-0.5">
           <div>
             <h1 class="text-base md:text-xl font-extrabold text-pink-main tracking-wide leading-none">JEMA_MAKEUP</h1>
             <p class="text-[9px] md:text-[10px] text-gray-400 uppercase tracking-widest font-semibold mt-0.5">Luxury Cosmetics</p>
@@ -196,7 +196,7 @@
       
       <div class="text-center mb-5">
         <div class="inline-block p-2 rounded-3xl bg-pink-50 border-2 border-[#ff00bf] mb-2.5 shadow-inner">
-          <img src="logo (5).png" class="w-12 h-12 md:w-14 md:h-14 rounded-2xl object-cover floating-logo bg-white">
+          <img src="logo (5).png" class="w-12 h-12 md:w-14 md:h-14 rounded-2xl object-contain floating-logo bg-white p-0.5">
         </div>
         <h2 class="text-xl md:text-2xl font-extrabold text-pink-main">Acceso Personal</h2>
         <p class="text-gray-400 text-[11px] mt-0.5">Área exclusiva para administradores y vendedoras</p>
@@ -232,8 +232,8 @@
     <header class="glass-card shadow-xs border-b border-pink-200 no-print sticky top-0 z-30">
       <div class="max-w-7xl mx-auto px-4 py-2.5 md:py-3 flex items-center justify-between">
         <div class="flex items-center space-x-2.5">
-          <div id="userAvatarHeader" class="w-10 h-10 md:w-11 md:h-11 rounded-2xl border-2 border-[#ff00bf] overflow-hidden floating-logo bg-white shadow-sm flex items-center justify-center">
-            <img src="logo (5).png" alt="Logo" class="w-full h-full object-cover">
+          <div id="userAvatarHeader" class="w-10 h-10 md:w-11 md:h-11 rounded-2xl border-2 border-[#ff00bf] overflow-hidden floating-logo bg-white shadow-sm flex items-center justify-center p-0.5">
+            <img src="logo (5).png" alt="Logo" class="w-full h-full object-contain">
           </div>
           <div>
             <span id="userNameHeader" class="font-extrabold text-gray-900 text-sm md:text-base block leading-tight">Mari</span>
@@ -254,7 +254,7 @@
     <main class="flex-1 max-w-7xl w-full mx-auto p-3.5 md:p-8" id="mainContent"></main>
   </div>
 
-  <!-- MODAL PRODUCTO (CON SELECTOR/CREADOR DE CATEGORÍA O MARCA) -->
+  <!-- MODAL PRODUCTO -->
   <div id="productModal" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-end md:items-center justify-center p-0 md:p-4 z-50">
     <div class="bg-white rounded-t-3xl md:rounded-3xl p-5 md:p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto border border-pink-200">
       <div class="flex justify-between items-center mb-3">
@@ -297,8 +297,8 @@
           <label class="block text-[11px] font-bold text-gray-600 mb-1 uppercase tracking-wider">Imagen (PNG / JPG)</label>
           <input type="file" id="prodImgFile" accept="image/*" class="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-pink-50 file:text-pink-main hover:file:bg-pink-100">
           <input type="hidden" id="prodImgBase64">
-          <div id="imgPreviewContainer" class="mt-2 hidden">
-            <img id="imgPreview" src="" class="w-16 h-16 object-cover rounded-xl border border-pink-200">
+          <div id="imgPreviewContainer" class="mt-2 hidden bg-pink-50/50 p-2 rounded-2xl border border-pink-200 flex justify-center">
+            <img id="imgPreview" src="" class="max-h-32 object-contain rounded-xl">
           </div>
         </div>
         <div class="flex justify-end space-x-2 pt-2">
@@ -621,7 +621,7 @@
       select.innerHTML = vendors.map(v => `<option value="${v.phone || '573112210988'}">${v.name} (${v.role === 'admin' ? 'Admin' : 'Vendedora'})</option>`).join('');
     }
 
-    // RENDERIZAR CATÁLOGO PÚBLICO CON FILTROS DE CATEGORÍA Y BUSCADOR
+    // RENDERIZAR CATÁLOGO PÚBLICO CON ADAPTACIÓN DE IMÁGENES
     function renderPublicCatalog() {
       renderCategoryFiltersHTML();
       filterPublicCatalog();
@@ -681,10 +681,10 @@
         const isStar = (p.id === starProductId && selectedPublicCategory === 'ALL' && searchTerm === '');
         return `
           <div class="glass-card p-3 md:p-4 rounded-3xl shadow-xs flex flex-col justify-between border ${isStar ? 'border-2 border-[#ff00bf] ring-2 ring-pink-100' : 'border-pink-200'} hover:shadow-md transition relative">
-            ${isStar ? '<span class="absolute -top-2.5 left-3 bg-gradient-to-r from-pink-500 to-[#ff00bf] text-white text-[9px] font-extrabold px-2.5 py-0.5 rounded-full uppercase shadow-xs flex items-center gap-1"><i class="fa-solid fa-star"></i> Estrella</span>' : ''}
+            ${isStar ? '<span class="absolute -top-2.5 left-3 bg-gradient-to-r from-pink-500 to-[#ff00bf] text-white text-[9px] font-extrabold px-2.5 py-0.5 rounded-full uppercase shadow-xs flex items-center gap-1 z-10"><i class="fa-solid fa-star"></i> Estrella</span>' : ''}
             <div>
-              <div class="relative mb-2.5 mt-0.5">
-                <img src="${p.img || 'https://via.placeholder.com/150'}" class="w-full h-36 md:h-40 object-cover rounded-2xl border border-pink-100 bg-gray-50">
+              <div class="relative mb-2.5 mt-0.5 bg-pink-50/40 rounded-2xl border border-pink-100 p-2 flex items-center justify-center h-40 md:h-44">
+                <img src="${p.img || 'https://via.placeholder.com/150'}" class="max-h-full max-w-full object-contain drop-shadow-sm rounded-xl">
                 <span class="absolute top-2 left-2 bg-white/90 backdrop-blur-xs text-pink-main text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase shadow-2xs">${p.category || 'General'}</span>
                 ${p.stock <= 0 ? '<span class="absolute top-2 right-2 bg-red-500 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase">Agotado</span>' : '<span class="absolute top-2 right-2 bg-green-500 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase">Disponible</span>'}
               </div>
@@ -731,7 +731,9 @@
         container.innerHTML = cart.map((item, index) => `
           <div class="flex justify-between items-center text-xs md:text-sm border-b border-gray-100 pb-2.5">
             <div class="flex items-center gap-2.5">
-              <img src="${item.img || 'https://via.placeholder.com/40'}" class="w-10 h-10 object-cover rounded-xl border">
+              <div class="w-12 h-12 bg-pink-50/50 rounded-xl border border-pink-100 p-1 flex items-center justify-center flex-shrink-0">
+                <img src="${item.img || 'https://via.placeholder.com/40'}" class="max-h-full max-w-full object-contain">
+              </div>
               <div>
                 <h5 class="font-bold text-gray-800 text-xs">${item.name}</h5>
                 <p class="text-[11px] text-gray-500">Cant: ${item.qty} x $${Number(item.price || 0).toLocaleString()}</p>
@@ -838,8 +840,8 @@
               <h1 class="text-2xl md:text-4xl font-extrabold text-gray-900">¡Bienvenid@, ${currentUser.name || currentUser.user}! ✨</h1>
               <p class="text-gray-500 text-xs md:text-sm">Todo listo para seguir brillando y alcanzando las metas de la semana.</p>
             </div>
-            <div class="w-16 h-16 md:w-20 md:h-20 rounded-3xl bg-white flex items-center justify-center shadow-md border-2 border-[#ff00bf] floating-logo overflow-hidden flex-shrink-0">
-              <img src="logo (5).png" class="w-full h-full object-cover">
+            <div class="w-16 h-16 md:w-20 md:h-20 rounded-3xl bg-white flex items-center justify-center shadow-md border-2 border-[#ff00bf] floating-logo overflow-hidden flex-shrink-0 p-1">
+              <img src="logo (5).png" class="w-full h-full object-contain">
             </div>
           </div>
 
@@ -895,8 +897,8 @@
           <div class="glass-card p-4 md:p-6 rounded-3xl border-2 border-[#ff00bf] shadow-sm bg-gradient-to-r from-pink-50/80 via-white to-pink-50/40">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
               <div class="flex items-center gap-3 md:gap-4">
-                <div class="w-14 h-14 md:w-16 md:h-16 rounded-2xl overflow-hidden border-2 border-[#ff00bf] shadow-xs bg-white flex-shrink-0">
-                  <img src="${starProduct ? (starProduct.img || 'https://via.placeholder.com/100') : 'https://via.placeholder.com/100'}" class="w-full h-full object-cover">
+                <div class="w-14 h-14 md:w-16 md:h-16 rounded-2xl overflow-hidden border-2 border-[#ff00bf] shadow-xs bg-white flex-shrink-0 p-1 flex items-center justify-center">
+                  <img src="${starProduct ? (starProduct.img || 'https://via.placeholder.com/100') : 'https://via.placeholder.com/100'}" class="max-h-full max-w-full object-contain">
                 </div>
                 <div>
                   <span class="px-2.5 py-0.5 bg-pink-main text-white font-extrabold text-[9px] md:text-[10px] rounded-full uppercase tracking-wider inline-flex items-center gap-1 shadow-2xs mb-1">
@@ -955,7 +957,11 @@
                 ${products.length === 0 ? '<tr><td colspan="7" class="p-6 text-center text-gray-400">El inventario maestro está vacío. Agrega un producto para comenzar.</td></tr>' : ''}
                 ${products.map(p => `
                   <tr>
-                    <td class="p-3.5 md:p-4"><img src="${p.img || 'https://via.placeholder.com/50'}" class="w-10 h-10 md:w-12 md:h-12 object-cover rounded-2xl border bg-gray-50"></td>
+                    <td class="p-3.5 md:p-4">
+                      <div class="w-12 h-12 md:w-14 md:h-14 bg-pink-50/50 rounded-2xl border border-pink-200 p-1 flex items-center justify-center">
+                        <img src="${p.img || 'https://via.placeholder.com/50'}" class="max-h-full max-w-full object-contain rounded-xl">
+                      </div>
+                    </td>
                     <td class="p-3.5 md:p-4 font-bold text-gray-900">
                       ${p.name} 
                       ${p.id === starProductId ? '<span class="ml-1.5 px-2 py-0.5 bg-pink-100 text-pink-main text-[9px] font-extrabold rounded-full">⭐ Estrella</span>' : ''}
@@ -1022,7 +1028,6 @@
       document.getElementById('modalUtilityPreview').innerText = `$${utility.toLocaleString()}`;
     }
 
-    // LÓGICA DE CATEGORÍAS EN MODAL DE PRODUCTO
     function checkCustomCategory(val) {
       const customInput = document.getElementById('prodCategoryCustom');
       if (!customInput) return;
@@ -1174,9 +1179,11 @@
                 ${products.length === 0 ? '<p class="col-span-full text-gray-400 text-xs py-4 text-center">No hay productos en el inventario.</p>' : ''}
                 ${products.map(p => `
                   <div onclick="posAddToCart('${p.id}')" class="glass-card p-3 rounded-2xl border ${p.id === starProductId ? 'border-2 border-[#ff00bf]' : 'border-pink-100'} shadow-2xs cursor-pointer hover:border-pink-300 transition flex flex-col justify-between relative active:scale-95">
-                    ${p.id === starProductId ? '<span class="absolute top-2 left-2 bg-[#ff00bf] text-white text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase"><i class="fa-solid fa-star"></i> Estrella</span>' : ''}
+                    ${p.id === starProductId ? '<span class="absolute top-2 left-2 bg-[#ff00bf] text-white text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase z-10"><i class="fa-solid fa-star"></i> Estrella</span>' : ''}
                     <div>
-                      <img src="${p.img || 'https://via.placeholder.com/100'}" class="w-full h-24 object-cover rounded-xl mb-2 mt-0.5 bg-gray-50">
+                      <div class="w-full h-28 bg-pink-50/40 rounded-xl mb-2 mt-0.5 border border-pink-100 p-1.5 flex items-center justify-center">
+                        <img src="${p.img || 'https://via.placeholder.com/100'}" class="max-h-full max-w-full object-contain rounded-lg">
+                      </div>
                       <span class="text-[9px] text-pink-main font-bold block mb-0.5">${p.category || 'General'}</span>
                       <h5 class="font-bold text-xs text-gray-900 line-clamp-1">${p.name}</h5>
                       <p class="text-pink-main font-extrabold text-xs md:text-sm mt-0.5">$${Number(p.price || 0).toLocaleString()}</p>
@@ -1330,7 +1337,12 @@
       } else {
         container.innerHTML = posCart.map((item, index) => `
           <div class="flex justify-between items-center text-xs border-b border-gray-50 pb-1.5">
-            <span>${item.qty}x ${item.name}</span>
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 bg-pink-50/50 rounded-lg border border-pink-100 p-0.5 flex items-center justify-center flex-shrink-0">
+                <img src="${item.img || 'https://via.placeholder.com/30'}" class="max-h-full max-w-full object-contain">
+              </div>
+              <span>${item.qty}x ${item.name}</span>
+            </div>
             <div class="flex items-center gap-2">
               <span class="font-bold text-pink-main">$${(item.price * item.qty).toLocaleString()}</span>
               <button onclick="posRemoveItem(${index})" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-xmark"></i></button>
