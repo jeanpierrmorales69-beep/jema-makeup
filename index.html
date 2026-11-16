@@ -122,16 +122,28 @@
       </div>
     </header>
 
-    <main class="max-w-7xl mx-auto p-3.5 md:p-8 flex-1 w-full">
-      <div class="glass-card p-5 md:p-6 rounded-3xl shadow-xs mb-6 flex flex-col md:flex-row justify-between items-center gap-3 border border-pink-200">
+    <main class="max-w-7xl mx-auto p-3.5 md:p-8 flex-1 w-full space-y-6">
+      <div class="glass-card p-5 md:p-6 rounded-3xl shadow-xs flex flex-col md:flex-row justify-between items-center gap-3 border border-pink-200">
         <div>
           <span class="text-[11px] font-bold text-pink-main uppercase tracking-wider block mb-0.5">Experiencia Exclusiva</span>
           <h2 class="text-xl md:text-2xl font-extrabold text-gray-900">Catálogo de Alta Gama</h2>
-          <p class="text-gray-500 text-xs md:text-sm mt-0.5">Selecciona tus productos, elige tu asesora preferida y envía tu pedido directamente a su WhatsApp.</p>
+          <p class="text-gray-500 text-xs md:text-sm mt-0.5">Busca tus productos, filtra por categoría, selecciona tu asesora y envía tu pedido a WhatsApp.</p>
         </div>
         <div class="flex items-center gap-2 bg-pink-50 px-3.5 py-2 rounded-2xl border border-pink-200 w-full md:w-auto justify-center">
           <i class="fa-solid fa-sparkles text-pink-main text-xs"></i>
           <span class="text-[11px] font-semibold text-gray-700">Belleza sin límites</span>
+        </div>
+      </div>
+
+      <!-- BARRA DE BÚSQUEDA Y FILTROS POR CATEGORÍA -->
+      <div class="glass-card p-4 md:p-5 rounded-3xl shadow-xs border border-pink-200 space-y-3.5">
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          <input type="text" id="publicSearchInput" oninput="filterPublicCatalog()" placeholder="Buscar producto por nombre..." class="w-full pl-11 pr-4 py-3 rounded-2xl border border-pink-200 text-xs md:text-sm bg-white focus:ring-2 focus:ring-[#ff00bf] outline-none">
+        </div>
+        <div>
+          <span class="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest block mb-2">Filtrar por Categoría / Marca:</span>
+          <div id="publicCategoryFilters" class="flex overflow-x-auto space-x-2 pb-1 no-scrollbar"></div>
         </div>
       </div>
 
@@ -235,7 +247,6 @@
       </div>
     </header>
 
-    <!-- NAVEGACIÓN MÓVIL OPTIMIZADA -->
     <nav class="bg-white border-b border-pink-100 no-print shadow-2xs sticky top-[57px] md:top-[65px] z-20">
       <div class="max-w-7xl mx-auto px-3 flex overflow-x-auto space-x-2 py-2 no-scrollbar" id="navTabs"></div>
     </nav>
@@ -243,7 +254,7 @@
     <main class="flex-1 max-w-7xl w-full mx-auto p-3.5 md:p-8" id="mainContent"></main>
   </div>
 
-  <!-- MODAL PRODUCTO -->
+  <!-- MODAL PRODUCTO (CON SELECTOR/CREADOR DE CATEGORÍA O MARCA) -->
   <div id="productModal" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-end md:items-center justify-center p-0 md:p-4 z-50">
     <div class="bg-white rounded-t-3xl md:rounded-3xl p-5 md:p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto border border-pink-200">
       <div class="flex justify-between items-center mb-3">
@@ -255,6 +266,14 @@
         <div>
           <label class="block text-[11px] font-bold text-gray-600 mb-1 uppercase tracking-wider">Nombre del Producto</label>
           <input type="text" id="prodName" required class="w-full px-3.5 py-2.5 rounded-xl border border-pink-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff00bf] outline-none">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-gray-600 mb-1 uppercase tracking-wider">Categoría / Marca</label>
+          <select id="prodCategorySelect" onchange="checkCustomCategory(this.value)" class="w-full px-3.5 py-2.5 rounded-xl border border-pink-200 text-xs md:text-sm bg-white font-bold text-pink-main mb-2 focus:outline-none focus:border-[#ff00bf]">
+            <option value="General">General / Sin Marca</option>
+            <option value="NEW_CAT">➕ Crear nueva categoría...</option>
+          </select>
+          <input type="text" id="prodCategoryCustom" placeholder="Escribe el nombre de la nueva categoría o marca" class="hidden w-full px-3.5 py-2.5 rounded-xl border border-pink-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff00bf] outline-none">
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
@@ -340,7 +359,7 @@
     </div>
   </div>
 
-  <!-- MODAL NUEVO ENCARGO (SOLO PRODUCTO Y CANTIDAD) -->
+  <!-- MODAL NUEVO ENCARGO -->
   <div id="customOrderModal" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-end md:items-center justify-center p-0 md:p-4 z-50">
     <div class="bg-white rounded-t-3xl md:rounded-3xl p-5 md:p-6 w-full max-w-md shadow-2xl border border-pink-200">
       <div class="flex justify-between items-center mb-3">
@@ -411,15 +430,13 @@
     let cart = [];
     let posCart = [];
     let selectedAnalyticsVendor = 'ALL';
+    let selectedPublicCategory = 'ALL';
 
     let users = [
       { id: '1', user: 'mari', pass: '1234', role: 'admin', name: 'Mari', phone: '573112210988', avatar: 'fa-crown', paidMonth: {} }
     ];
-    
-    // Lista inicial vacía por defecto para evitar productos fantasma al borrar todo
     let products = [];
     let starProductId = null;
-
     let clients = [
       { id: '1', name: 'Camila Torres', phone: '3001234567', debt: 0, owner: 'mari', ownerName: 'Mari', history: [] }
     ];
@@ -479,7 +496,6 @@
           if (snapshot.exists()) {
             const cloudData = snapshot.val();
             if (cloudData.users) users = cloudData.users;
-            // Se lee estrictamente lo que hay en la base de datos sin rellenar con productos por defecto
             if (cloudData.products !== undefined) products = cloudData.products;
             if (cloudData.clients) clients = cloudData.clients;
             if (cloudData.sales) sales = cloudData.sales;
@@ -605,17 +621,55 @@
       select.innerHTML = vendors.map(v => `<option value="${v.phone || '573112210988'}">${v.name} (${v.role === 'admin' ? 'Admin' : 'Vendedora'})</option>`).join('');
     }
 
+    // RENDERIZAR CATÁLOGO PÚBLICO CON FILTROS DE CATEGORÍA Y BUSCADOR
     function renderPublicCatalog() {
+      renderCategoryFiltersHTML();
+      filterPublicCatalog();
+    }
+
+    function renderCategoryFiltersHTML() {
+      const catContainer = document.getElementById('publicCategoryFilters');
+      if (!catContainer) return;
+
+      const categories = ['ALL', ...new Set(products.map(p => p.category || 'General'))];
+
+      catContainer.innerHTML = categories.map(cat => {
+        const isActive = selectedPublicCategory === cat;
+        const displayName = cat === 'ALL' ? '🌟 Todas' : cat;
+        return `
+          <button onclick="setPublicCategory('${cat}')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition shadow-2xs ${isActive ? 'bg-pink-main text-white shadow-sm' : 'bg-white text-gray-700 border border-pink-200 hover:bg-pink-50'}">
+            ${displayName}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function setPublicCategory(cat) {
+      selectedPublicCategory = cat;
+      renderCategoryFiltersHTML();
+      filterPublicCatalog();
+    }
+
+    function filterPublicCatalog() {
       const grid = document.getElementById('publicProductGrid');
+      const searchInput = document.getElementById('publicSearchInput');
       if (!grid) return;
 
-      if (products.length === 0) {
-        grid.innerHTML = '<div class="col-span-full py-12 text-center text-gray-400"><p class="text-sm font-semibold">No hay productos disponibles en el catálogo por el momento.</p></div>';
+      const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+      let filtered = products.filter(p => {
+        const matchesCategory = (selectedPublicCategory === 'ALL' || (p.category || 'General') === selectedPublicCategory);
+        const matchesSearch = p.name.toLowerCase().includes(searchTerm) || (p.category || '').toLowerCase().includes(searchTerm);
+        return matchesCategory && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div class="col-span-full py-12 text-center text-gray-400"><p class="text-sm font-semibold">No se encontraron productos con esos criterios.</p></div>';
         return;
       }
 
-      let sortedProducts = [...products];
-      if (starProductId) {
+      let sortedProducts = [...filtered];
+      if (starProductId && selectedPublicCategory === 'ALL' && searchTerm === '') {
         const idx = sortedProducts.findIndex(p => p.id === starProductId);
         if (idx > -1) {
           const star = sortedProducts.splice(idx, 1)[0];
@@ -624,13 +678,14 @@
       }
 
       grid.innerHTML = sortedProducts.map(p => {
-        const isStar = (p.id === starProductId);
+        const isStar = (p.id === starProductId && selectedPublicCategory === 'ALL' && searchTerm === '');
         return `
           <div class="glass-card p-3 md:p-4 rounded-3xl shadow-xs flex flex-col justify-between border ${isStar ? 'border-2 border-[#ff00bf] ring-2 ring-pink-100' : 'border-pink-200'} hover:shadow-md transition relative">
             ${isStar ? '<span class="absolute -top-2.5 left-3 bg-gradient-to-r from-pink-500 to-[#ff00bf] text-white text-[9px] font-extrabold px-2.5 py-0.5 rounded-full uppercase shadow-xs flex items-center gap-1"><i class="fa-solid fa-star"></i> Estrella</span>' : ''}
             <div>
               <div class="relative mb-2.5 mt-0.5">
                 <img src="${p.img || 'https://via.placeholder.com/150'}" class="w-full h-36 md:h-40 object-cover rounded-2xl border border-pink-100 bg-gray-50">
+                <span class="absolute top-2 left-2 bg-white/90 backdrop-blur-xs text-pink-main text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase shadow-2xs">${p.category || 'General'}</span>
                 ${p.stock <= 0 ? '<span class="absolute top-2 right-2 bg-red-500 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase">Agotado</span>' : '<span class="absolute top-2 right-2 bg-green-500 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase">Disponible</span>'}
               </div>
               <h4 class="font-bold text-xs md:text-sm text-gray-900 line-clamp-2">${p.name}</h4>
@@ -884,14 +939,14 @@
           </div>
 
           <div class="glass-card rounded-3xl shadow-xs border border-pink-100 overflow-x-auto">
-            <table class="w-full text-left border-collapse min-w-[650px]">
+            <table class="w-full text-left border-collapse min-w-[700px]">
               <thead class="bg-pink-50 text-pink-main text-[11px] uppercase font-extrabold tracking-wider">
                 <tr>
                   <th class="p-3.5 md:p-4">Foto</th>
                   <th class="p-3.5 md:p-4">Producto</th>
+                  <th class="p-3.5 md:p-4">Categoría / Marca</th>
                   <th class="p-3.5 md:p-4">Costo</th>
                   <th class="p-3.5 md:p-4">Precio Venta</th>
-                  <th class="p-3.5 md:p-4">Utilidad Unit.</th>
                   <th class="p-3.5 md:p-4">Stock</th>
                   <th class="p-3.5 md:p-4 no-print">Acciones</th>
                 </tr>
@@ -906,9 +961,9 @@
                       ${p.id === starProductId ? '<span class="ml-1.5 px-2 py-0.5 bg-pink-100 text-pink-main text-[9px] font-extrabold rounded-full">⭐ Estrella</span>' : ''}
                       ${p.stock <= 0 ? '<span class="text-red-500 text-[11px] ml-1.5">(Agotado)</span>' : ''}
                     </td>
+                    <td class="p-3.5 md:p-4"><span class="px-2.5 py-1 bg-pink-50 text-pink-main rounded-full font-bold text-[11px]">${p.category || 'General'}</span></td>
                     <td class="p-3.5 md:p-4 text-gray-600">$${Number(p.cost || 0).toLocaleString()}</td>
                     <td class="p-3.5 md:p-4 text-pink-main font-extrabold">$${Number(p.price || 0).toLocaleString()}</td>
-                    <td class="p-3.5 md:p-4 text-green-600 font-bold">$${(Number(p.price || 0) - Number(p.cost || 0)).toLocaleString()}</td>
                     <td class="p-3.5 md:p-4"><span class="px-2.5 py-1 rounded-full ${p.stock > 0 ? 'bg-pink-50 text-pink-main' : 'bg-red-100 text-red-600'} font-bold text-[11px]">${p.stock} unids</span></td>
                     <td class="p-3.5 md:p-4 space-x-1 no-print whitespace-nowrap">
                       <button onclick="editProduct('${p.id}')" class="text-blue-500 hover:text-blue-700 p-2" title="Editar"><i class="fa-solid fa-pen"></i></button>
@@ -967,6 +1022,43 @@
       document.getElementById('modalUtilityPreview').innerText = `$${utility.toLocaleString()}`;
     }
 
+    // LÓGICA DE CATEGORÍAS EN MODAL DE PRODUCTO
+    function checkCustomCategory(val) {
+      const customInput = document.getElementById('prodCategoryCustom');
+      if (!customInput) return;
+      if (val === 'NEW_CAT') {
+        customInput.classList.remove('hidden');
+        customInput.value = '';
+        customInput.focus();
+      } else {
+        customInput.classList.add('hidden');
+        customInput.value = val;
+      }
+    }
+
+    function populateCategoryDropdown(selectedCat = 'General') {
+      const select = document.getElementById('prodCategorySelect');
+      const customInput = document.getElementById('prodCategoryCustom');
+      if (!select || !customInput) return;
+
+      const existingCategories = [...new Set(products.map(p => p.category || 'General'))];
+      if (!existingCategories.includes('General')) existingCategories.unshift('General');
+
+      let optionsHTML = existingCategories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+      optionsHTML += `<option value="NEW_CAT">➕ Crear nueva categoría...</option>`;
+      select.innerHTML = optionsHTML;
+
+      if (existingCategories.includes(selectedCat)) {
+        select.value = selectedCat;
+        customInput.classList.add('hidden');
+        customInput.value = selectedCat;
+      } else {
+        select.value = 'NEW_CAT';
+        customInput.classList.remove('hidden');
+        customInput.value = selectedCat;
+      }
+    }
+
     function openProductModal(prod = null) {
       document.getElementById('productModalTitle').innerText = prod ? 'Editar Producto' : 'Agregar Nuevo Producto';
       document.getElementById('productId').value = prod ? prod.id : '';
@@ -975,6 +1067,8 @@
       document.getElementById('prodPrice').value = prod ? prod.price : '';
       document.getElementById('prodStock').value = prod ? prod.stock : '';
       document.getElementById('prodImgBase64').value = prod ? prod.img : '';
+      
+      populateCategoryDropdown(prod ? (prod.category || 'General') : 'General');
       calculateModalUtility();
 
       if (prod && prod.img) {
@@ -1000,12 +1094,18 @@
       const stock = parseInt(document.getElementById('prodStock').value);
       const img = document.getElementById('prodImgBase64').value;
 
+      const catSelectVal = document.getElementById('prodCategorySelect').value;
+      let finalCategory = catSelectVal;
+      if (catSelectVal === 'NEW_CAT') {
+        finalCategory = document.getElementById('prodCategoryCustom').value.trim() || 'General';
+      }
+
       if (id) {
         const p = products.find(x => x.id === id);
-        if (p) { p.name = name; p.cost = cost; p.price = price; p.stock = stock; p.img = img; }
+        if (p) { p.name = name; p.category = finalCategory; p.cost = cost; p.price = price; p.stock = stock; p.img = img; }
       } else {
         const newId = Date.now().toString();
-        products.push({ id: newId, name, cost, price, stock, img });
+        products.push({ id: newId, name, category: finalCategory, cost, price, stock, img });
         if (!starProductId) starProductId = newId;
       }
 
@@ -1077,6 +1177,7 @@
                     ${p.id === starProductId ? '<span class="absolute top-2 left-2 bg-[#ff00bf] text-white text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase"><i class="fa-solid fa-star"></i> Estrella</span>' : ''}
                     <div>
                       <img src="${p.img || 'https://via.placeholder.com/100'}" class="w-full h-24 object-cover rounded-xl mb-2 mt-0.5 bg-gray-50">
+                      <span class="text-[9px] text-pink-main font-bold block mb-0.5">${p.category || 'General'}</span>
                       <h5 class="font-bold text-xs text-gray-900 line-clamp-1">${p.name}</h5>
                       <p class="text-pink-main font-extrabold text-xs md:text-sm mt-0.5">$${Number(p.price || 0).toLocaleString()}</p>
                     </div>
