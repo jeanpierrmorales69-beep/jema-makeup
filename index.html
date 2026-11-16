@@ -319,6 +319,27 @@
     </div>
   </div>
 
+  <!-- MODAL HISTORIAL DE ABONOS Y PAGOS DEL CLIENTE -->
+  <div id="clientHistoryModal" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-end md:items-center justify-center p-0 md:p-4 z-50">
+    <div class="bg-white rounded-t-3xl md:rounded-3xl p-5 md:p-6 w-full max-w-lg shadow-2xl max-h-[85vh] flex flex-col border border-pink-200">
+      <div class="flex justify-between items-center mb-3 border-b border-gray-100 pb-3">
+        <div>
+          <h3 id="historyClientTitle" class="text-lg md:text-xl font-extrabold text-pink-main">Estado de Cuenta</h3>
+          <p id="historyClientSubtitle" class="text-xs text-gray-500 mt-0.5"></p>
+        </div>
+        <button onclick="closeClientHistoryModal()" class="text-gray-400 hover:text-gray-600 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div id="clientHistorySummary" class="mb-3"></div>
+
+      <div id="clientHistoryList" class="flex-1 overflow-y-auto space-y-2.5 pr-1"></div>
+
+      <div class="border-t border-gray-100 pt-3 mt-3 flex justify-end gap-2">
+        <button type="button" onclick="closeClientHistoryModal()" class="px-5 py-2.5 rounded-xl bg-gray-900 text-white font-bold text-xs">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL NUEVO ENCARGO (SOLO PRODUCTO Y CANTIDAD) -->
   <div id="customOrderModal" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-end md:items-center justify-center p-0 md:p-4 z-50">
     <div class="bg-white rounded-t-3xl md:rounded-3xl p-5 md:p-6 w-full max-w-md shadow-2xl border border-pink-200">
@@ -383,7 +404,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT PRINCIPAL CON FIREBASE, CLIENTES Y ENCARGOS PRIVADOS POR VENDEDORA -->
+  <!-- SCRIPT PRINCIPAL CON FACTURA UNIFICADA COMPLETA, ABONOS Y ENVÍO POR WHATSAPP -->
   <script>
     let currentUser = null;
     let selectedAvatar = 'fa-crown';
@@ -401,7 +422,7 @@
     ];
     let starProductId = '1';
     let clients = [
-      { id: '1', name: 'Camila Torres', phone: '3001234567', debt: 0, owner: 'mari', ownerName: 'Mari' }
+      { id: '1', name: 'Camila Torres', phone: '3001234567', debt: 0, owner: 'mari', ownerName: 'Mari', history: [] }
     ];
     let sales = [];
     let customOrders = [];
@@ -422,6 +443,18 @@
       if (!currentUser) return [];
       if (currentUser.role === 'admin') return customOrders;
       return customOrders.filter(o => (o.owner || o.author || '').toLowerCase() === (currentUser.user || '').toLowerCase());
+    }
+
+    // Helper para renderizar el listado completo de productos de una factura (compatible con facturas antiguas y unificadas)
+    function formatInvoiceItemsHTML(sale) {
+      if (Array.isArray(sale.items) && sale.items.length > 0) {
+        return `<ul class="space-y-0.5 text-xs">
+          ${sale.items.map(it => `
+            <li>• <span class="font-bold">${it.qty}x</span> ${it.name} <span class="text-gray-400">($${Number(it.subtotal || (it.price * it.qty)).toLocaleString()})</span></li>
+          `).join('')}
+        </ul>`;
+      }
+      return `<span>${sale.product || 'Producto'}</span>`;
     }
 
     async function saveData() {
@@ -777,7 +810,7 @@
             </div>
             <div class="glass-card p-5 md:p-6 rounded-3xl shadow-xs flex items-center justify-between border border-pink-100">
               <div>
-                <span class="text-[10px] md:text-xs font-extrabold text-gray-400 uppercase tracking-widest block">${currentUser.role === 'admin' ? 'Ventas Registradas' : 'Mis Ventas (Cant.)'}</span>
+                <span class="text-[10px] md:text-xs font-extrabold text-gray-400 uppercase tracking-widest block">${currentUser.role === 'admin' ? 'Facturas Registradas' : 'Mis Facturas'}</span>
                 <span class="text-2xl md:text-3xl font-extrabold text-pink-main mt-1 block">${visibleSales.length}</span>
               </div>
               <div class="p-3.5 bg-pink-100 rounded-2xl text-pink-main text-xl md:text-2xl"><i class="fa-solid fa-bag-shopping"></i></div>
@@ -1000,7 +1033,7 @@
       }
     }
 
-    // PUNTO DE VENTA (POS / FACTURACIÓN CON CLIENTES PRIVADOS POR VENDEDORA)
+    // PUNTO DE VENTA (FACTURA UNIFICADA CON TODOS LOS PRODUCTOS + ABONO INICIAL / FIADO / PAGADO COMPLETO)
     function renderPOSSection(container, mode) {
       const weeklyGoal = mode === 'admin' ? 300000 : 100000;
       const mySales = getVisibleSales();
@@ -1055,74 +1088,93 @@
 
             <div class="glass-card p-5 md:p-6 rounded-3xl border border-pink-200 shadow-xs flex flex-col justify-between space-y-4">
               <div>
-                <h3 class="text-base md:text-lg font-extrabold text-pink-main mb-3 flex items-center gap-2"><i class="fa-solid fa-file-invoice-dollar"></i> Factura de Venta</h3>
+                <h3 class="text-base md:text-lg font-extrabold text-pink-main mb-3 flex items-center gap-2"><i class="fa-solid fa-file-invoice-dollar"></i> Factura Única</h3>
                 
                 <div class="space-y-3 mb-3">
                   <div>
-                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Mis Clientes</label>
+                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Cliente</label>
                     <select id="posClientSelect" class="w-full px-3 py-2 rounded-xl border text-xs bg-white font-semibold focus:outline-none focus:border-[#ff00bf]">
-                      <option value="Cliente Ocasional">Cliente Ocasional</option>
-                      ${myClients.map(c => `<option value="${c.name}">${c.name} (${c.phone})</option>`).join('')}
+                      <option value="">Cliente Ocasional</option>
+                      ${myClients.map(c => `<option value="${c.id}">${c.name} (${c.phone})</option>`).join('')}
                     </select>
                   </div>
                   <div>
-                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Estado de Pago</label>
-                    <select id="posPaymentStatus" class="w-full px-3 py-2 rounded-xl border text-xs bg-white font-bold text-[#ff00bf] focus:outline-none focus:border-[#ff00bf]">
-                      <option value="Pagado">Pagado</option>
-                      <option value="Fiado">Fiado (Crédito)</option>
-                      <option value="Queda debiendo">Queda debiendo</option>
+                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Modalidad de Pago</label>
+                    <select id="posPaymentStatus" onchange="toggleAbonoField()" class="w-full px-3 py-2 rounded-xl border text-xs bg-white font-bold text-[#ff00bf] focus:outline-none focus:border-[#ff00bf]">
+                      <option value="Pagado Completo">Pagado Completo</option>
+                      <option value="Abono Inicial">Abono Inicial (Da una parte)</option>
+                      <option value="Fiado">Fiado (Crédito total)</option>
                     </select>
+                  </div>
+
+                  <!-- CAMPO DINÁMICO PARA ABONO INICIAL -->
+                  <div id="posAbonoContainer" class="hidden bg-pink-50 p-3 rounded-2xl border border-pink-200 space-y-2">
+                    <div>
+                      <label class="block text-[11px] font-bold text-gray-700 mb-1">¿Cuánto abona hoy? ($)</label>
+                      <input type="number" id="posAbonoAmount" oninput="updatePOSBalance()" min="0" placeholder="Ej: 5000" class="w-full px-3 py-2 rounded-xl border border-pink-300 text-xs bg-white font-extrabold text-green-700 focus:outline-none focus:border-[#ff00bf]">
+                    </div>
+                    <div class="flex justify-between items-center text-[11px] font-bold pt-1 border-t border-pink-200">
+                      <span class="text-gray-600">Queda debiendo de esta factura:</span>
+                      <span id="posRemainingDebt" class="text-red-600 font-extrabold">$0</span>
+                    </div>
                   </div>
                 </div>
 
-                <div id="posCartItems" class="space-y-2 max-h-40 overflow-y-auto pr-1 border-t border-b border-gray-100 py-3">
+                <div id="posCartItems" class="space-y-2 max-h-44 overflow-y-auto pr-1 border-t border-b border-gray-100 py-3">
                   <p class="text-xs text-gray-400 text-center">Selecciona productos a la izquierda.</p>
                 </div>
               </div>
 
               <div>
                 <div class="flex justify-between items-center text-base md:text-lg font-extrabold mb-3">
-                  <span>Total:</span>
+                  <span>Total Factura:</span>
                   <span id="posTotalText" class="text-pink-main">$0</span>
                 </div>
-                <button onclick="completePOSSale()" class="w-full py-3 btn-lux font-bold rounded-2xl text-xs md:text-sm shadow-md active:scale-95">Registrar Venta & Facturar</button>
+                <button onclick="completePOSSale()" class="w-full py-3 btn-lux font-bold rounded-2xl text-xs md:text-sm shadow-md active:scale-95">Registrar Factura Completa</button>
               </div>
             </div>
           </div>
 
           <div class="pt-4">
-            <h2 class="text-lg md:text-xl font-extrabold text-gray-900 mb-3">${mode === 'admin' ? 'Historial Global de Ventas' : 'Mis Ventas Realizadas'}</h2>
+            <h2 class="text-lg md:text-xl font-extrabold text-gray-900 mb-3">${mode === 'admin' ? 'Historial Global de Facturas' : 'Mis Facturas Realizadas'}</h2>
             <div class="glass-card rounded-3xl shadow-xs border border-pink-100 overflow-x-auto">
-              <table class="w-full text-left border-collapse min-w-[650px]">
+              <table class="w-full text-left border-collapse min-w-[700px]">
                 <thead class="bg-pink-50 text-pink-main text-[11px] uppercase font-extrabold">
                   <tr>
-                    <th class="p-3.5">Foto</th>
                     <th class="p-3.5">Fecha</th>
                     <th class="p-3.5">Cliente</th>
-                    <th class="p-3.5">Producto</th>
-                    <th class="p-3.5">Estado</th>
-                    <th class="p-3.5">Total</th>
-                    <th class="p-3.5">Acciones</th>
+                    <th class="p-3.5">Productos Incluidos</th>
+                    <th class="p-3.5">Estado / Abono</th>
+                    <th class="p-3.5">Total Factura</th>
+                    <th class="p-3.5">Enviar / Acciones</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 text-xs md:text-sm">
-                  ${mySales.length === 0 ? '<tr><td colspan="7" class="p-4 text-center text-gray-400">No hay ventas registradas.</td></tr>' : ''}
-                  ${mySales.map(s => `
-                    <tr>
-                      <td class="p-3.5"><img src="${s.productImg || 'https://via.placeholder.com/40'}" class="w-9 h-9 object-cover rounded-xl border bg-gray-50"></td>
-                      <td class="p-3.5 text-xs text-gray-500">${s.date}</td>
-                      <td class="p-3.5 font-bold">${s.clientName || 'Ocasional'}</td>
-                      <td class="p-3.5">${s.product}</td>
-                      <td class="p-3.5"><span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold ${s.status === 'Pagado' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${s.status || 'Pagado'}</span></td>
-                      <td class="p-3.5 text-pink-main font-extrabold">$${Number(s.total || 0).toLocaleString()}</td>
-                      <td class="p-3.5 space-x-1 whitespace-nowrap">
-                        <button onclick="generateReceiptPDF('${s.id}')" class="text-blue-500 hover:text-blue-700 text-xs p-1.5" title="Recibo PDF"><i class="fa-solid fa-file-pdf text-base"></i></button>
-                        <button onclick="sendReceiptWhatsApp('${s.id}')" class="text-green-500 hover:text-green-700 text-xs p-1.5" title="WhatsApp"><i class="fa-brands fa-whatsapp text-base"></i></button>
-                        <button onclick="editSale('${s.id}')" class="text-amber-500 hover:text-amber-700 text-xs p-1.5" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                        <button onclick="deleteSale('${s.id}')" class="text-red-400 hover:text-red-600 text-xs p-1.5" title="Borrar"><i class="fa-solid fa-trash"></i></button>
-                      </td>
-                    </tr>
-                  `).join('')}
+                  ${mySales.length === 0 ? '<tr><td colspan="6" class="p-4 text-center text-gray-400">No hay facturas registradas.</td></tr>' : ''}
+                  ${mySales.map(s => {
+                    const isPaidFull = (s.status === 'Pagado Completo' || s.status === 'Pagado');
+                    const isPartial = (s.status === 'Abono Inicial');
+                    return `
+                      <tr>
+                        <td class="p-3.5 text-xs text-gray-500 whitespace-nowrap">${s.date}</td>
+                        <td class="p-3.5 font-bold text-gray-900">${s.clientName || 'Cliente Ocasional'}</td>
+                        <td class="p-3.5">${formatInvoiceItemsHTML(s)}</td>
+                        <td class="p-3.5">
+                          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold ${isPaidFull ? 'bg-green-100 text-green-700' : (isPartial ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700')}">${s.status || 'Pagado Completo'}</span>
+                          ${isPartial ? `<div class="text-[10px] text-gray-500 mt-1 font-semibold">Abonó: $${Number(s.paidAmount || 0).toLocaleString()} | Debe: <span class="text-red-500 font-bold">$${Number(s.pendingAmount || 0).toLocaleString()}</span></div>` : ''}
+                        </td>
+                        <td class="p-3.5 text-pink-main font-extrabold text-sm md:text-base whitespace-nowrap">$${Number(s.total || 0).toLocaleString()}</td>
+                        <td class="p-3.5 space-x-1 whitespace-nowrap">
+                          <button onclick="sendReceiptWhatsApp('${s.id}')" class="px-2.5 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-[11px] font-bold inline-flex items-center gap-1 shadow-2xs" title="Enviar Factura Completa por WhatsApp">
+                            <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
+                          </button>
+                          <button onclick="generateReceiptPDF('${s.id}')" class="text-blue-500 hover:text-blue-700 text-xs p-1.5" title="Imprimir / PDF"><i class="fa-solid fa-file-pdf text-base"></i></button>
+                          <button onclick="editSale('${s.id}')" class="text-amber-500 hover:text-amber-700 text-xs p-1.5" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                          <button onclick="deleteSale('${s.id}')" class="text-red-400 hover:text-red-600 text-xs p-1.5" title="Borrar"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
                 </tbody>
               </table>
             </div>
@@ -1130,6 +1182,28 @@
         </div>
       `;
       renderPOSCart();
+    }
+
+    function toggleAbonoField() {
+      const status = document.getElementById('posPaymentStatus').value;
+      const abonoBox = document.getElementById('posAbonoContainer');
+      if (!abonoBox) return;
+      if (status === 'Abono Inicial') {
+        abonoBox.classList.remove('hidden');
+        updatePOSBalance();
+      } else {
+        abonoBox.classList.add('hidden');
+      }
+    }
+
+    function updatePOSBalance() {
+      const total = posCart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+      const abonoInput = document.getElementById('posAbonoAmount');
+      const remEl = document.getElementById('posRemainingDebt');
+      if (!abonoInput || !remEl) return;
+      const abono = parseFloat(abonoInput.value) || 0;
+      const remaining = Math.max(0, total - abono);
+      remEl.innerText = `$${remaining.toLocaleString()}`;
     }
 
     function posAddToCart(productId) {
@@ -1166,6 +1240,7 @@
       }
       const total = posCart.reduce((acc, i) => acc + (i.price * i.qty), 0);
       document.getElementById('posTotalText').innerText = `$${total.toLocaleString()}`;
+      updatePOSBalance();
     }
 
     function posRemoveItem(index) {
@@ -1173,54 +1248,141 @@
       renderPOSCart();
     }
 
+    // REGISTRO DE FACTURA UNIFICADA (TODOS LOS PRODUCTOS EN UN MISMO REGISTRO)
     function completePOSSale() {
       if (posCart.length === 0) {
-        alert('Agrega al menos un producto.');
+        alert('Agrega al menos un producto a la factura.');
         return;
       }
-      const clientName = document.getElementById('posClientSelect').value;
-      const status = document.getElementById('posPaymentStatus').value;
 
-      posCart.forEach(item => {
+      const clientId = document.getElementById('posClientSelect').value;
+      const clientObj = clients.find(c => c.id === clientId);
+      const clientName = clientObj ? clientObj.name : 'Cliente Ocasional';
+      const clientPhone = clientObj ? clientObj.phone : '';
+      const status = document.getElementById('posPaymentStatus').value;
+      const totalFactura = posCart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+
+      let abonoInicial = 0;
+      if (status === 'Abono Inicial') {
+        abonoInicial = parseFloat(document.getElementById('posAbonoAmount').value) || 0;
+        if (abonoInicial <= 0) {
+          alert('Ingresa un monto de abono válido mayor a $0, o selecciona la opción "Fiado".');
+          return;
+        }
+        if (abonoInicial >= totalFactura) {
+          alert('El abono cubre el total de la factura. Cambia la modalidad a "Pagado Completo".');
+          return;
+        }
+      }
+
+      if ((status === 'Fiado' || status === 'Abono Inicial') && !clientObj) {
+        alert('Para registrar una factura como Fiado o con Abono Inicial, debes seleccionar un cliente registrado.');
+        return;
+      }
+
+      const pendienteFactura = status === 'Fiado'
+        ? totalFactura
+        : (status === 'Abono Inicial' ? Math.max(0, totalFactura - abonoInicial) : 0);
+
+      const pagadoFactura = status === 'Pagado Completo'
+        ? totalFactura
+        : (status === 'Abono Inicial' ? abonoInicial : 0);
+
+      // Construir el detalle completo de todos los productos de la factura
+      let totalCostoFactura = 0;
+      const itemsDetalle = posCart.map(item => {
         const prodRef = products.find(p => p.id === item.id);
         if (prodRef) prodRef.stock = Math.max(0, prodRef.stock - item.qty);
 
-        const totalItemCost = Number(item.cost || 0) * item.qty;
-        const totalItemPrice = Number(item.price || 0) * item.qty;
-        const utility = totalItemPrice - totalItemCost;
-        const commission = utility > 0 ? utility * 0.35 : 0;
+        const itemCost = Number(item.cost || 0) * item.qty;
+        const itemSubtotal = Number(item.price || 0) * item.qty;
+        totalCostoFactura += itemCost;
 
-        sales.push({
-          id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
-          vendor: currentUser.user,
-          vendorName: currentUser.name || currentUser.user,
-          clientName: clientName,
-          product: `${item.qty}x ${item.name}`,
-          productName: item.name,
+        return {
+          productId: item.id,
+          name: item.name,
           qty: item.qty,
-          unitCost: Number(item.cost || 0),
-          totalCost: totalItemCost,
-          productImg: item.img,
-          total: totalItemPrice,
-          utility: utility,
-          commission: commission,
-          status: status,
-          date: new Date().toLocaleDateString()
-        });
+          price: Number(item.price || 0),
+          cost: Number(item.cost || 0),
+          subtotal: itemSubtotal,
+          img: item.img || ''
+        };
+      });
+
+      const resumenTexto = itemsDetalle.map(i => `${i.qty}x ${i.name}`).join(', ');
+      const utilidadFactura = totalFactura - totalCostoFactura;
+      const comisionFactura = utilidadFactura > 0 ? utilidadFactura * 0.35 : 0;
+      const fechaHoy = new Date().toLocaleDateString();
+
+      // Actualizar deuda e historial del cliente si aplica
+      if (clientObj) {
+        if (!Array.isArray(clientObj.history)) clientObj.history = [];
+
+        if (status === 'Pagado Completo') {
+          clientObj.history.unshift({
+            id: Date.now().toString() + '_h',
+            date: fechaHoy,
+            type: 'Pagó completo',
+            detail: `Factura completa (${resumenTexto})`,
+            amount: totalFactura,
+            balanceAfter: Number(clientObj.debt || 0)
+          });
+        } else if (status === 'Abono Inicial') {
+          clientObj.debt = Number(clientObj.debt || 0) + pendienteFactura;
+          clientObj.history.unshift({
+            id: Date.now().toString() + '_h',
+            date: fechaHoy,
+            type: 'Abonó',
+            detail: `Abono inicial en factura (${resumenTexto}) por $${totalFactura.toLocaleString()}`,
+            amount: abonoInicial,
+            balanceAfter: clientObj.debt
+          });
+        } else if (status === 'Fiado') {
+          clientObj.debt = Number(clientObj.debt || 0) + totalFactura;
+          clientObj.history.unshift({
+            id: Date.now().toString() + '_h',
+            date: fechaHoy,
+            type: 'Fiado',
+            detail: `Factura a crédito (${resumenTexto})`,
+            amount: totalFactura,
+            balanceAfter: clientObj.debt
+          });
+        }
+      }
+
+      // Guardar UNA SOLA FACTURA con todos los productos incluidos
+      sales.unshift({
+        id: Date.now().toString() + '_' + Math.random().toString(36).substr(2, 4),
+        vendor: currentUser.user,
+        vendorName: currentUser.name || currentUser.user,
+        clientId: clientObj ? clientObj.id : '',
+        clientName: clientName,
+        clientPhone: clientPhone,
+        items: itemsDetalle,
+        product: resumenTexto,
+        productImg: itemsDetalle[0] ? itemsDetalle[0].img : '',
+        totalCost: totalCostoFactura,
+        total: totalFactura,
+        paidAmount: pagadoFactura,
+        pendingAmount: pendienteFactura,
+        utility: utilidadFactura,
+        commission: comisionFactura,
+        status: status,
+        date: fechaHoy
       });
 
       posCart = [];
       saveData();
       switchTab(currentUser.role === 'admin' ? 'admin_sales' : 'vendor_inv');
-      showToast('¡Venta registrada con éxito!');
+      showToast('¡Factura completa registrada exitosamente!');
     }
 
     function deleteSale(saleId) {
-      if (confirm('¿Deseas eliminar este registro de venta?')) {
+      if (confirm('¿Deseas eliminar esta factura?')) {
         sales = sales.filter(s => s.id !== saleId);
         saveData();
         switchTab(currentUser.role === 'admin' ? 'admin_sales' : 'vendor_inv');
-        showToast('Venta eliminada.');
+        showToast('Factura eliminada.');
       }
     }
 
@@ -1231,46 +1393,120 @@
       if (nuevoCliente !== null && nuevoCliente.trim() !== "") {
         s.clientName = nuevoCliente.trim();
       }
-      const nuevoEstado = prompt("Actualizar estado de pago (Pagado / Fiado / Queda debiendo):", s.status || "Pagado");
+      const nuevoEstado = prompt("Actualizar estado de pago (Pagado Completo / Abono Inicial / Fiado):", s.status || "Pagado Completo");
       if (nuevoEstado !== null && nuevoEstado.trim() !== "") {
         s.status = nuevoEstado.trim();
       }
       saveData();
       switchTab(currentUser.role === 'admin' ? 'admin_sales' : 'vendor_inv');
-      showToast('Venta actualizada.');
+      showToast('Factura actualizada.');
     }
 
+    // RECIBO PDF COMPLETO CON TODOS LOS PRODUCTOS DE LA FACTURA
     function generateReceiptPDF(saleId) {
       const s = sales.find(x => x.id === saleId);
       if (!s) return;
+      const isPartial = s.status === 'Abono Inicial';
+      const isFiado = s.status === 'Fiado';
+
+      let rowsHTML = '';
+      if (Array.isArray(s.items) && s.items.length > 0) {
+        rowsHTML = s.items.map(it => `
+          <tr>
+            <td style="padding: 6px 0; border-bottom: 1px solid #f3f4f6;">${it.qty}x ${it.name}</td>
+            <td style="padding: 6px 0; text-align: right; border-bottom: 1px solid #f3f4f6;">$${Number(it.subtotal || (it.price * it.qty)).toLocaleString()}</td>
+          </tr>
+        `).join('');
+      } else {
+        rowsHTML = `
+          <tr>
+            <td style="padding: 6px 0; border-bottom: 1px solid #f3f4f6;">${s.product}</td>
+            <td style="padding: 6px 0; text-align: right; border-bottom: 1px solid #f3f4f6;">$${Number(s.total || 0).toLocaleString()}</td>
+          </tr>
+        `;
+      }
+
       const receiptHTML = `
-        <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 400px; margin: auto; border: 1px solid #ddd; border-radius: 10px;">
-          <h2 style="text-align: center; color: #ff00bf;">JEMA_MAKEUP</h2>
-          <p style="text-align: center; font-size: 12px; color: #777;">Comprobante de Venta</p>
-          <hr style="border: 0; border-top: 1px dashed #eee;" />
-          <p><strong>Fecha:</strong> ${s.date}</p>
-          <p><strong>Cliente:</strong> ${s.clientName || 'Ocasional'}</p>
-          <p><strong>Vendedora:</strong> ${s.vendor}</p>
-          <p><strong>Estado:</strong> ${s.status || 'Pagado'}</p>
-          <hr style="border: 0; border-top: 1px dashed #eee;" />
-          <p><strong>Producto:</strong> ${s.product}</p>
-          <p style="font-size: 16px; font-weight: bold; color: #ff00bf;">Total: $${Number(s.total || 0).toLocaleString()}</p>
-          <hr style="border: 0; border-top: 1px dashed #eee;" />
-          <p style="text-align: center; font-size: 10px; color: #aaa;">¡Gracias por tu compra en Jema_makeup!</p>
+        <div style="font-family: Arial, sans-serif; padding: 24px; max-width: 420px; margin: auto; border: 1px solid #f9a8d4; border-radius: 14px;">
+          <h2 style="text-align: center; color: #ff00bf; margin-bottom: 4px;">JEMA_MAKEUP</h2>
+          <p style="text-align: center; font-size: 12px; color: #777; margin-top: 0;">Factura Detallada de Venta</p>
+          <hr style="border: 0; border-top: 1px dashed #ddd;" />
+          <p style="font-size: 13px; margin: 4px 0;"><strong>Fecha:</strong> ${s.date}</p>
+          <p style="font-size: 13px; margin: 4px 0;"><strong>Cliente:</strong> ${s.clientName || 'Cliente Ocasional'}</p>
+          <p style="font-size: 13px; margin: 4px 0;"><strong>Asesora:</strong> ${s.vendorName || s.vendor}</p>
+          <p style="font-size: 13px; margin: 4px 0;"><strong>Estado:</strong> ${s.status || 'Pagado Completo'}</p>
+          <hr style="border: 0; border-top: 1px dashed #ddd;" />
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin: 8px 0;">
+            <thead>
+              <tr style="color: #ff00bf; text-align: left;">
+                <th style="padding-bottom: 6px;">Producto</th>
+                <th style="padding-bottom: 6px; text-align: right;">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHTML}
+            </tbody>
+          </table>
+          <p style="font-size: 17px; font-weight: bold; color: #ff00bf; text-align: right; margin-top: 12px;">Total Factura: $${Number(s.total || 0).toLocaleString()}</p>
+          ${isPartial ? `<p style="font-size: 13px; color: #15803d; text-align: right; margin: 4px 0;"><strong>Abonado:</strong> $${Number(s.paidAmount || 0).toLocaleString()}</p><p style="font-size: 13px; color: #dc2626; text-align: right; margin: 4px 0;"><strong>Saldo Pendiente:</strong> $${Number(s.pendingAmount || 0).toLocaleString()}</p>` : ''}
+          ${isFiado ? `<p style="font-size: 13px; color: #dc2626; text-align: right; margin: 4px 0;"><strong>Saldo Pendiente (Fiado):</strong> $${Number(s.total || 0).toLocaleString()}</p>` : ''}
+          <hr style="border: 0; border-top: 1px dashed #ddd; margin-top: 14px;" />
+          <p style="text-align: center; font-size: 11px; color: #999;">¡Gracias por tu compra en Jema_makeup! 💖</p>
         </div>
       `;
-      const win = window.open('', '_print', 'width=500,height=600');
+      const win = window.open('', '_print', 'width=500,height=650');
       win.document.write(receiptHTML);
       win.document.close();
       win.focus();
       setTimeout(() => win.print(), 500);
     }
 
+    // ENVÍO DE FACTURA COMPLETA POR WHATSAPP (TODOS LOS PRODUCTOS + TOTAL + ABONO/SALDO)
     function sendReceiptWhatsApp(saleId) {
       const s = sales.find(x => x.id === saleId);
       if (!s) return;
-      const text = `✨ *Comprobante Jema_makeup* ✨\n\n- Cliente: ${s.clientName}\n- Producto: ${s.product}\n- Total: $${Number(s.total || 0).toLocaleString()}\n- Estado: ${s.status}\n\n¡Gracias por tu compra! 💖`;
-      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+
+      const isPartial = s.status === 'Abono Inicial';
+      const isFiado = s.status === 'Fiado';
+
+      let text = `✨ *FACTURA JEMA_MAKEUP* ✨\n`;
+      text += `📅 *Fecha:* ${s.date}\n`;
+      text += `👤 *Cliente:* ${s.clientName || 'Cliente Ocasional'}\n`;
+      text += `💄 *Asesora:* ${s.vendorName || s.vendor}\n\n`;
+      text += `🛍️ *Detalle de Productos:*\n`;
+
+      if (Array.isArray(s.items) && s.items.length > 0) {
+        s.items.forEach(it => {
+          text += `• ${it.qty}x ${it.name} — $${Number(it.subtotal || (it.price * it.qty)).toLocaleString()}\n`;
+        });
+      } else {
+        text += `• ${s.product} — $${Number(s.total || 0).toLocaleString()}\n`;
+      }
+
+      text += `\n💰 *TOTAL FACTURA:* $${Number(s.total || 0).toLocaleString()}`;
+      text += `\n📌 *Estado:* ${s.status || 'Pagado Completo'}`;
+
+      if (isPartial) {
+        text += `\n✅ *Abonado:* $${Number(s.paidAmount || 0).toLocaleString()}`;
+        text += `\n⏳ *Saldo Pendiente:* $${Number(s.pendingAmount || 0).toLocaleString()}`;
+      } else if (isFiado) {
+        text += `\n⏳ *Saldo Pendiente:* $${Number(s.total || 0).toLocaleString()}`;
+      }
+
+      text += `\n\n¡Gracias por confiar en Jema_makeup! 💖`;
+
+      // Si el cliente tiene celular guardado, abrir directamente su chat de WhatsApp
+      const clientObj = clients.find(c => c.id === s.clientId || (c.name || '').toLowerCase() === (s.clientName || '').toLowerCase());
+      let rawPhone = (s.clientPhone || (clientObj ? clientObj.phone : '') || '').replace(/\D/g, '');
+      if (rawPhone.length === 10 && rawPhone.startsWith('3')) {
+        rawPhone = '57' + rawPhone;
+      }
+
+      const waUrl = rawPhone
+        ? `https://wa.me/${rawPhone}?text=${encodeURIComponent(text)}`
+        : `https://wa.me/?text=${encodeURIComponent(text)}`;
+
+      window.open(waUrl, '_blank');
     }
 
     // DASHBOARD ADMIN, RANKING Y FILTRO DETALLADO POR VENDEDOR
@@ -1326,7 +1562,7 @@
                       <span class="text-[11px] font-bold text-pink-main underline">Ver detalle <i class="fa-solid fa-arrow-right"></i></span>
                     </div>
                     <h4 class="font-extrabold text-gray-900 text-base md:text-xl mt-2.5">${v.name}</h4>
-                    <p class="text-[11px] text-gray-500 mt-0.5">${vSales.length} ventas realizadas</p>
+                    <p class="text-[11px] text-gray-500 mt-0.5">${vSales.length} facturas realizadas</p>
                     <p class="text-gray-900 font-extrabold text-base md:text-lg mt-2.5">Ventas: $${totalV.toLocaleString()}</p>
                     <p class="text-green-600 font-bold text-xs">Comisión (35% util): $${totalCommission.toLocaleString()}</p>
                   </div>
@@ -1339,7 +1575,7 @@
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-pink-100 pb-4">
               <div>
                 <span class="text-[11px] font-bold text-pink-main uppercase tracking-wider block">Auditoría Financiera Privada</span>
-                <h3 class="text-base md:text-xl font-extrabold text-gray-900">Detalle de Ventas y Utilidades</h3>
+                <h3 class="text-base md:text-xl font-extrabold text-gray-900">Detalle de Facturas y Utilidades</h3>
               </div>
               <div class="w-full md:w-72">
                 <select onchange="filterAnalyticsByVendor(this.value)" class="w-full px-4 py-2.5 rounded-2xl border-2 border-pink-200 text-xs md:text-sm bg-white font-bold text-pink-main focus:outline-none focus:border-[#ff00bf]">
@@ -1377,24 +1613,26 @@
                     <th class="p-3.5">Fecha</th>
                     <th class="p-3.5">Vendedor</th>
                     <th class="p-3.5">Cliente</th>
-                    <th class="p-3.5">Producto</th>
+                    <th class="p-3.5">Productos</th>
                     <th class="p-3.5">Total</th>
                     <th class="p-3.5">Utilidad</th>
                     <th class="p-3.5">Estado</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 text-xs md:text-sm bg-white">
-                  ${filteredSales.length === 0 ? '<tr><td colspan="7" class="p-4 text-center text-gray-400">Sin ventas registradas.</td></tr>' : ''}
+                  ${filteredSales.length === 0 ? '<tr><td colspan="7" class="p-4 text-center text-gray-400">Sin facturas registradas.</td></tr>' : ''}
                   ${filteredSales.map(s => {
+                    const isPaidFull = (s.status === 'Pagado Completo' || s.status === 'Pagado');
+                    const isPartial = (s.status === 'Abono Inicial');
                     return `
                       <tr>
                         <td class="p-3.5 text-xs text-gray-500">${s.date}</td>
                         <td class="p-3.5 font-bold text-pink-main">${s.vendorName || s.vendor}</td>
                         <td class="p-3.5 font-semibold text-gray-800">${s.clientName || 'Ocasional'}</td>
-                        <td class="p-3.5">${s.product}</td>
+                        <td class="p-3.5">${formatInvoiceItemsHTML(s)}</td>
                         <td class="p-3.5 font-extrabold text-gray-900">$${Number(s.total || 0).toLocaleString()}</td>
                         <td class="p-3.5 font-extrabold text-green-600">$${Number(s.utility || 0).toLocaleString()}</td>
-                        <td class="p-3.5"><span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold ${s.status === 'Pagado' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${s.status || 'Pagado'}</span></td>
+                        <td class="p-3.5"><span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold ${isPaidFull ? 'bg-green-100 text-green-700' : (isPartial ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700')}">${s.status || 'Pagado Completo'}</span></td>
                       </tr>
                     `;
                   }).join('')}
@@ -1457,7 +1695,7 @@
       }
     }
 
-    // CLIENTES (AISLADOS POR VENDEDORA, GLOBAL SOLO PARA ADMIN)
+    // CLIENTES CON ESTADO DE PAGO / ABONOS Y ENVÍO COMPLETO DE FACTURAS POR WHATSAPP
     function renderClientsTab(container) {
       const isAdmin = currentUser.role === 'admin';
       const visibleClients = getVisibleClients();
@@ -1468,76 +1706,159 @@
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
               <h2 class="text-xl md:text-2xl font-extrabold text-gray-900">${isAdmin ? 'Base de Clientes & Abonos' : 'Mis Clientes & Abonos'}</h2>
-              <p class="text-xs text-gray-500 mt-0.5">${isAdmin ? 'Visualizando todos los clientes registrados en el sistema.' : 'Aquí solo aparecen tus clientes personales y tus ventas.'}</p>
+              <p class="text-xs text-gray-500 mt-0.5">${isAdmin ? 'Visualizando todos los clientes registrados en el sistema.' : 'Control de saldos, abonos y facturas completas de tus clientes.'}</p>
             </div>
             <button onclick="openClientModal()" class="w-full sm:w-auto px-5 py-2.5 btn-lux rounded-2xl text-xs font-bold shadow-md">+ Registrar Cliente</button>
           </div>
 
           <div class="glass-card rounded-3xl shadow-xs border border-pink-100 overflow-x-auto">
-            <table class="w-full text-left border-collapse min-w-[600px]">
+            <table class="w-full text-left border-collapse min-w-[700px]">
               <thead class="bg-pink-50 text-pink-main text-[11px] uppercase font-extrabold">
                 <tr>
                   <th class="p-3.5 md:p-4">Nombre</th>
                   <th class="p-3.5 md:p-4">Celular</th>
                   ${isAdmin ? '<th class="p-3.5 md:p-4">Asesora</th>' : ''}
+                  <th class="p-3.5 md:p-4">Estado de Cuenta</th>
                   <th class="p-3.5 md:p-4">Deuda Pendiente</th>
-                  <th class="p-3.5 md:p-4">Acción Abono</th>
+                  <th class="p-3.5 md:p-4">Pagos / Abonos</th>
                   <th class="p-3.5 md:p-4">Editar / Eliminar</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-100 text-xs md:text-sm">
-                ${visibleClients.length === 0 ? `<tr><td colspan="${isAdmin ? '6' : '5'}" class="p-5 text-center text-gray-400">Aún no tienes clientes registrados en tu lista personal.</td></tr>` : ''}
-                ${visibleClients.map(c => `
-                  <tr>
-                    <td class="p-3.5 md:p-4 font-bold text-gray-900">${c.name}</td>
-                    <td class="p-3.5 md:p-4">${c.phone}</td>
-                    ${isAdmin ? `<td class="p-3.5 md:p-4"><span class="px-2.5 py-0.5 bg-pink-50 text-pink-main rounded-full text-[11px] font-bold">${c.ownerName || c.owner || 'Mari'}</span></td>` : ''}
-                    <td class="p-3.5 md:p-4 text-red-500 font-extrabold">$${Number(c.debt || 0).toLocaleString()}</td>
-                    <td class="p-3.5 md:p-4">
-                      <button onclick="openAbonoModal('${c.id}')" class="px-3 py-1.5 bg-green-100 text-green-700 font-bold text-[11px] rounded-xl hover:bg-green-200 transition">Abono</button>
-                    </td>
-                    <td class="p-3.5 md:p-4 space-x-1 whitespace-nowrap">
-                      <button onclick="editClient('${c.id}')" class="text-blue-500 hover:text-blue-700 p-2 rounded-xl transition" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                      <button onclick="deleteClient('${c.id}')" class="text-red-400 hover:text-red-600 p-2 rounded-xl transition" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                  </tr>
-                `).join('')}
+                ${visibleClients.length === 0 ? `<tr><td colspan="${isAdmin ? '7' : '6'}" class="p-5 text-center text-gray-400">Aún no tienes clientes registrados en tu lista personal.</td></tr>` : ''}
+                ${visibleClients.map(c => {
+                  const debtVal = Number(c.debt || 0);
+                  const historyArr = Array.isArray(c.history) ? c.history : [];
+                  const lastMove = historyArr.length > 0 ? historyArr[0] : null;
+
+                  return `
+                    <tr>
+                      <td class="p-3.5 md:p-4 font-bold text-gray-900">${c.name}</td>
+                      <td class="p-3.5 md:p-4">${c.phone}</td>
+                      ${isAdmin ? `<td class="p-3.5 md:p-4"><span class="px-2.5 py-0.5 bg-pink-50 text-pink-main rounded-full text-[11px] font-bold">${c.ownerName || c.owner || 'Mari'}</span></td>` : ''}
+                      <td class="p-3.5 md:p-4">
+                        ${debtVal <= 0
+                          ? '<span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-green-100 text-green-700"><i class="fa-solid fa-check mr-1"></i>Pagó completo / Al día</span>'
+                          : `<span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-amber-100 text-amber-800"><i class="fa-solid fa-clock mr-1"></i>${lastMove && lastMove.type === 'Abonó' ? 'Abonó (Con saldo)' : 'Debe saldo'}</span>`
+                        }
+                        ${lastMove ? `<div class="text-[10px] text-gray-500 mt-1">Último: <strong>${lastMove.type}</strong> $${Number(lastMove.amount || 0).toLocaleString()} (${lastMove.date})</div>` : ''}
+                      </td>
+                      <td class="p-3.5 md:p-4 ${debtVal > 0 ? 'text-red-500' : 'text-green-600'} font-extrabold">$${debtVal.toLocaleString()}</td>
+                      <td class="p-3.5 md:p-4 whitespace-nowrap space-x-1">
+                        <button onclick="openAbonoModal('${c.id}')" class="px-3 py-1.5 bg-green-100 text-green-700 font-bold text-[11px] rounded-xl hover:bg-green-200 transition">Abonar</button>
+                        <button onclick="openClientHistoryModal('${c.id}')" class="px-3 py-1.5 bg-pink-50 text-pink-main font-bold text-[11px] rounded-xl hover:bg-pink-100 transition border border-pink-200">Historial (${historyArr.length})</button>
+                      </td>
+                      <td class="p-3.5 md:p-4 space-x-1 whitespace-nowrap">
+                        <button onclick="editClient('${c.id}')" class="text-blue-500 hover:text-blue-700 p-2 rounded-xl transition" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteClient('${c.id}')" class="text-red-400 hover:text-red-600 p-2 rounded-xl transition" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
               </tbody>
             </table>
           </div>
 
           <div class="pt-4">
-            <h2 class="text-lg md:text-xl font-extrabold text-gray-900 mb-3">${isAdmin ? 'Todas las Facturas Registradas' : 'Mis Facturas y Ventas'}</h2>
+            <h2 class="text-lg md:text-xl font-extrabold text-gray-900 mb-3">${isAdmin ? 'Todas las Facturas Registradas' : 'Mis Facturas Completas'}</h2>
             <div class="glass-card rounded-3xl shadow-xs border border-pink-100 overflow-x-auto">
-              <table class="w-full text-left border-collapse min-w-[600px]">
+              <table class="w-full text-left border-collapse min-w-[720px]">
                 <thead class="bg-pink-50 text-pink-main text-[11px] uppercase font-extrabold">
                   <tr>
                     <th class="p-3.5">Fecha</th>
                     <th class="p-3.5">Cliente</th>
                     ${isAdmin ? '<th class="p-3.5">Asesora</th>' : ''}
-                    <th class="p-3.5">Producto</th>
-                    <th class="p-3.5">Estado</th>
+                    <th class="p-3.5">Productos de la Factura</th>
+                    <th class="p-3.5">Modalidad / Abono</th>
                     <th class="p-3.5">Total</th>
+                    <th class="p-3.5">Enviar Factura</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 text-xs md:text-sm">
-                  ${visibleSales.length === 0 ? `<tr><td colspan="${isAdmin ? '6' : '5'}" class="p-4 text-center text-gray-400">No tienes facturas registradas aún.</td></tr>` : ''}
-                  ${visibleSales.map(s => `
-                    <tr>
-                      <td class="p-3.5 text-xs">${s.date}</td>
-                      <td class="p-3.5 font-bold text-gray-900">${s.clientName || 'Cliente Ocasional'}</td>
-                      ${isAdmin ? `<td class="p-3.5 text-pink-main font-semibold">${s.vendorName || s.vendor}</td>` : ''}
-                      <td class="p-3.5">${s.product}</td>
-                      <td class="p-3.5"><span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold ${s.status === 'Pagado' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${s.status || 'Pagado'}</span></td>
-                      <td class="p-3.5 text-pink-main font-extrabold">$${Number(s.total || 0).toLocaleString()}</td>
-                    </tr>
-                  `).join('')}
+                  ${visibleSales.length === 0 ? `<tr><td colspan="${isAdmin ? '7' : '6'}" class="p-4 text-center text-gray-400">No tienes facturas registradas aún.</td></tr>` : ''}
+                  ${visibleSales.map(s => {
+                    const isPaidFull = (s.status === 'Pagado Completo' || s.status === 'Pagado');
+                    const isPartial = (s.status === 'Abono Inicial');
+                    return `
+                      <tr>
+                        <td class="p-3.5 text-xs whitespace-nowrap">${s.date}</td>
+                        <td class="p-3.5 font-bold text-gray-900">${s.clientName || 'Cliente Ocasional'}</td>
+                        ${isAdmin ? `<td class="p-3.5 text-pink-main font-semibold">${s.vendorName || s.vendor}</td>` : ''}
+                        <td class="p-3.5">${formatInvoiceItemsHTML(s)}</td>
+                        <td class="p-3.5">
+                          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold ${isPaidFull ? 'bg-green-100 text-green-700' : (isPartial ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700')}">${s.status || 'Pagado Completo'}</span>
+                          ${isPartial ? `<div class="text-[10px] text-gray-500 mt-0.5">Abonó: $${Number(s.paidAmount || 0).toLocaleString()} | Debe: $${Number(s.pendingAmount || 0).toLocaleString()}</div>` : ''}
+                        </td>
+                        <td class="p-3.5 text-pink-main font-extrabold whitespace-nowrap">$${Number(s.total || 0).toLocaleString()}</td>
+                        <td class="p-3.5 whitespace-nowrap space-x-1">
+                          <button onclick="sendReceiptWhatsApp('${s.id}')" class="px-2.5 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-[11px] font-bold inline-flex items-center gap-1 shadow-2xs" title="Enviar Factura Completa por WhatsApp">
+                            <i class="fa-brands fa-whatsapp text-sm"></i> Enviar
+                          </button>
+                          <button onclick="generateReceiptPDF('${s.id}')" class="text-blue-500 hover:text-blue-700 p-1.5" title="Ver / Imprimir PDF"><i class="fa-solid fa-file-pdf text-base"></i></button>
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
                 </tbody>
               </table>
             </div>
           </div>
         </div>
       `;
+    }
+
+    function openClientHistoryModal(clientId) {
+      const c = clients.find(x => x.id === clientId);
+      if (!c) return;
+      const debtVal = Number(c.debt || 0);
+      const historyArr = Array.isArray(c.history) ? c.history : [];
+
+      document.getElementById('historyClientTitle').innerText = c.name;
+      document.getElementById('historyClientSubtitle').innerText = `Celular: ${c.phone}`;
+
+      document.getElementById('clientHistorySummary').innerHTML = `
+        <div class="p-3.5 rounded-2xl border ${debtVal > 0 ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'} flex justify-between items-center">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider ${debtVal > 0 ? 'text-red-600' : 'text-green-700'} block">Estado Actual</span>
+            <span class="text-sm font-extrabold ${debtVal > 0 ? 'text-red-700' : 'text-green-800'}">${debtVal > 0 ? 'Debe saldo pendiente' : 'Pagó completo / Al día'}</span>
+          </div>
+          <div class="text-right">
+            <span class="text-[10px] font-bold text-gray-500 uppercase block">Deuda Total</span>
+            <span class="text-base font-extrabold ${debtVal > 0 ? 'text-red-600' : 'text-green-600'}">$${debtVal.toLocaleString()}</span>
+          </div>
+        </div>
+      `;
+
+      const listEl = document.getElementById('clientHistoryList');
+      if (historyArr.length === 0) {
+        listEl.innerHTML = '<p class="text-center text-gray-400 text-xs py-6">Aún no hay movimientos de pagos o abonos registrados para este cliente.</p>';
+      } else {
+        listEl.innerHTML = historyArr.map(h => {
+          const isFull = h.type === 'Pagó completo';
+          const isAbono = h.type === 'Abonó';
+          return `
+            <div class="p-3 rounded-2xl border border-gray-100 bg-gray-50/70 flex justify-between items-start gap-2">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${isFull ? 'bg-green-100 text-green-700' : (isAbono ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-800')}">${h.type}</span>
+                  <span class="text-[10px] text-gray-400 font-semibold">${h.date}</span>
+                </div>
+                <p class="text-xs text-gray-700 font-semibold mt-1">${h.detail}</p>
+              </div>
+              <div class="text-right flex-shrink-0">
+                <span class="text-xs font-extrabold ${isFull || isAbono ? 'text-green-600' : 'text-amber-700'} block">$${Number(h.amount || 0).toLocaleString()}</span>
+                <span class="text-[10px] text-gray-500 block">Saldo: $${Number(h.balanceAfter || 0).toLocaleString()}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('clientHistoryModal').classList.remove('hidden');
+    }
+
+    function closeClientHistoryModal() {
+      document.getElementById('clientHistoryModal').classList.add('hidden');
     }
 
     function openClientModal(client = null) {
@@ -1596,7 +1917,8 @@
           phone,
           debt: 0,
           owner: currentUser.user,
-          ownerName: currentUser.name || currentUser.user
+          ownerName: currentUser.name || currentUser.user,
+          history: []
         });
       }
       saveData();
@@ -1608,13 +1930,29 @@
     function openAbonoModal(clientId) {
       const c = clients.find(x => x.id === clientId);
       if (!c) return;
-      const montoStr = prompt(`Registrar abono para ${c.name}. Deuda actual: $${Number(c.debt || 0).toLocaleString()}\nIngrese cantidad:`);
+      const currentDebt = Number(c.debt || 0);
+      if (currentDebt <= 0) {
+        alert(`${c.name} ya se encuentra al día ($0 de deuda).`);
+        return;
+      }
+      const montoStr = prompt(`Registrar pago o abono para ${c.name}.\nDeuda actual: $${currentDebt.toLocaleString()}\n\nIngrese cantidad que entrega hoy:`);
       const monto = parseFloat(montoStr);
       if (!isNaN(monto) && monto > 0) {
-        c.debt = Math.max(0, Number(c.debt || 0) - monto);
+        const newDebt = Math.max(0, currentDebt - monto);
+        c.debt = newDebt;
+        if (!Array.isArray(c.history)) c.history = [];
+        const moveType = newDebt === 0 ? 'Pagó completo' : 'Abonó';
+        c.history.unshift({
+          id: Date.now().toString() + '_ab',
+          date: new Date().toLocaleDateString(),
+          type: moveType,
+          detail: newDebt === 0 ? 'Canceló la totalidad de su deuda pendiente' : 'Abono registrado a deuda pendiente',
+          amount: monto,
+          balanceAfter: newDebt
+        });
         saveData();
         renderClientsTab(document.getElementById('mainContent'));
-        showToast(`¡Abono registrado! Nuevo saldo: $${c.debt.toLocaleString()}`);
+        showToast(newDebt === 0 ? `¡${c.name} pagó completo su deuda!` : `¡Abono registrado! Nuevo saldo: $${newDebt.toLocaleString()}`);
       }
     }
 
